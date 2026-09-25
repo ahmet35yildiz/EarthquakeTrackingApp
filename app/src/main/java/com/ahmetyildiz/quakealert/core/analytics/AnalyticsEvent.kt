@@ -77,9 +77,14 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
     data class EarthquakeListViewed(
         val regionFilter: RegionFilterValue,
         val magnitudeFilter: MagnitudeFilterValue,
+        val sortOrder: SortOrderValue,
     ) : AnalyticsEvent(
         name = "earthquake_list_viewed",
-        params = mapOf("region_filter" to regionFilter.paramValue, "magnitude_filter" to magnitudeFilter.paramValue),
+        params = mapOf(
+            "region_filter" to regionFilter.paramValue,
+            "magnitude_filter" to magnitudeFilter.paramValue,
+            "sort" to sortOrder.paramValue,
+        ),
     )
 
     data class EarthquakeListRefreshed(
@@ -105,6 +110,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("filter" to "magnitude", "value" to value.paramValue),
     )
 
+    data class ListSortChanged(val sortOrder: SortOrderValue) : AnalyticsEvent(
+        name = "list_sort_changed",
+        params = mapOf("sort" to sortOrder.paramValue),
+    )
+
     data class EarthquakeDetailViewed(val source: DetailSource, val magnitude: Double?) : AnalyticsEvent(
         name = "earthquake_detail_viewed",
         params = buildMap {
@@ -120,7 +130,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
 
     data class AlertNotificationPosted(val eventId: String, val magnitude: Double, val batchSize: Int) : AnalyticsEvent(
         name = "alert_notification_posted",
-        params = mapOf("event_id" to eventId, "magnitude" to magnitude.toString(), "batch_size" to batchSize.toString()),
+        params = mapOf(
+            "event_id" to eventId,
+            "magnitude" to magnitude.toString(),
+            "batch_size" to batchSize.toString(),
+        ),
     )
 
     data class AlertNotificationSuppressed(val reason: SuppressionReason) : AnalyticsEvent(

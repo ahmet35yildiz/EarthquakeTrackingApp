@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSettingsScreen
-import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeListScreen
+import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeListRoute
 import com.ahmetyildiz.quakealert.features.settings.presentation.screen.SettingsScreen
 
 @Composable
@@ -21,7 +21,7 @@ fun QuakeAlertNavHost(
         startDestination = EarthquakesRoute,
         modifier = modifier,
     ) {
-        composable<EarthquakesRoute> { EarthquakeListScreen() }
+        composable<EarthquakesRoute> { EarthquakeListRoute(onEarthquakeClick = {}) }
         composable<AlertsRoute> { AlertSettingsScreen() }
         composable<SettingsRoute> { SettingsScreen() }
     }

@@ -80,7 +80,10 @@ publication delay + background check interval). The app says this explicitly in 
   `All (2.5+) | ≥ my threshold`.
 - Item: magnitude badge (colour by severity), place, relative time ("12 min ago"), depth, distance to the user's
   city when an area is set.
-- Sorted by time, newest first. `LazyColumn` with stable keys (event id).
+- Sort order (menu next to the count, always visible): `Newest first` (default) | `Largest first` (unknown
+  magnitudes last) | `Nearest first` (only when an area is set). Ties are broken by time, newest first. Changing the
+  sort or a filter scrolls back to the top; rotation keeps the position. `LazyColumn` with stable keys (event id).
+- The whole cached period is one list (no paging); see ADR-023.
 - Refresh: on first open and when the cache is older than 5 min; pull-to-refresh anytime.
 - States: loading (first load), content, empty (with explanation for active filters), error with retry, offline
   banner "Showing data from <time>" when refresh fails but a cache exists.

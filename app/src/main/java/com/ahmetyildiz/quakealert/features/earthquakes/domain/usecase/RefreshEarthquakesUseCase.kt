@@ -15,13 +15,13 @@ class RefreshEarthquakesUseCase @Inject constructor(
     private val clock: Clock,
 ) {
 
-    suspend operator fun invoke(): AppResult<Unit> {
+    suspend operator fun invoke(): AppResult<Int> {
         val now: Instant = clock.now()
         val query = EarthquakeQuery(
             startTime = now.minus(EarthquakesConfig.RECENT_PERIOD),
             minMagnitude = EarthquakesConfig.RECENT_MIN_MAGNITUDE,
         )
-        val result: AppResult<Unit> = earthquakeRepository.refreshCache(query)
+        val result: AppResult<Int> = earthquakeRepository.refreshCache(query)
         if (result is AppResult.Success) userPreferencesRepository.setLastRefreshedAt(now)
         return result
     }

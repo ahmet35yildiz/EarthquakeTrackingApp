@@ -82,9 +82,13 @@ class AnalyticsEventTest {
                 "reason" to "unavailable",
             ),
             entry(
-                AnalyticsEvent.EarthquakeListViewed(RegionFilterValue.NEAR_CITY, MagnitudeFilterValue.ABOVE_THRESHOLD),
+                AnalyticsEvent.EarthquakeListViewed(
+                    RegionFilterValue.NEAR_CITY,
+                    MagnitudeFilterValue.ABOVE_THRESHOLD,
+                    SortOrderValue.NEAREST_FIRST,
+                ),
                 "earthquake_list_viewed",
-                "region_filter" to "near_city", "magnitude_filter" to "above_threshold",
+                "region_filter" to "near_city", "magnitude_filter" to "above_threshold", "sort" to "nearest_first",
             ),
             entry(
                 AnalyticsEvent.EarthquakeListRefreshed(RefreshTrigger.PULL, isSuccessful = false, count = 372),
@@ -100,6 +104,11 @@ class AnalyticsEventTest {
                 AnalyticsEvent.MagnitudeFilterChanged(MagnitudeFilterValue.ALL),
                 "list_filter_changed",
                 "filter" to "magnitude", "value" to "all",
+            ),
+            entry(
+                AnalyticsEvent.ListSortChanged(SortOrderValue.LARGEST_FIRST),
+                "list_sort_changed",
+                "sort" to "largest_first",
             ),
             entry(
                 AnalyticsEvent.EarthquakeDetailViewed(DetailSource.LIST, magnitude = 5.3),

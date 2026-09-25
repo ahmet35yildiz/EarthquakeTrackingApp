@@ -87,11 +87,21 @@ EarthquakeListScreen ─▶ EarthquakeListViewModel
   not written to the cache, which always mirrors the last list refresh.
 - Features that are not earthquakes or lack valid coordinates/depth are dropped while mapping.
 - Filters and distances are computed in the domain layer (haversine) on the cached list:
-  `ObserveRecentEarthquakesUseCase(filters)` combines the cache with the user preferences and returns
-  `RecentEarthquakes` (filtered items with distance, applied filters, cached count, area, threshold, last refresh).
-  "Near city" without an area falls back to the whole world and is reported as such in `appliedFilters`.
+  `ObserveRecentEarthquakesUseCase(options)` combines the cache with the user preferences and returns
+  `RecentEarthquakes` (filtered and sorted items with distance, applied options, cached count, area, threshold, last
+  refresh). `EarthquakeListOptions` = region filter + magnitude filter + sort order. "Near city" and "nearest first"
+  without an area fall back to world / newest first and are reported as such in `appliedOptions`.
+- The mapping, filtering, distance and sorting run on the injected `@DefaultDispatcher` (`flowOn`), never on the main
+  thread. The full period is kept as one in-memory list without paging (ADR-023).
 - `CheckCacheFreshnessUseCase` → `MISSING` (never refreshed) / `STALE` (older than 5 min) / `FRESH`; the list uses it to
   decide on an initial or stale refresh. Product values live in `EarthquakesConfig`.
+- The screen calls `onScreenStarted()` / `onScreenStopped(isConfigurationChange)` from a `LifecycleStartEffect`: each
+  start checks freshness; a restart caused by rotation or a language switch is not logged as a new view.
+- `EarthquakeListUiState.content` = `LOADING` | `ERROR` | `EMPTY` | `EMPTY_FILTERED` | `ITEMS`, derived in the ViewModel
+  from the cache size, the filtered list and the last refresh result; the stale-data banner and the filter chips sit
+  above the list (not inside it), together with the count + sort menu, so they are always visible. The list state is
+  keyed on the options (`rememberSaveable(options)`): a new sort or filter starts at the top, rotation keeps the
+  position.
 
 ### 4.2 Background alert check
 ```
@@ -158,7 +168,10 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
   spacing tokens (`Spacing`) in `core/ui/theme`; values come from the UI design (ADR-018).
 - Magnitude severity colours as an extended theme token set (`LocalSeverityColors`, read via
   `QuakeAlertTheme.severityColors`): < 4, 4–5, 5–6, 6–7, ≥ 7. The bands live in `core/model/MagnitudeSeverity`.
-- Shared state composables: `LoadingState`, `EmptyState`, `ErrorState`, `OfflineBanner`, `MagnitudeBadge`.
+- Shared state composables: `LoadingState`, `EmptyState`, `ErrorState`, `StaleDataBanner` (offline or failed refresh
+  over cached data), `MagnitudeBadge`. `EmptyState`/`ErrorState` scroll themselves: never place them inside a lazy list.
+- Formatting (`core/ui/format`): relative times from `core/time/RelativeTime` with plural resources (not `DateUtils`,
+  which ignores the in-app language), numbers and dates with `LocalLocale`, a once-per-minute `rememberCurrentTime()`.
 - Icons: `material-icons-core` (`Icons.Rounded.*`); icons it lacks, and the bottom-bar icons (outlined/filled pairs),
   are Material Symbols Rounded vector drawables (ADR-016).
 - Edge-to-edge, custom adaptive launcher icon, `contentDescription` on all meaningful icons.

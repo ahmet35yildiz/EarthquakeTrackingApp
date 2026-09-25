@@ -33,10 +33,10 @@ class EarthquakeRepositoryImplTest {
     private val repository = EarthquakeRepositoryImpl(api = api, dao = dao)
 
     @Test
-    fun `refresh replaces the whole cache with the earthquakes of the response`() = runTest {
+    fun `refresh replaces the whole cache and reports how many earthquakes it stored`() = runTest {
         dao.insertAll(listOf(singleEarthquake.toEntity()))
-        val result: AppResult<Unit> = repository.refreshCache(query)
-        assertEquals(AppResult.Success(Unit), result)
+        val result: AppResult<Int> = repository.refreshCache(query)
+        assertEquals(AppResult.Success(listedEarthquakes.size), result)
         assertEquals(listedEarthquakes, repository.observeCachedEarthquakes().first())
     }
 
@@ -51,7 +51,7 @@ class EarthquakeRepositoryImplTest {
         val cached: List<EarthquakeEntity> = listOf(singleEarthquake.toEntity())
         dao.insertAll(cached)
         api.failure = IOException("offline")
-        val result: AppResult<Unit> = repository.refreshCache(query)
+        val result: AppResult<Int> = repository.refreshCache(query)
         assertEquals(AppResult.Failure(AppError.Network), result)
         assertEquals(cached, dao.storedEarthquakes)
     }

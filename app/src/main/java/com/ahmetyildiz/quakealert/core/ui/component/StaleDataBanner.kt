@@ -20,8 +20,8 @@ import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
 @Composable
-fun OfflineBanner(
-    dataTime: String,
+fun StaleDataBanner(
+    message: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -31,7 +31,12 @@ fun OfflineBanner(
         shape = MaterialTheme.shapes.medium,
     ) {
         Row(
-            modifier = Modifier.padding(start = Spacing.large, end = Spacing.small, top = Spacing.small, bottom = Spacing.small),
+            modifier = Modifier.padding(
+                start = Spacing.large,
+                end = Spacing.small,
+                top = Spacing.small,
+                bottom = Spacing.small,
+            ),
             horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -41,7 +46,7 @@ fun OfflineBanner(
                 tint = MaterialTheme.colorScheme.tertiary,
             )
             Text(
-                text = stringResource(R.string.offline_banner_message, dataTime),
+                text = message,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f),
             )
@@ -52,10 +57,14 @@ fun OfflineBanner(
 
 @PreviewLightDark
 @Composable
-private fun OfflineBannerPreview() {
+private fun StaleDataBannerPreview() {
     QuakeAlertTheme {
         Surface {
-            OfflineBanner(dataTime = "14:32", onRetry = {}, modifier = Modifier.padding(Spacing.large))
+            StaleDataBanner(
+                message = stringResource(R.string.stale_data_offline_message, "14:32"),
+                onRetry = {},
+                modifier = Modifier.padding(Spacing.large),
+            )
         }
     }
 }

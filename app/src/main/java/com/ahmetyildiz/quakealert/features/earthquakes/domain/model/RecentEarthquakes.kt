@@ -5,7 +5,7 @@ import java.time.Instant
 
 data class RecentEarthquakes(
     val earthquakes: List<EarthquakeWithDistance>,
-    val appliedFilters: EarthquakeFilters,
+    val appliedOptions: EarthquakeListOptions,
     val cachedCount: Int,
     val area: AlertArea,
     val magnitudeThreshold: Double,

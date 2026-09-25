@@ -12,6 +12,8 @@ enum class RegionFilterValue { WORLD, NEAR_CITY }
 
 enum class MagnitudeFilterValue { ALL, ABOVE_THRESHOLD }
 
+enum class SortOrderValue { NEWEST_FIRST, LARGEST_FIRST, NEAREST_FIRST }
+
 enum class RefreshTrigger { INITIAL, PULL, STALE }
 
 enum class DetailSource { LIST, NOTIFICATION }

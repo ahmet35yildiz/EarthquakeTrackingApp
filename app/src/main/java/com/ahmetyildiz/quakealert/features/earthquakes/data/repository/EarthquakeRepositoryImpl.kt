@@ -27,8 +27,11 @@ class EarthquakeRepositoryImpl @Inject constructor(
     override fun observeCachedEarthquakes(): Flow<List<Earthquake>> =
         dao.observeAll().map { entities -> entities.map(EarthquakeEntity::toEarthquake) }
 
-    override suspend fun refreshCache(query: EarthquakeQuery): AppResult<Unit> =
-        fetchEarthquakes(query).map { earthquakes -> dao.replaceAll(earthquakes.map(Earthquake::toEntity)) }
+    override suspend fun refreshCache(query: EarthquakeQuery): AppResult<Int> =
+        fetchEarthquakes(query).map { earthquakes ->
+            dao.replaceAll(earthquakes.map(Earthquake::toEntity))
+            earthquakes.size
+        }
 
     override suspend fun getEarthquake(id: String): AppResult<Earthquake> {
         val cached: EarthquakeEntity? = dao.getById(id)

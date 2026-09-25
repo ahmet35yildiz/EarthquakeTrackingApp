@@ -211,3 +211,20 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** Names are chosen to be self-explanatory (e.g. `toEarthquakeOrNull`, `refreshCache`), and a test
   name states the rule it checks. Third-party attributions (Material Symbols, Apache License 2.0) are recorded in
   the docs instead of the drawable files.
+
+## ADR-023 — The earthquake list is one in-memory list, computed off the main thread
+- **Context:** The list shows every cached earthquake of the last 7 days (M2.5+, ~320–380 items, ~265 KB of JSON) and
+  can now be sorted by time, magnitude or distance. The question was whether showing all of them at once costs too
+  much and needs paging.
+- **Measurement** (API 31 and 34 emulators, debug build, 321 items): the `LazyColumn` composes ~7 cards at any time,
+  also after scrolling to the end, so rendering does not grow with the list. Mapping the Room rows + filtering +
+  distance + sorting took 1–13 ms per change and ran on the main thread (a frame is 16 ms). Emulator frame timings
+  were not used: the emulators render with SwiftShader (CPU), which says nothing about list size.
+- **Decision:** Keep the full period as one list, fetched in one request and filtered/sorted in memory (ADR-009).
+  Run the use case's `combine` on an injected `@DefaultDispatcher` with `flowOn`. No paging.
+- **Alternatives:** In-memory "load 10 more" (started, removed: the data is already loaded and sorted, and the lazy
+  list already renders only visible rows — it only added state); Paging 3 over Room with SQL filtering/sorting
+  (distance filter and sort need haversine in SQL, more code, no benefit at this size); USGS `limit`/`offset` paging
+  (more requests, breaks offline filtering and sorting of the whole period).
+- **Consequences:** Simple code, instant sort and filter changes, smooth main thread. Revisit if the cached period grows
+  by an order of magnitude (e.g. 30 days or M1+, several thousand items): then Paging 3 with SQL-side filtering.

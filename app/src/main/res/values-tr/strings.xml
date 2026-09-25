@@ -5,7 +5,25 @@
 
     <string name="action_retry">Tekrar dene</string>
     <string name="state_loading">Yükleniyor</string>
-    <string name="offline_banner_message">Çevrimdışısın · Gösterilen veriler: %1$s</string>
+    <string name="action_refresh">Yenile</string>
+    <string name="stale_data_offline_message">Çevrimdışısın · Gösterilen veriler: %1$s</string>
+    <string name="stale_data_failed_message">Güncellenemedi · Gösterilen veriler: %1$s</string>
+    <string name="error_message_network">İnternet bağlantını kontrol edip tekrar dene.</string>
+    <string name="error_message_generic">Bir sorun oluştu. Birazdan tekrar dene.</string>
+
+    <string name="relative_time_just_now">az önce</string>
+    <plurals name="relative_time_minutes_ago">
+        <item quantity="one">%d dk önce</item>
+        <item quantity="other">%d dk önce</item>
+    </plurals>
+    <plurals name="relative_time_hours_ago">
+        <item quantity="one">%d sa önce</item>
+        <item quantity="other">%d sa önce</item>
+    </plurals>
+    <plurals name="relative_time_days_ago">
+        <item quantity="one">%d gün önce</item>
+        <item quantity="other">%d gün önce</item>
+    </plurals>
 
     <string name="magnitude_badge_description">Büyüklük %1$s (%2$s)</string>
     <string name="magnitude_unknown_description">Büyüklük bilinmiyor</string>
@@ -14,4 +32,41 @@
     <string name="severity_moderate">Orta</string>
     <string name="severity_strong">Güçlü</string>
     <string name="severity_major">Büyük</string>
+
+    <plurals name="earthquake_list_scope">
+        <item quantity="one">Son %1$d gün · M%2$s+</item>
+        <item quantity="other">Son %1$d gün · M%2$s+</item>
+    </plurals>
+    <string name="earthquake_list_updated">%1$s güncellendi</string>
+    <plurals name="earthquake_count">
+        <item quantity="one">%d deprem</item>
+        <item quantity="other">%d deprem</item>
+    </plurals>
+    <string name="filter_world">Dünya</string>
+    <string name="filter_near_city">%1$s yakını</string>
+    <string name="filter_all_magnitudes">Tümü (M%1$s+)</string>
+    <string name="filter_above_threshold">M%1$s+</string>
+    <string name="earthquake_unknown_place">Konum bilinmiyor</string>
+    <string name="earthquake_depth">%1$s km derinlikte</string>
+    <string name="earthquake_distance_from_city">%2$s merkezine %1$s km</string>
+    <string name="earthquake_list_error_title">Depremler yüklenemedi</string>
+    <string name="earthquake_list_empty_title">Gösterilecek deprem yok</string>
+    <string name="earthquake_list_empty_message">Yenilemek için aşağı çek.</string>
+    <plurals name="earthquake_list_empty_near_above">
+        <item quantity="one">Son %3$d günde %2$s yakınında M%1$s+ deprem yok.</item>
+        <item quantity="other">Son %3$d günde %2$s yakınında M%1$s+ deprem yok.</item>
+    </plurals>
+    <plurals name="earthquake_list_empty_near">
+        <item quantity="one">Son %2$d günde %1$s yakınında deprem yok.</item>
+        <item quantity="other">Son %2$d günde %1$s yakınında deprem yok.</item>
+    </plurals>
+    <plurals name="earthquake_list_empty_above">
+        <item quantity="one">Son %2$d günde M%1$s+ deprem yok.</item>
+        <item quantity="other">Son %2$d günde M%1$s+ deprem yok.</item>
+    </plurals>
+    <string name="action_show_all_earthquakes">Tüm depremleri göster</string>
+    <string name="sort_newest_first">En yeni</string>
+    <string name="sort_largest_first">En büyük</string>
+    <string name="sort_nearest_first">En yakın</string>
+    <string name="sort_button_description">Sıralama: %1$s</string>
 </resources>

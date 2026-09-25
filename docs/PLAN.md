@@ -75,8 +75,8 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   Verified with a temporary toggle button (removed afterwards) on API 34 and API 31: instant switch EN ↔ TR, choice
   kept after the app is killed, selected tab kept; on API 34 also via the system per-app language setting.
 - [x] **0.6 Design system.** Light/dark color schemes (dynamic color off), typography, shapes, spacing tokens,
-  `LocalSeverityColors`; shared `LoadingState`, `EmptyState`, `ErrorState`, `OfflineBanner`, `MagnitudeBadge` with
-  previews.
+  `LocalSeverityColors`; shared `LoadingState`, `EmptyState`, `ErrorState`, `OfflineBanner` (renamed
+  `StaleDataBanner` in 1.5), `MagnitudeBadge` with previews.
   *Done when:* previews render in light and dark.
   *Result:* tokens taken from the UI design (ADR-018): light scheme = design values, dark scheme generated from the
   same Material 3 palettes (light regeneration matched the design on 34/35 roles), severity scale with a corrected
@@ -149,9 +149,33 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   adds the distance to the user's city. Tests with fake repositories (boundaries: threshold equal, 1 m inside/outside
   the radius, 300 s vs 301 s). Verified on API 34 with temporary injection (reverted): Hilt builds all use cases;
   live data filtered to Izmir + 1000 km, M4.0+ returned only Turkish and Greek events with plausible distances.
-- [ ] **1.5 List screen.** ViewModel + `EarthquakeListUiState`, list items, region/magnitude chips, pull-to-refresh,
+- [x] **1.5 List screen.** ViewModel + `EarthquakeListUiState`, list items, region/magnitude chips, pull-to-refresh,
   stale-cache refresh (> 5 min), loading/empty/error/offline states, analytics (viewed, refreshed, filter changed).
   *Done when:* SPEC §4.2 fully met on emulator incl. airplane mode; ViewModel tests pass.
+  *Result:* `EarthquakeListViewModel` (filters, refresh on start when missing/stale, pull/button/retry refresh,
+  analytics incl. `count`), `EarthquakeListUiState` with a derived `content`; `refreshCache` now returns the stored
+  count. Screen: top bar with scope + "Updated x ago" and a refresh button (accessible alternative to the pull
+  gesture), stale-data banner (offline vs. failed wording), filter chips in two wrapping groups (region / magnitude;
+  a scrolling row hid the threshold chip in Turkish), count, cards (badge, place, relative time, depth, distance),
+  loading / error / empty / filtered-empty states. Design followed for visual language; notification banner, search,
+  profile and day headers left out. Relative times use own plurals (`DateUtils` ignores the in-app language).
+  Found and fixed on the emulator: the offline banner inserted as the first lazy item was scrolled out of view, and
+  the filtered-empty state inside the lazy list crashed (scrollable in infinite height) — both now sit outside the
+  list, and a Compose UI test renders every content state. Tests: 11 ViewModel, 8 relative time, 7 Compose UI
+  (API 31 and 34). Verified on API 34 (EN/TR, light/dark, landscape, airplane mode, filters, rotation logs no extra
+  view) and API 31 (list, offline banner). Item tap is wired in 1.6/1.7.
+- [x] **1.5.1 List sorting + list performance check** (added on request, not in the original plan). Sort menu
+  (newest / largest / nearest first) next to the count, above the list; `list_sort_changed` event and `sort` on
+  `earthquake_list_viewed`.
+  *Done when:* each order is correct incl. ties and unknown values; the cost of showing the full list is measured.
+  *Result:* measured on API 31 and 34 with temporary logging (reverted): ~7 cards composed at any time for a
+  321-item list, also after scrolling to the end; mapping + filter + sort 1–13 ms per change, previously on the main
+  thread. Decision (ADR-023): no paging — an in-memory "load 10 more" step started earlier was removed as it saved
+  nothing — and the list computation moved to `@DefaultDispatcher`. Tests: 5 sort cases in the use case, 3 in the
+  ViewModel, 2 Compose UI tests for the menu (API 31 and 34). Verified: nearest / largest order with real data, scroll
+  back to top on a new order, position kept on rotation, EN/TR labels. One run showed the area chip missing right
+  after install; not reproducible in 14 runs (live preference updates confirmed), most likely read before the save
+  finished on a busy first launch.
 - [ ] **1.6 Detail screen.** ViewModel, all fields of SPEC §4.3, maps/USGS/share actions, not-found state,
   analytics (viewed with source, action clicked).
   *Done when:* SPEC §4.3 met; opening an unknown id shows not-found.
@@ -197,7 +221,8 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 - [ ] **3.1 Settings screen.** Language picker (System default + generated list, names in their own language),
   about (USGS attribution, disclaimer, version), permission status, developer entries (debug only).
 - [ ] **3.2 Event log screen.** List, filter by name, clear, share as text.
-- [ ] **3.3 Polish.** Adaptive launcher icon, copy review (EN + TR), accessibility labels, dark mode, landscape,
+- [ ] **3.3 Polish.** Adaptive launcher icon, copy review (EN + TR), accessibility labels, dark mode, landscape (list:
+  header + bottom bar leave room for ~1 card; consider scrolling the header away or a navigation rail),
   font scale, empty/error texts, consistent spacing.
 - [ ] **3.4 Instrumented tests.** Compose UI tests for list states, onboarding happy path, alert settings;
   worker test with fakes.
@@ -246,3 +271,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 20:52–20:58 | ~6m | Project rules: no comments in code/build/resource files, no Turkish outside README and TR strings; removed existing comments (80 files) and Turkish test/preview data |
 | 2026-09-25 | 20:58–21:07 | ~9m | 1.3 Earthquakes data: USGS DTOs + API, mappers, query parameters, cache table + DAO (DB v2, auto-migration), repository; unit + instrumented tests; verified on API 31 and 34 (ADR-021, ADR-022) |
 | 2026-09-25 | 21:12–21:15 | ~3m | 1.4 Earthquakes domain: config, filters, observe/refresh/freshness/get use cases with distance; unit tests; verified on API 34 |
+| 2026-09-25 | 21:18–21:42 | ~24m | 1.5 List screen: ViewModel, UI state, top bar, chips, cards, states, stale banner, analytics; fixed two layout bugs found on the emulator; unit + Compose UI tests; verified on API 31 and 34 |
+| 2026-09-25 | 21:42–22:30 | ~48m | 1.5.1 List sorting (newest / largest / nearest) + performance measurement; list computation off the main thread, in-memory paging removed (ADR-023); unit + Compose UI tests; verified on API 31 and 34 |

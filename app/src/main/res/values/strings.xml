@@ -7,7 +7,25 @@
 
     <string name="action_retry">Retry</string>
     <string name="state_loading">Loading</string>
-    <string name="offline_banner_message">You\'re offline · Showing data from %1$s</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="stale_data_offline_message">You\'re offline · Showing data from %1$s</string>
+    <string name="stale_data_failed_message">Couldn\'t update · Showing data from %1$s</string>
+    <string name="error_message_network">Check your internet connection and try again.</string>
+    <string name="error_message_generic">Something went wrong. Please try again in a moment.</string>
+
+    <string name="relative_time_just_now">just now</string>
+    <plurals name="relative_time_minutes_ago">
+        <item quantity="one">%d min ago</item>
+        <item quantity="other">%d min ago</item>
+    </plurals>
+    <plurals name="relative_time_hours_ago">
+        <item quantity="one">%d h ago</item>
+        <item quantity="other">%d h ago</item>
+    </plurals>
+    <plurals name="relative_time_days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
 
     <string name="magnitude_value" translatable="false">%.1f</string>
     <string name="magnitude_unknown_value" translatable="false">–</string>
@@ -18,4 +36,41 @@
     <string name="severity_moderate">Moderate</string>
     <string name="severity_strong">Strong</string>
     <string name="severity_major">Major</string>
+
+    <plurals name="earthquake_list_scope">
+        <item quantity="one">Last day · M%2$s+</item>
+        <item quantity="other">Last %1$d days · M%2$s+</item>
+    </plurals>
+    <string name="earthquake_list_updated">Updated %1$s</string>
+    <plurals name="earthquake_count">
+        <item quantity="one">%d earthquake</item>
+        <item quantity="other">%d earthquakes</item>
+    </plurals>
+    <string name="filter_world">World</string>
+    <string name="filter_near_city">Near %1$s</string>
+    <string name="filter_all_magnitudes">All (M%1$s+)</string>
+    <string name="filter_above_threshold">M%1$s+</string>
+    <string name="earthquake_unknown_place">Unknown location</string>
+    <string name="earthquake_depth">%1$s km deep</string>
+    <string name="earthquake_distance_from_city">%1$s km from %2$s</string>
+    <string name="earthquake_list_error_title">Couldn\'t load earthquakes</string>
+    <string name="earthquake_list_empty_title">No earthquakes to show</string>
+    <string name="earthquake_list_empty_message">Pull down to refresh.</string>
+    <plurals name="earthquake_list_empty_near_above">
+        <item quantity="one">No M%1$s+ earthquakes near %2$s in the last day.</item>
+        <item quantity="other">No M%1$s+ earthquakes near %2$s in the last %3$d days.</item>
+    </plurals>
+    <plurals name="earthquake_list_empty_near">
+        <item quantity="one">No earthquakes near %1$s in the last day.</item>
+        <item quantity="other">No earthquakes near %1$s in the last %2$d days.</item>
+    </plurals>
+    <plurals name="earthquake_list_empty_above">
+        <item quantity="one">No M%1$s+ earthquakes in the last day.</item>
+        <item quantity="other">No M%1$s+ earthquakes in the last %2$d days.</item>
+    </plurals>
+    <string name="action_show_all_earthquakes">Show all earthquakes</string>
+    <string name="sort_newest_first">Newest first</string>
+    <string name="sort_largest_first">Largest first</string>
+    <string name="sort_nearest_first">Nearest first</string>
+    <string name="sort_button_description">Sort: %1$s</string>
 </resources>

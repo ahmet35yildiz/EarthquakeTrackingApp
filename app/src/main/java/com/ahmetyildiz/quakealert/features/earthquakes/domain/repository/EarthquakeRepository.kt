@@ -9,7 +9,7 @@ interface EarthquakeRepository {
 
     fun observeCachedEarthquakes(): Flow<List<Earthquake>>
 
-    suspend fun refreshCache(query: EarthquakeQuery): AppResult<Unit>
+    suspend fun refreshCache(query: EarthquakeQuery): AppResult<Int>
 
     suspend fun getEarthquake(id: String): AppResult<Earthquake>
 

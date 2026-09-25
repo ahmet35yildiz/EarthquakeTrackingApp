@@ -19,11 +19,11 @@ class FakeEarthquakeRepository(cached: List<Earthquake> = emptyList()) : Earthqu
 
     override fun observeCachedEarthquakes(): Flow<List<Earthquake>> = cachedEarthquakes
 
-    override suspend fun refreshCache(query: EarthquakeQuery): AppResult<Unit> {
+    override suspend fun refreshCache(query: EarthquakeQuery): AppResult<Int> {
         receivedQueries += query
         failure?.let { return AppResult.Failure(it) }
         cachedEarthquakes.value = remoteEarthquakes
-        return AppResult.Success(Unit)
+        return AppResult.Success(remoteEarthquakes.size)
     }
 
     override suspend fun getEarthquake(id: String): AppResult<Earthquake> {

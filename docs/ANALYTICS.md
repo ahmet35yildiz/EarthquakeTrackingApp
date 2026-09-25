@@ -13,7 +13,7 @@ in later as another `AnalyticsTracker` implementation.
 | Do users personalise alerts? | % with an area set; threshold distribution | onboarding_completed, alert_* |
 | Are alerts valuable? (**north star**) | **Alert open rate** = `alert_notification_opened` / `alert_notification_posted`; median time to open | alert_notification_* |
 | Are alerts too noisy? | Threshold raised or alerts disabled within 24 h after a notification | alert_threshold_changed, alerts_toggled |
-| Is the list useful on its own? | Detail views per list view; share/map actions | earthquake_list_viewed, earthquake_detail_viewed, detail_action_clicked |
+| Is the list useful on its own? | Detail views per list view; share/map actions; which sort orders people use | earthquake_list_viewed, earthquake_detail_viewed, detail_action_clicked, list_sort_changed |
 | Is the pipeline reliable? | Background check success rate; refresh failure rate | background_check_*, earthquake_list_refreshed |
 
 ## 2. Event dictionary
@@ -34,9 +34,10 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `alert_area_cleared` | `context` | Switched to whole world |
 | `city_search_performed` | `country_code`, `result_count` | Search completed |
 | `city_search_failed` | `reason` = network \| unavailable \| unknown | Search failed |
-| `earthquake_list_viewed` | `region_filter` = world \| near_city, `magnitude_filter` = all \| above_threshold | List screen shown |
-| `earthquake_list_refreshed` | `trigger` = initial \| pull \| stale, `result` = success \| failure, `count` | Refresh finished |
+| `earthquake_list_viewed` | `region_filter` = world \| near_city, `magnitude_filter` = all \| above_threshold, `sort` = newest_first \| largest_first \| nearest_first | List screen shown (not again after rotation / language switch) |
+| `earthquake_list_refreshed` | `trigger` = initial \| pull \| stale (pull = any user-started refresh: pull, refresh button, retry), `result` = success \| failure, `count` (cached earthquakes after the refresh) | Refresh finished |
 | `list_filter_changed` | `filter` = region \| magnitude, `value` (same values as above) | Chip tapped |
+| `list_sort_changed` | `sort` = newest_first \| largest_first \| nearest_first | Sort order picked |
 | `earthquake_detail_viewed` | `source` = list \| notification, `magnitude` | Detail shown |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
 | `alert_notification_posted` | `event_id`, `magnitude`, `batch_size` | Notification posted |

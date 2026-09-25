@@ -45,15 +45,15 @@ class RefreshEarthquakesUseCaseTest {
     @Test
     fun `successful refresh records when it happened`() = runTest {
         earthquakeRepository.remoteEarthquakes = listOf(earthquake(id = "a"))
-        val result: AppResult<Unit> = useCase()
-        assertEquals(AppResult.Success(Unit), result)
+        val result: AppResult<Int> = useCase()
+        assertEquals(AppResult.Success(1), result)
         assertEquals(clock.now(), preferencesRepository.userPreferences.value.lastRefreshedAt)
     }
 
     @Test
     fun `failed refresh keeps the previous refresh time`() = runTest {
         earthquakeRepository.failure = AppError.Network
-        val result: AppResult<Unit> = useCase()
+        val result: AppResult<Int> = useCase()
         assertEquals(AppResult.Failure(AppError.Network), result)
         assertNull(preferencesRepository.userPreferences.value.lastRefreshedAt)
     }
