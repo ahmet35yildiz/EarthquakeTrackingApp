@@ -1,4 +1,4 @@
-package com.example.earthquaketrackingapp
+package com.ahmetyildiz.quakealert
 
 import org.junit.Test
 

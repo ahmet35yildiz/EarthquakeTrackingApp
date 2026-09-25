@@ -5,14 +5,14 @@ plugins {
 }
 
 android {
-    namespace = "com.example.earthquaketrackingapp"
+    namespace = "com.ahmetyildiz.quakealert"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.earthquaketrackingapp"
-        minSdk = 24
+        applicationId = "com.ahmetyildiz.quakealert"
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

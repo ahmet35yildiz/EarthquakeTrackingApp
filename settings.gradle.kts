@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Earthquake Tracking App"
+rootProject.name = "QuakeAlert"
 include(":app")

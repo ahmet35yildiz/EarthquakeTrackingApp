@@ -1,4 +1,4 @@
-package com.example.earthquaketrackingapp.ui.theme
+package com.ahmetyildiz.quakealert.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
