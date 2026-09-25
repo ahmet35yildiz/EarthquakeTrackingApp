@@ -13,12 +13,12 @@
 |---|---|
 | Language / build | Kotlin 2.4 (AGP built-in Kotlin), AGP 9, Gradle 9, version catalog, KSP, Java 17, compileSdk 36 |
 | UI | Jetpack Compose (BOM pinned for compileSdk 36), Material 3, Navigation Compose (type-safe routes with kotlinx.serialization) |
-| DI | Hilt (+ `hilt-navigation-compose`, `hilt-work`) |
+| DI | Hilt (+ `hilt-lifecycle-viewmodel-compose` for `hiltViewModel()`, `hilt-work`) |
 | Networking | Retrofit + OkHttp + kotlinx.serialization converter |
 | Persistence | Room (cache, notified ids, analytics events), DataStore Preferences (user preferences) |
 | Background | WorkManager (periodic work, `CoroutineWorker`, Hilt worker factory) |
 | Localization | Android resources + AppCompat per-app language API (`AppCompatDelegate.setApplicationLocales`) |
-| Tests | JUnit 5 (android-junit5 plugin), MockK, kotlinx-coroutines-test, Turbine; Compose UI tests (JUnit 4 rule) |
+| Tests | JUnit Jupiter 6 (android-junit plugin), MockK, kotlinx-coroutines-test, Turbine; Compose UI tests (JUnit 4 rule) |
 
 Exact versions are pinned in `gradle/libs.versions.toml`: the latest stable release that supports compileSdk 36
 (ADR-015).
@@ -146,6 +146,8 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
   spacing tokens in `core/ui/theme`.
 - Magnitude severity colours as an extended theme token set (`LocalSeverityColors`): < 4, 4–5, 5–6, 6–7, ≥ 7.
 - Shared state composables: `LoadingState`, `EmptyState`, `ErrorState`, `OfflineBanner`, `MagnitudeBadge`.
+- Icons: `material-icons-core` (`Icons.Default.*`); icons it lacks are added as Material Symbols vector drawables
+  (ADR-016).
 - Edge-to-edge, custom adaptive launcher icon, `contentDescription` on all meaningful icons.
 
 ## 8. Error handling

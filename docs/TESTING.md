@@ -2,7 +2,7 @@
 
 ## 1. Automated tests
 
-### Unit tests (`app/src/test`, JUnit 5 + MockK + coroutines-test + Turbine, Arrange-Act-Assert)
+### Unit tests (`app/src/test`, JUnit Jupiter 6 + MockK + coroutines-test + Turbine, Arrange-Act-Assert)
 | Area | What to cover |
 |---|---|
 | USGS mapper | null `mag` / `place`, depth from coordinates, epoch conversion, non-earthquake types |

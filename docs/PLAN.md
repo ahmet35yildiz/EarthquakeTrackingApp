@@ -42,11 +42,18 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   *Result:* theme files moved to `core/ui/theme` (ARCHITECTURE §3), `EarthquakeTrackingAppTheme` → `QuakeAlertTheme`,
   `app_name` marked `translatable="false"`, `mipmap-anydpi-v26` → `mipmap-anydpi` (v26 qualifier redundant with
   minSdk 26). Verified on Pixel_7_API_34.
-- [ ] **0.3 Dependencies.** Hilt (+ navigation-compose, work), KSP, Room, Retrofit, OkHttp (+ logging, debug only),
+- [x] **0.3 Dependencies.** Hilt (+ navigation-compose, work), KSP, Room, Retrofit, OkHttp (+ logging, debug only),
   kotlinx.serialization (+ plugin), DataStore Preferences, WorkManager, Navigation Compose, lifecycle-runtime-compose,
   AppCompat, material-icons-extended (or a minimal icon set), test libs (android-junit5 plugin, JUnit 5, MockK,
   coroutines-test, Turbine, work-testing, hilt-android-testing).
   *Done when:* build passes; a sample JUnit 5 test runs in `testDebugUnitTest`.
+  *Result:* all libraries at the latest version that supports compileSdk 36 (policy of ADR-015; navigation 2.10,
+  androidx.hilt 1.4 and OkHttp 5.5 need compileSdk 37, so pinned: navigation 2.9.8, androidx.hilt 1.3.0, OkHttp
+  5.4.0). `hiltViewModel()` comes from `hilt-lifecycle-viewmodel-compose` (moved there from `hilt-navigation-compose`
+  in androidx.hilt 1.3). No `room-ktx` (merged into `room-runtime` since Room 2.7).
+  Room Gradle plugin exports schemas to `app/schemas`. Icons: `material-icons-core` (ADR-016). Tests: JUnit Jupiter 6
+  (ADR-017). Hilt, Room and serialization code generation verified with Kotlin 2.4.20 using temporary sample classes
+  (then removed).
 - [ ] **0.4 App skeleton.** `QuakeAlertApplication` (`@HiltAndroidApp`, `Configuration.Provider` with
   `HiltWorkerFactory`, default WorkManager initializer removed in manifest); `MainActivity : AppCompatActivity`,
   edge-to-edge, `QuakeAlertTheme`, NavHost with 3 placeholder tabs (Earthquakes, Alerts, Settings) in a bottom bar;
@@ -163,4 +170,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 15:30–16:45 | ~1h15 | Requirement analysis, USGS/AFAD/geocoding research, product & architecture decisions, planning docs |
 | 2026-09-25 | 16:55–17:20 | ~25m | 0.1 attempt: version research, upgrade built on CLI but IDE sync failed (Studio too old for AGP 9.4); reverted, postponed |
 | 2026-09-25 | 17:20–17:30 | ~10m | 0.2 Rename and base config: new package/id, QuakeAlert naming, minSdk 26, BuildConfig; verified on API 34 |
-| 2026-09-25 | 17:40–17:50 | ~10m | 0.1 Toolchain upgrade (after Studio update): Gradle 9.8.0, AGP 9.4.1, Kotlin 2.4.20, KSP 2.3.12, Java 17 (ADR-015) |
+| 2026-09-25 | 17:30–17:45 | ~15m | 0.1 Toolchain upgrade (after Studio update): Gradle 9.8.0, AGP 9.4.1, Kotlin 2.4.20, KSP 2.3.12, Java 17 (ADR-015) |
+| 2026-09-25 | 17:45–17:55 | ~10m | 0.3 Dependencies: Hilt, Room, DataStore, WorkManager, Navigation, Retrofit/OkHttp, serialization, test stack (ADR-016, ADR-017) |

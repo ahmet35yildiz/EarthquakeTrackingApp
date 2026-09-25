@@ -130,3 +130,21 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** Builds on the SDK platforms already used for testing, with no extra setup. Compose stays one minor
   release behind. Moving to compileSdk 37 later means changing one number plus the pinned versions in
   `gradle/libs.versions.toml`. AGP 9.4 requires Android Studio Quail 4 (2026.1.4) or newer.
+
+## ADR-016 — Icons from `material-icons-core` plus Material Symbols drawables
+- **Context:** The app needs a few dozen standard icons (tabs, refresh, share, map, warning…). The Compose
+  `material-icons-*` libraries are no longer updated (frozen at 1.7.8); `material-icons-extended` holds thousands of
+  icons and slows debug builds.
+- **Decision:** Use `material-icons-core` (`Icons.Default.*`, via the Compose BOM) for common icons. Any icon it lacks
+  is added as a Material Symbols vector drawable in `res/drawable`.
+- **Alternatives:** `material-icons-extended` (every icon in code, heavy); only vector drawables (more files for icons
+  the core set already has).
+- **Consequences:** Small dependency, familiar `Icons.Default.X` API; missing icons are single XML files.
+
+## ADR-017 — Unit tests on JUnit Jupiter 6
+- **Context:** Unit tests need parameterized tests and readable names; the current JUnit major version is 6 (same
+  Jupiter API as JUnit 5, requires Java 17 — already our baseline).
+- **Decision:** JUnit Jupiter 6 through the `de.mannodermaus.android-junit` Gradle plugin for `src/test`, with MockK,
+  Turbine and kotlinx-coroutines-test. Instrumented tests stay on the JUnit 4 runner that the Compose test rule needs.
+- **Alternatives:** JUnit 4 everywhere (no parameterized tests without extra runners, older API).
+- **Consequences:** Two test APIs in the project, split cleanly by source set (`test` = Jupiter, `androidTest` = JUnit 4).
