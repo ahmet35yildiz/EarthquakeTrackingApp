@@ -135,10 +135,20 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   `NotFound`), instrumented `EarthquakeDao` test (passed on API 31 and 34). Verified on API 31 and 34 with temporary
   injection (reverted): v1 → v2 upgrade kept existing analytics rows, live refresh cached 322 earthquakes, cache
   lookup, unknown id → `NotFound`, 1000 km around Tokyo returned only Japanese events.
-- [ ] **1.4 Earthquakes domain.** Use cases (the domain types exist since 1.3): `ObserveRecentEarthquakesUseCase`
+- [x] **1.4 Earthquakes domain.** Use cases (the domain types exist since 1.3): `ObserveRecentEarthquakesUseCase`
   (filters + distance), `RefreshEarthquakesUseCase` (builds the 7-day M2.5+ query from an `EarthquakesConfig`,
   stores `lastRefreshedAt`), `GetEarthquakeUseCase`.
   *Done when:* filter/distance unit tests pass.
+  *Result:* `EarthquakesConfig` (7 days, M2.5, stale after 5 min). Filters: `EarthquakeFilters(region: WORLD |
+  NEAR_CITY, magnitude: ALL | ABOVE_THRESHOLD)`; "above threshold" includes equal magnitudes and drops unknown ones;
+  "near city" includes the radius edge and falls back to world when no area is set. The observe use case returns
+  `RecentEarthquakes` with everything the list needs (items with distance, applied filters, cached count for the
+  "filtered empty" vs "no data" message, area and threshold for chip labels, last refresh for the offline banner).
+  Added `CheckCacheFreshnessUseCase` (MISSING / STALE / FRESH, stale strictly after 5 min) so the list can log
+  initial vs stale refreshes. The list refresh is always worldwide, whatever the user's area. `GetEarthquakeUseCase`
+  adds the distance to the user's city. Tests with fake repositories (boundaries: threshold equal, 1 m inside/outside
+  the radius, 300 s vs 301 s). Verified on API 34 with temporary injection (reverted): Hilt builds all use cases;
+  live data filtered to Izmir + 1000 km, M4.0+ returned only Turkish and Greek events with plausible distances.
 - [ ] **1.5 List screen.** ViewModel + `EarthquakeListUiState`, list items, region/magnitude chips, pull-to-refresh,
   stale-cache refresh (> 5 min), loading/empty/error/offline states, analytics (viewed, refreshed, filter changed).
   *Done when:* SPEC §4.2 fully met on emulator incl. airplane mode; ViewModel tests pass.
@@ -235,3 +245,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 20:40–20:48 | ~8m | 1.2 Analytics core: event dictionary (25 events), LocalAnalyticsTracker (Room + Logcat), QuakeAlertDatabase v1, app scope, `app_opened`; unit + instrumented tests; verified on API 31 and 34 (ADR-020) |
 | 2026-09-25 | 20:52–20:58 | ~6m | Project rules: no comments in code/build/resource files, no Turkish outside README and TR strings; removed existing comments (80 files) and Turkish test/preview data |
 | 2026-09-25 | 20:58–21:07 | ~9m | 1.3 Earthquakes data: USGS DTOs + API, mappers, query parameters, cache table + DAO (DB v2, auto-migration), repository; unit + instrumented tests; verified on API 31 and 34 (ADR-021, ADR-022) |
+| 2026-09-25 | 21:12–21:15 | ~3m | 1.4 Earthquakes domain: config, filters, observe/refresh/freshness/get use cases with distance; unit tests; verified on API 34 |

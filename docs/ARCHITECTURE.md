@@ -86,7 +86,12 @@ EarthquakeListScreen ─▶ EarthquakeListViewModel
 - Detail by id: cache first, then USGS `eventid` (404 or a non-earthquake event → `NotFound`); the network result is
   not written to the cache, which always mirrors the last list refresh.
 - Features that are not earthquakes or lack valid coordinates/depth are dropped while mapping.
-- Filters and distances are computed in the domain layer (haversine) on the cached list.
+- Filters and distances are computed in the domain layer (haversine) on the cached list:
+  `ObserveRecentEarthquakesUseCase(filters)` combines the cache with the user preferences and returns
+  `RecentEarthquakes` (filtered items with distance, applied filters, cached count, area, threshold, last refresh).
+  "Near city" without an area falls back to the whole world and is reported as such in `appliedFilters`.
+- `CheckCacheFreshnessUseCase` → `MISSING` (never refreshed) / `STALE` (older than 5 min) / `FRESH`; the list uses it to
+  decide on an initial or stale refresh. Product values live in `EarthquakesConfig`.
 
 ### 4.2 Background alert check
 ```
