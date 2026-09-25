@@ -89,12 +89,24 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   *Result:* AVD `Pixel_6` (API 31, Google APIs, arm64).
 
 ## Phase 1 — Core and Earthquakes
-- [ ] **1.1 Core basics.** `AppResult`/`AppError`, `Clock` (+ `FakeClock` for tests), dispatcher qualifiers,
+- [x] **1.1 Core basics.** `AppResult`/`AppError`, `Clock` (+ `FakeClock` for tests), dispatcher qualifiers,
   network module (Retrofit + Json `ignoreUnknownKeys`, timeouts), `QuakeAlertDatabase`, DataStore
   `UserPreferencesDataSource` + `UserPreferencesRepository` (ADR-006), `GeoPoint`, `AlertArea`, haversine.
   *Done when:* unit tests for haversine / `AlertArea.contains` / preferences mapping pass.
-- [ ] **1.2 Analytics core.** `AnalyticsEvent` sealed class (all events of ANALYTICS.md §2), `AnalyticsTracker`,
-  `LocalAnalyticsTracker` (Room + Logcat), DAO, Hilt binding.
+  *Result:* `AlertArea` is sealed (`WholeWorld` | `AroundCity(city, radiusKm)`, edge inclusive); `City` lives in
+  `core/model` so city search (2.2) and preferences share it. Preferences: `UserPreferencesRepository` interface +
+  one `DataStoreUserPreferencesRepository` (keys and mapping in one class instead of a separate pass-through data
+  source); `saveAlertSettings(settings, baselineAt)` always writes the baseline; default threshold 4.5 is
+  `AlertSettings.DEFAULT_MAGNITUDE_THRESHOLD` (ADR-019). `safeApiCall` maps exceptions to `AppError`
+  (404 → `NotFound`). Only `@IoDispatcher` for now (no other dispatcher is needed yet). HTTP logging is contributed
+  by `src/debug` into an interceptor multibinding, so release builds do not reference the debug-only library.
+  INTERNET permission added. **`QuakeAlertDatabase` moved to 1.2:** Room rejects a database without entities, so it
+  is created together with its first entity. Tests: haversine, `GeoPoint` validation, `AlertArea`, DataStore
+  round-trips on a temp file, error mapping. Verified on API 34 and API 31 with temporary injection (reverted): Hilt
+  graph resolves, preferences survive an app restart, a USGS request succeeds and is logged in debug.
+- [ ] **1.2 Analytics core.** `QuakeAlertDatabase` (created here with its first entity, see 1.1),
+  `AnalyticsEvent` sealed class (all events of ANALYTICS.md §2), `AnalyticsTracker`, `LocalAnalyticsTracker`
+  (Room + Logcat), DAO, Hilt binding.
   *Done when:* unit test verifies events are persisted with params; `app_opened` logged from `MainActivity`.
 - [ ] **1.3 Earthquakes data.** GeoJSON DTOs, `UsgsApi` (query + eventid), mapper, `EarthquakeEntity` + DAO,
   `EarthquakeRepositoryImpl` (refresh = replace cache in a transaction, observe, get by id with network fallback,
@@ -114,7 +126,8 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   *Done when:* `adb shell am start -d "quakealert://earthquake/<id>"` opens the detail.
 
 ## Phase 2 — Alerts
-- [ ] **2.1 Alert domain.** `AlertConfig` (threshold range 2.5–8.0 step 0.5, default 4.5; radius options
+- [ ] **2.1 Alert domain.** `AlertConfig` (threshold range 2.5–8.0 step 0.5, default 4.5 = reuse
+  `AlertSettings.DEFAULT_MAGNITUDE_THRESHOLD` from core, ADR-019; radius options
   50/100/250/500/1000, default 250; check interval 15 min; max event age 6 h; overlap 10 min; notified-id retention
   30 days; max individual notifications 3), `AlertMatcher` implementing SPEC §5.1.
   *Done when:* every rule in SPEC §5.1 has a unit test (incl. boundaries).
@@ -193,3 +206,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 18:05–18:12 | ~7m | 0.4 App skeleton: Hilt application + WorkManager factory, AppCompat MainActivity, 3-tab navigation |
 | 2026-09-25 | 18:12–18:30 | ~18m | 0.5 i18n infrastructure + 0.7 API 31 emulator: generated language list and locale config, AppLanguageManager; EN/TR verified on API 31 and 34 |
 | 2026-09-25 | 18:38–18:50 | ~12m | 0.6 Design system from the UI design: colour schemes, severity scale, type, shapes, spacing, shared state components (ADR-018) |
+| 2026-09-25 | 20:28–20:36 | ~8m | 1.1 Core basics: AppResult/AppError, Clock, IO dispatcher, network + DataStore modules, preferences repository, GeoPoint/City/AlertArea, haversine; 50 unit tests; verified on API 31 and 34 (ADR-019) |

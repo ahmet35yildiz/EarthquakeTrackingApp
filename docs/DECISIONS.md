@@ -163,3 +163,19 @@ Add a new record (next number) whenever a significant decision is made; never re
   Fonts (needs Play services, async loading and a fallback).
 - **Consequences:** Both themes derive from one palette definition; every badge colour pair meets WCAG AA
   (≥ 5.7:1). Changing the brand colour means regenerating `Color.kt` from the same palettes.
+
+## ADR-019 — User preferences: one DataStore repository, baseline saved with the alert settings
+- **Context:** ADR-006 puts shared preferences in `core`. The alert rules (SPEC §5.1) require that a change of alert
+  settings never alerts for events from before the change, and the default threshold is needed by both the list
+  filter and alerts before the user has saved anything.
+- **Decision:** `UserPreferencesRepository` (interface, `core/preferences`) with a single implementation,
+  `DataStoreUserPreferencesRepository` (`core/datastore`), which owns the keys and the mapping. Alert settings are
+  saved only through `saveAlertSettings(settings, baselineAt)`, so a new baseline is written in the same edit. The
+  area is a sealed `AlertArea` (`WholeWorld` | `AroundCity`); an incomplete stored area reads as whole world.
+  Defaults for persisted values live next to the model (`AlertSettings.DEFAULT`, threshold 4.5, alerts enabled);
+  the alerts feature's `AlertConfig` reuses that constant instead of redefining it.
+- **Alternatives:** A separate `UserPreferencesDataSource` wrapped by a repository (a pass-through layer with no
+  logic of its own); separate setters for threshold, area and baseline (easy to forget the baseline); nullable
+  stored threshold with the default in `alerts` (the list would need the alerts feature).
+- **Consequences:** One class to read to see what is stored and how. Features depend on the interface and are
+  tested with a fake. Key names are part of the file format; renaming one drops the stored value.

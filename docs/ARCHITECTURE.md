@@ -32,9 +32,9 @@ com.ahmetyildiz.quakealert/
 ├── core/
 │   ├── analytics/                   # AnalyticsTracker (interface), AnalyticsEvent, LocalAnalyticsTracker
 │   ├── database/                    # QuakeAlertDatabase, entities, DAOs (earthquake cache, notified ids, events)
-│   ├── datastore/                   # UserPreferencesDataSource (DataStore)
-│   ├── preferences/                 # UserPreferences model + UserPreferencesRepository (shared by features)
-│   ├── model/                       # GeoPoint, AlertArea, Magnitude … pure Kotlin shared models
+│   ├── datastore/                   # DataStoreUserPreferencesRepository (DataStore keys + mapping)
+│   ├── preferences/                 # UserPreferences, AlertSettings + UserPreferencesRepository (shared by features)
+│   ├── model/                       # GeoPoint, City, AlertArea, MagnitudeSeverity … pure Kotlin shared models
 │   ├── location/                    # Distance (haversine) utilities
 │   ├── network/                     # Retrofit/OkHttp/Json setup
 │   ├── notification/                # Channels, NotificationPermissionChecker
@@ -111,7 +111,8 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
   - **API < 33:** deprecated blocking `getFromLocationName(name, max)` on the IO dispatcher (`@Suppress` scoped to
     that one function).
   - `IOException` → network error; empty → no results.
-  - Results filtered by `Address.countryCode == countryCode`, mapped to `City(name, adminArea, countryCode, point)`,
+  - Results filtered by `Address.countryCode == countryCode`, mapped to `City(name, adminArea, countryCode, location)`
+    (`core/model`),
     de-duplicated.
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
 
