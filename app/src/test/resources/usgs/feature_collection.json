@@ -1,0 +1,37 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {"generated": 1790359156000, "status": 200, "api": "2.7.0", "count": 3},
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 5.3, "place": "15 km SSW of Hilvan, Turkey", "time": 1790358888110, "updated": 1790359130664,
+        "tz": null, "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000abcd",
+        "felt": 12, "cdi": 4.1, "mmi": null, "alert": "green", "status": "reviewed", "tsunami": 1, "sig": 432,
+        "net": "us", "code": "7000abcd", "magType": "mww", "type": "earthquake", "title": "M 5.3 - 15 km SSW of Hilvan, Turkey"
+      },
+      "geometry": {"type": "Point", "coordinates": [38.9, 37.4, 10.0]},
+      "id": "us7000abcd"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": null, "place": null, "time": 1790358000000, "updated": 1790358100000,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/hv75043722",
+        "felt": null, "status": "automatic", "tsunami": 0, "magType": null, "type": "earthquake"
+      },
+      "geometry": {"type": "Point", "coordinates": [-155.888336181641, 19.4190006256104, -1.07000005245209]},
+      "id": "hv75043722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.6, "place": "5 km E of Somewhere, Nevada", "time": 1790357000000, "updated": 1790357100000,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/nn00000001",
+        "felt": null, "status": "reviewed", "tsunami": 0, "magType": "ml", "type": "quarry blast"
+      },
+      "geometry": {"type": "Point", "coordinates": [-116.1, 38.2, 0.0]},
+      "id": "nn00000001"
+    }
+  ]
+}

@@ -9,7 +9,6 @@ data class AnalyticsEventEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
-    /** Stored as a JSON object (see [StringMapConverter]). */
     val params: Map<String, String>,
     @ColumnInfo(name = "timestamp_epoch_ms")
     val timestampEpochMs: Long,

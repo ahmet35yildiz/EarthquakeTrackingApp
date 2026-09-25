@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-/** Dispatchers are injected (never referenced directly) so tests can replace them with test dispatchers. */
 @Module
 @InstallIn(SingletonComponent::class)
 object DispatchersModule {

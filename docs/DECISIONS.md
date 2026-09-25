@@ -136,7 +136,7 @@ Add a new record (next number) whenever a significant decision is made; never re
   `material-icons-*` libraries are no longer updated (frozen at 1.7.8); `material-icons-extended` holds thousands of
   icons and slows debug builds.
 - **Decision:** Use `material-icons-core` (`Icons.Default.*`, via the Compose BOM) for common icons. Any icon it lacks
-  is added as a Material Symbols vector drawable in `res/drawable`.
+  is added as a Material Symbols vector drawable in `res/drawable` (Material Symbols: Apache License 2.0).
 - **Alternatives:** `material-icons-extended` (every icon in code, heavy); only vector drawables (more files for icons
   the core set already has).
 - **Consequences:** Small dependency, familiar `Icons.Default.X` API; missing icons are single XML files.
@@ -190,3 +190,24 @@ Add a new record (next number) whenever a significant decision is made; never re
   would allow duplicate alerts); one database per feature (more setup, no cross-table transactions).
 - **Consequences:** Upgrades are safe and reviewable (schema JSON diffs). Adding a table is a version bump plus
   one annotation.
+
+## ADR-021 — Earthquake repository without extra data source classes and without product rules
+- **Context:** The list, the detail and the background check all read USGS data. The planned layout had a remote and
+  a local data source between the repository and Retrofit/Room.
+- **Decision:** `EarthquakeRepositoryImpl` talks to `UsgsApi` and `EarthquakeDao` directly. It only moves data: the
+  caller passes an `EarthquakeQuery` (time window, minimum magnitude, area, `updatedAfter`), and use cases own the
+  product values (7 days, M2.5+, alert threshold). Detail lookups read the cache first and fall back to USGS without
+  writing the result into the cache.
+- **Alternatives:** Remote/local data source wrappers (one-line pass-through classes); repository methods with the
+  query rules built in (the list and the alert check would need different methods for the same call).
+- **Consequences:** One class shows the whole data flow. Changing what the list or the alerts fetch is a use case
+  change. The cache always equals the last list refresh.
+
+## ADR-022 — No comments in source, build and resource files
+- **Context:** Comments drift away from the code they describe, and the rationale for decisions already lives in
+  these docs.
+- **Decision:** Code, Gradle and resource files carry no comments; names (types, functions, constants, tests) carry
+  the meaning. Rationale goes into `docs/DECISIONS.md` and `docs/ARCHITECTURE.md`.
+- **Consequences:** Names are chosen to be self-explanatory (e.g. `toEarthquakeOrNull`, `refreshCache`), and a test
+  name states the rule it checks. Third-party attributions (Material Symbols, Apache License 2.0) are recorded in
+  the docs instead of the drawable files.

@@ -29,17 +29,11 @@ import com.ahmetyildiz.quakealert.core.ui.theme.SeverityColor
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
 enum class MagnitudeBadgeSize(val minSize: Dp, val textStyle: TextStyle, val showsSeverityLabel: Boolean) {
-    /** List rows: the number only. */
     COMPACT(minSize = 48.dp, textStyle = MagnitudeTextStyle, showsSeverityLabel = false),
 
-    /** Detail header: the number and the severity name. */
     LARGE(minSize = 72.dp, textStyle = MagnitudeLargeTextStyle, showsSeverityLabel = true),
 }
 
-/**
- * Magnitude in a solid box coloured by severity. The number is always visible, so colour is never the only cue.
- * A null magnitude (not yet computed by USGS) shows a dash on a neutral colour.
- */
 @Composable
 fun MagnitudeBadge(
     magnitude: Double?,

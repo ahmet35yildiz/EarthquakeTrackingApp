@@ -5,10 +5,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-// Brand colour schemes. Light values are the design system's; dark values come from the same Material 3 "fidelity"
-// tonal palettes (primary #006874, secondary #4A6267, tertiary #785900, neutral #70787D), so both themes stay in sync.
-// surfaceVariant equals surfaceContainerHighest, as in the design system.
-
 internal val LightColorScheme: ColorScheme = lightColorScheme(
     primary = Color(0xFF004E58),
     onPrimary = Color(0xFFFFFFFF),

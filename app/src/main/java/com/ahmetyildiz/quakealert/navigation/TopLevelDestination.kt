@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.ahmetyildiz.quakealert.R
 
-/** Tabs of the bottom navigation bar, in display order. Icons: Material Symbols Rounded (outlined / filled). */
 enum class TopLevelDestination(
     val route: TopLevelRoute,
     @param:StringRes val labelRes: Int,

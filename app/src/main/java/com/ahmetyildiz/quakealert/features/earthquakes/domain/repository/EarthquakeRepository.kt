@@ -1,0 +1,17 @@
+package com.ahmetyildiz.quakealert.features.earthquakes.domain.repository
+
+import com.ahmetyildiz.quakealert.core.error.AppResult
+import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
+import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeQuery
+import kotlinx.coroutines.flow.Flow
+
+interface EarthquakeRepository {
+
+    fun observeCachedEarthquakes(): Flow<List<Earthquake>>
+
+    suspend fun refreshCache(query: EarthquakeQuery): AppResult<Unit>
+
+    suspend fun getEarthquake(id: String): AppResult<Earthquake>
+
+    suspend fun fetchEarthquakes(query: EarthquakeQuery): AppResult<List<Earthquake>>
+}

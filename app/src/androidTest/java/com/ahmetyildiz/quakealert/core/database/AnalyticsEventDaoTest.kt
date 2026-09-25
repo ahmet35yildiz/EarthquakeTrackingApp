@@ -11,7 +11,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Runs against real SQLite (in memory), so the table, the query and the params converter are covered together. */
 @RunWith(AndroidJUnit4::class)
 class AnalyticsEventDaoTest {
 

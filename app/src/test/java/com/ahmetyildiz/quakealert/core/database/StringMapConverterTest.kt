@@ -17,7 +17,7 @@ class StringMapConverterTest {
     fun `map survives a round trip, including empty maps and special characters`() {
         val maps: List<Map<String, String>> = listOf(
             emptyMap(),
-            mapOf("text" to "quotes \" and \\ backslash", "turkish" to "İzmir ığüşöç"),
+            mapOf("text" to "quotes \" and \\ backslash", "unicode" to "Zürich São Paulo 東京"),
         )
         val roundTripped: List<Map<String, String>> = maps.map { converter.toMap(converter.fromMap(it)) }
         assertEquals(maps, roundTripped)

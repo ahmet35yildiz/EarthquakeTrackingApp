@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** [AnalyticsTracker] that keeps events on the device (Room) and prints them to Logcat (tag `Analytics`). */
 class LocalAnalyticsTracker @Inject constructor(
     private val dao: AnalyticsEventDao,
     private val clock: Clock,
@@ -30,7 +29,6 @@ class LocalAnalyticsTracker @Inject constructor(
         try {
             dao.insert(entity)
         } catch (exception: Exception) {
-            // Losing one event is acceptable; crashing the app because of analytics is not.
             Log.w(TAG, "Could not store ${entity.name}", exception)
         }
     }

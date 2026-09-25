@@ -10,15 +10,10 @@ class HaversineTest {
 
     @ParameterizedTest(name = "({0}, {1}) → ({2}, {3}) = {4} km")
     @CsvSource(
-        // One degree of longitude on the equator: 2πR / 360.
         "0.0, 0.0, 0.0, 1.0, 111.195",
-        // Equator to pole: a quarter of the circumference.
         "0.0, 0.0, 90.0, 0.0, 10007.543",
-        // Antipodal points: half of the circumference.
         "0.0, 0.0, 0.0, 180.0, 20015.087",
-        // Across the antimeridian: 179°E to 179°W is two degrees, not 358.
         "0.0, 179.0, 0.0, -179.0, 222.390",
-        // London → Paris.
         "51.5074, -0.1278, 48.8566, 2.3522, 343.556",
     )
     fun `distance matches the great-circle distance`(

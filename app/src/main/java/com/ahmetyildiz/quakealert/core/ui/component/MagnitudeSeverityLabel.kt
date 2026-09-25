@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.MagnitudeSeverity
 
-/** Localized name of a severity level ("Light", "Hafif"). */
 @get:StringRes
 val MagnitudeSeverity.labelRes: Int
     get() = when (this) {

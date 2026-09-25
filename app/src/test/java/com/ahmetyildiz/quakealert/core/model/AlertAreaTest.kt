@@ -9,7 +9,6 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class AlertAreaTest {
 
-    // Center on the equator so a point's distance depends only on its longitude.
     private val area = AlertArea.AroundCity(
         city = City(name = "Center", adminArea = null, countryCode = "XX", location = GeoPoint(0.0, 0.0)),
         radiusKm = RADIUS_KM,

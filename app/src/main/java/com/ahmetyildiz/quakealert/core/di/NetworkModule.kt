@@ -21,11 +21,9 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideJson(): Json = Json {
-        // USGS responses carry many fields we do not use; new fields must not break parsing.
         ignoreUnknownKeys = true
     }
 
-    /** [interceptors] come from [NetworkInterceptorsModule]; debug builds add HTTP logging. */
     @Provides
     @Singleton
     fun provideOkHttpClient(interceptors: Set<@JvmSuppressWildcards Interceptor>): OkHttpClient =

@@ -37,7 +37,6 @@ import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
-/** A button shown below a status message. */
 data class StateAction(
     val label: String,
     val onClick: () -> Unit,
@@ -51,7 +50,6 @@ fun LoadingState(modifier: Modifier = Modifier) {
     }
 }
 
-/** Nothing to show, e.g. no earthquakes match the filters. The optional [action] is a quiet text button. */
 @Composable
 fun EmptyState(
     title: String,
@@ -72,7 +70,6 @@ fun EmptyState(
     }
 }
 
-/** Loading failed and there is nothing cached to show; the primary action retries. */
 @Composable
 fun ErrorState(
     title: String,
@@ -138,7 +135,7 @@ private fun StatusStatesPreview() {
                 Box(modifier = Modifier.height(120.dp)) { LoadingState() }
                 Box(modifier = Modifier.height(300.dp)) {
                     EmptyState(
-                        title = "No M4.5+ earthquakes near İzmir in the last 7 days.",
+                        title = "No M4.5+ earthquakes near Izmir in the last 7 days.",
                         message = "That's good news.",
                         action = StateAction(label = "Show all earthquakes", onClick = {}),
                     )

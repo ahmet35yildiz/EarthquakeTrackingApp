@@ -25,8 +25,10 @@ All three of `assembleDebug testDebugUnitTest lintDebug` must pass before a task
 
 ## Rules
 - Package: `com.ahmetyildiz.quakealert`. Feature-first Clean Architecture, MVVM in presentation (see ARCHITECTURE).
-- Code, identifiers, comments and docs in English. `README.md` is kept in Turkish during development and translated
-  to English at the end.
+- Code, identifiers and docs in English. No Turkish anywhere in the project except `README.md` (Turkish during
+  development, translated to English at the end) and the Turkish translations in `res/values-tr/strings.xml`.
+- No comments in code or build/resource files (no `//`, `/* */`, KDoc, `<!-- -->`, `#`). Names must explain the code;
+  the "why" goes into `docs/DECISIONS.md` / `docs/ARCHITECTURE.md`.
 - Every user-facing string lives in `res/values/strings.xml` (English, default) and `res/values-tr/strings.xml`.
   No hard-coded UI text.
 - Tunable values (thresholds, radius options, intervals, limits) live in one place per feature as named constants.

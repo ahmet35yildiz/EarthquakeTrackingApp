@@ -7,9 +7,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
-// Material 3 type scale with the design system's weights. The system font (Roboto) is used instead of bundling
-// Roboto Flex: same metrics and look, no font download or extra APK size.
-
 private fun textStyle(size: TextUnit, lineHeight: TextUnit, weight: FontWeight, letterSpacing: TextUnit): TextStyle =
     TextStyle(
         fontFamily = FontFamily.Default,
@@ -37,10 +34,8 @@ internal val QuakeAlertTypography: Typography = Typography(
     labelSmall = textStyle(11.sp, 16.sp, FontWeight.SemiBold, 0.5.sp),
 )
 
-/** Magnitude numbers: bold with tabular figures so values line up in lists. */
 val MagnitudeTextStyle: TextStyle = textStyle(18.sp, 22.sp, FontWeight.Bold, (-0.2).sp)
     .copy(fontFeatureSettings = "tnum")
 
-/** Magnitude number in large badges (detail screen). */
 val MagnitudeLargeTextStyle: TextStyle = textStyle(28.sp, 36.sp, FontWeight.Bold, 0.sp)
     .copy(fontFeatureSettings = "tnum")

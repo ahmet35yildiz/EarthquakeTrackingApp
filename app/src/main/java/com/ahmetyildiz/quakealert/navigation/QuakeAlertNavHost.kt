@@ -27,7 +27,6 @@ fun QuakeAlertNavHost(
     }
 }
 
-/** Switches tabs keeping one back stack entry per tab and restoring each tab's state. */
 fun NavController.navigateToTopLevelDestination(destination: TopLevelDestination) {
     navigate(destination.route) {
         popUpTo(graph.findStartDestination().id) {

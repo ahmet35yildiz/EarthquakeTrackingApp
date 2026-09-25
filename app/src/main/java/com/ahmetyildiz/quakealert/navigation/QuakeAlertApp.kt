@@ -11,7 +11,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
-/** App shell: bottom navigation bar around the navigation host. */
 @Composable
 fun QuakeAlertApp() {
     val navController: NavHostController = rememberNavController()

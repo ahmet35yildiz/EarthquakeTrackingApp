@@ -3,6 +3,7 @@ package com.ahmetyildiz.quakealert.core.di
 import android.content.Context
 import androidx.room.Room
 import com.ahmetyildiz.quakealert.core.database.AnalyticsEventDao
+import com.ahmetyildiz.quakealert.core.database.EarthquakeDao
 import com.ahmetyildiz.quakealert.core.database.QuakeAlertDatabase
 import dagger.Module
 import dagger.Provides
@@ -22,4 +23,7 @@ object DatabaseModule {
 
     @Provides
     fun provideAnalyticsEventDao(database: QuakeAlertDatabase): AnalyticsEventDao = database.analyticsEventDao()
+
+    @Provides
+    fun provideEarthquakeDao(database: QuakeAlertDatabase): EarthquakeDao = database.earthquakeDao()
 }

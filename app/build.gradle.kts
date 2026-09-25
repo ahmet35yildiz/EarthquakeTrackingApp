@@ -25,7 +25,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Languages for the in-app language picker, generated from the res/values-* folders.
         buildConfigField(
             "String[]",
             "SUPPORTED_LANGUAGE_TAGS",
@@ -34,7 +33,6 @@ android {
     }
 
     androidResources {
-        // Generates locales_config.xml (system per-app language settings, Android 13+) from the same folders.
         generateLocaleConfig = true
     }
 
@@ -61,10 +59,6 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
-/**
- * Returns the default language (from res/resources.properties) followed by the language of every
- * `values-<language>/strings.xml`, e.g. ["en", "tr"]. Adding a translation folder is all it takes to add a language.
- */
 fun findSupportedLanguageTags(): List<String> {
     val resDirectory: File = file("src/main/res")
     val resourceProperties = Properties().apply {

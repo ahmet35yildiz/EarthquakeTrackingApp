@@ -12,7 +12,6 @@ import com.ahmetyildiz.quakealert.navigation.QuakeAlertApp
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-// AppCompatActivity (not ComponentActivity) so the per-app language API also works below Android 13.
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -22,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        // A recreation (rotation, language switch) restores state and is not a new open.
         if (savedInstanceState == null) {
             analyticsTracker.track(AnalyticsEvent.AppOpened(source = AppOpenSource.LAUNCHER))
         }

@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 
-/** App theme: brand colours (no dynamic colour), type scale, shapes and the magnitude severity colours. */
 @Composable
 fun QuakeAlertTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -25,7 +24,6 @@ fun QuakeAlertTheme(
     }
 }
 
-/** Theme values that MaterialTheme does not cover. */
 object QuakeAlertTheme {
     val severityColors: SeverityColors
         @Composable

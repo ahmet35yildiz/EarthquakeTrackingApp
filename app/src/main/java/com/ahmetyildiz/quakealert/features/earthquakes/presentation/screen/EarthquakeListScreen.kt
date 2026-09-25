@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.ahmetyildiz.quakealert.R
 
-// Placeholder until the real screen is built.
 @Composable
 fun EarthquakeListScreen(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

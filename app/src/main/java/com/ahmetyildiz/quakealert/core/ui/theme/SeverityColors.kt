@@ -5,14 +5,12 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.ahmetyildiz.quakealert.core.model.MagnitudeSeverity
 
-/** Solid badge colour of one severity level; [onContainer] keeps WCAG AA contrast on [container]. */
 @Immutable
 data class SeverityColor(
     val container: Color,
     val onContainer: Color,
 )
 
-/** Magnitude severity scale, one colour pair per [MagnitudeSeverity]. */
 @Immutable
 data class SeverityColors(
     val minor: SeverityColor,
@@ -38,7 +36,6 @@ internal val LightSeverityColors: SeverityColors = SeverityColors(
     major = SeverityColor(container = Color(0xFF680016), onContainer = Color(0xFFFFFFFF)),
 )
 
-// Major differs from the design system's dark value (#FFB2BC), which was indistinguishable from strong (#FFB4AB).
 internal val DarkSeverityColors: SeverityColors = SeverityColors(
     minor = SeverityColor(container = Color(0xFF4FD8EB), onContainer = Color(0xFF00363D)),
     light = SeverityColor(container = Color(0xFFE9C349), onContainer = Color(0xFF3C2F00)),

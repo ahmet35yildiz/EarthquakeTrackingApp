@@ -3,7 +3,6 @@ package com.ahmetyildiz.quakealert.core.ui.theme
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/** Spacing scale on the 4 dp grid. */
 object Spacing {
     val extraSmall: Dp = 4.dp
     val small: Dp = 8.dp
@@ -12,6 +11,5 @@ object Spacing {
     val extraLarge: Dp = 24.dp
     val huge: Dp = 32.dp
 
-    /** Horizontal margin of screen content. */
     val screenMargin: Dp = large
 }

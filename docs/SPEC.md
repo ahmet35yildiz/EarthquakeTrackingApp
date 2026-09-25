@@ -141,7 +141,7 @@ An earthquake triggers an alert when **all** hold:
 7. If the notification permission is missing → do not post, log a suppressed event.
 
 ### 5.3 Notification content
-- Title: "M5.3 earthquake · 12 km from İzmir" (distance part only when an area is set).
+- Title: "M5.3 earthquake · 12 km from Izmir" (distance part only when an area is set).
 - Text: place + local time. Channel "Earthquake alerts", high importance. Tap → detail.
 
 ## 6. Non-functional requirements

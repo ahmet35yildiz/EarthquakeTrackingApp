@@ -119,12 +119,25 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   (names and params match ANALYTICS.md), tracker with a fake DAO, converter, and an instrumented DAO test on
   in-memory Room (passed on API 31 and 34). Verified on API 31 and 34: rows in `analytics_events` with params,
   Logcat `Analytics`, no event on rotation.
-- [ ] **1.3 Earthquakes data.** GeoJSON DTOs, `UsgsApi` (query + eventid), mapper, `EarthquakeEntity` + DAO,
+- [x] **1.3 Earthquakes data.** GeoJSON DTOs, `UsgsApi` (query + eventid), mapper, `EarthquakeEntity` + DAO,
   `EarthquakeRepositoryImpl` (refresh = replace cache in a transaction, observe, get by id with network fallback,
   `fetchUpdatedSince` for alerts).
   *Done when:* mapper + repository unit tests pass (null mag/place, 404, failure keeps cache).
-- [ ] **1.4 Earthquakes domain.** `Earthquake`, `EarthquakeRepository`, `EarthquakeQuery`, use cases:
-  `ObserveRecentEarthquakesUseCase` (filters + distance), `RefreshEarthquakesUseCase`, `GetEarthquakeUseCase`.
+  *Result:* the domain types the repository implements (`Earthquake` with a nullable `Magnitude(value, type)`,
+  `EarthquakeQuery`, `EarthquakeRepository`) were created here; 1.4 keeps the use cases. Repository API:
+  `observeCachedEarthquakes`, `refreshCache(query)`, `getEarthquake(id)`, `fetchEarthquakes(query)` (alerts pass
+  `updatedAfter`, replacing the planned `fetchUpdatedSince`). No separate remote/local data source classes: the
+  repository uses `UsgsApi` and `EarthquakeDao` directly (ADR-021). USGS `updated` is not stored (nothing uses it).
+  Query numbers are formatted with `Locale.ROOT` (a Turkish device locale would otherwise send "4,5"). Database v2
+  with an `@AutoMigration` from v1 (ADR-020). Tests: DTO parsing from real-shaped JSON fixtures, mapper (null
+  mag/place/felt, negative depth, non-earthquake, invalid coordinates), query parameters, repository with fakes
+  (refresh replaces cache, failure keeps cache, cache-first detail, network fallback, 404 and non-earthquake →
+  `NotFound`), instrumented `EarthquakeDao` test (passed on API 31 and 34). Verified on API 31 and 34 with temporary
+  injection (reverted): v1 → v2 upgrade kept existing analytics rows, live refresh cached 322 earthquakes, cache
+  lookup, unknown id → `NotFound`, 1000 km around Tokyo returned only Japanese events.
+- [ ] **1.4 Earthquakes domain.** Use cases (the domain types exist since 1.3): `ObserveRecentEarthquakesUseCase`
+  (filters + distance), `RefreshEarthquakesUseCase` (builds the 7-day M2.5+ query from an `EarthquakesConfig`,
+  stores `lastRefreshedAt`), `GetEarthquakeUseCase`.
   *Done when:* filter/distance unit tests pass.
 - [ ] **1.5 List screen.** ViewModel + `EarthquakeListUiState`, list items, region/magnitude chips, pull-to-refresh,
   stale-cache refresh (> 5 min), loading/empty/error/offline states, analytics (viewed, refreshed, filter changed).
@@ -220,3 +233,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 18:38–18:50 | ~12m | 0.6 Design system from the UI design: colour schemes, severity scale, type, shapes, spacing, shared state components (ADR-018) |
 | 2026-09-25 | 20:28–20:36 | ~8m | 1.1 Core basics: AppResult/AppError, Clock, IO dispatcher, network + DataStore modules, preferences repository, GeoPoint/City/AlertArea, haversine; 50 unit tests; verified on API 31 and 34 (ADR-019) |
 | 2026-09-25 | 20:40–20:48 | ~8m | 1.2 Analytics core: event dictionary (25 events), LocalAnalyticsTracker (Room + Logcat), QuakeAlertDatabase v1, app scope, `app_opened`; unit + instrumented tests; verified on API 31 and 34 (ADR-020) |
+| 2026-09-25 | 20:52–20:58 | ~6m | Project rules: no comments in code/build/resource files, no Turkish outside README and TR strings; removed existing comments (80 files) and Turkish test/preview data |
+| 2026-09-25 | 20:58–21:07 | ~9m | 1.3 Earthquakes data: USGS DTOs + API, mappers, query parameters, cache table + DAO (DB v2, auto-migration), repository; unit + instrumented tests; verified on API 31 and 34 (ADR-021, ADR-022) |

@@ -21,7 +21,6 @@ private const val USER_PREFERENCES_FILE_NAME: String = "user_preferences"
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
 
-    /** One instance per file for the whole process, as DataStore requires. A corrupt file resets to defaults. */
     @Provides
     @Singleton
     fun provideUserPreferencesDataStore(

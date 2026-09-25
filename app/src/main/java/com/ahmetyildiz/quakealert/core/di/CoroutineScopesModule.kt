@@ -13,7 +13,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CoroutineScopesModule {
 
-    /** A [SupervisorJob], so one failing job does not cancel the others. */
     @Provides
     @Singleton
     @ApplicationScope

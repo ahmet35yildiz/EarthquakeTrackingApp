@@ -1,15 +1,12 @@
 <resources>
-    <!-- Bottom navigation -->
     <string name="tab_earthquakes">Depremler</string>
     <string name="tab_alerts">Alarmlar</string>
     <string name="tab_settings">Ayarlar</string>
 
-    <!-- Common actions and states -->
     <string name="action_retry">Tekrar dene</string>
     <string name="state_loading">Yükleniyor</string>
     <string name="offline_banner_message">Çevrimdışısın · Gösterilen veriler: %1$s</string>
 
-    <!-- Magnitude -->
     <string name="magnitude_badge_description">Büyüklük %1$s (%2$s)</string>
     <string name="magnitude_unknown_description">Büyüklük bilinmiyor</string>
     <string name="severity_minor">Küçük</string>

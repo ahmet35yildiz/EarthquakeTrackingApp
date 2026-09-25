@@ -8,7 +8,6 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import kotlin.coroutines.cancellation.CancellationException
 
-/** Runs a network [call] and turns its expected exceptions into an [AppResult.Failure]. */
 suspend fun <T> safeApiCall(call: suspend () -> T): AppResult<T> =
     try {
         AppResult.Success(call())
@@ -18,7 +17,6 @@ suspend fun <T> safeApiCall(call: suspend () -> T): AppResult<T> =
         AppResult.Failure(exception.toAppError())
     }
 
-/** Maps an exception thrown by Retrofit, OkHttp or kotlinx.serialization to an [AppError]. */
 fun Exception.toAppError(): AppError =
     when (this) {
         is HttpException -> if (code() == HttpURLConnection.HTTP_NOT_FOUND) AppError.NotFound else AppError.Server(code())

@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.argumentSet
 import org.junit.jupiter.params.provider.MethodSource
 
-/** Every event of docs/ANALYTICS.md §2 with the exact name and params it is recorded with. */
 class AnalyticsEventTest {
 
     @ParameterizedTest

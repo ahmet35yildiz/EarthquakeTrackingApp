@@ -2,10 +2,6 @@ package com.ahmetyildiz.quakealert.core.analytics
 
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 
-/**
- * Every event the app records, with its parameters (docs/ANALYTICS.md §2). Names and parameter keys are defined
- * only here, so call sites cannot log free-form strings. Parameters never carry coordinates or city names.
- */
 sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = emptyMap()) {
 
     data class AppOpened(val source: AppOpenSource) : AnalyticsEvent(
@@ -20,7 +16,6 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("step" to step.paramValue),
     )
 
-    /** [radiusKm] is null when the user kept "Whole world". */
     data class OnboardingCompleted(
         val threshold: Double,
         val radiusKm: Int?,
@@ -87,7 +82,6 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("region_filter" to regionFilter.paramValue, "magnitude_filter" to magnitudeFilter.paramValue),
     )
 
-    /** [count] is the number of earthquakes in the list after the refresh (the cached count on failure). */
     data class EarthquakeListRefreshed(
         val trigger: RefreshTrigger,
         val isSuccessful: Boolean,
@@ -111,7 +105,6 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("filter" to "magnitude", "value" to value.paramValue),
     )
 
-    /** [magnitude] is null for events USGS published without one. */
     data class EarthquakeDetailViewed(val source: DetailSource, val magnitude: Double?) : AnalyticsEvent(
         name = "earthquake_detail_viewed",
         params = buildMap {
@@ -160,7 +153,6 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("reason" to reason.paramValue),
     )
 
-    /** A null language means "System default". */
     data class LanguageChanged(val from: AppLanguage?, val to: AppLanguage?) : AnalyticsEvent(
         name = "language_changed",
         params = mapOf("from" to from.paramValue, "to" to to.paramValue),
@@ -175,11 +167,9 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
     }
 }
 
-// lowercase() is locale-independent, so "I" never becomes a dotless "ı" on Turkish devices.
 private val Enum<*>.paramValue: String
     get() = name.lowercase()
 
-/** Logged language value when the app follows the device language. */
 private const val SYSTEM_LANGUAGE: String = "system"
 
 private val AppLanguage?.paramValue: String

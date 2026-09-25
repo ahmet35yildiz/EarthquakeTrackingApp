@@ -12,8 +12,6 @@ class QuakeAlertApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
-    // WorkManager is initialized on demand with this configuration so workers get Hilt injection.
-    // The default initializer is removed in AndroidManifest.xml.
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)

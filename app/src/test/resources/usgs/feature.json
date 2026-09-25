@@ -1,0 +1,10 @@
+{
+  "type": "Feature",
+  "properties": {
+    "mag": 4.7, "place": "10 km N of Somewhere, Japan", "time": 1790350000000, "updated": 1790351000000,
+    "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000efgh", "felt": 3, "status": "reviewed",
+    "tsunami": 0, "magType": "mb", "type": "earthquake", "products": {"origin": [{"id": "origin-1"}]}
+  },
+  "geometry": {"type": "Point", "coordinates": [139.7, 35.7, 45.5]},
+  "id": "us7000efgh"
+}

@@ -1,6 +1,5 @@
 package com.ahmetyildiz.quakealert.core.model
 
-/** Severity band of an earthquake magnitude; drives badge colours and wording. */
 enum class MagnitudeSeverity(val lowerBound: Double) {
     MINOR(lowerBound = Double.NEGATIVE_INFINITY),
     LIGHT(lowerBound = 4.0),

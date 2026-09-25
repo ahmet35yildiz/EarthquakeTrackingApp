@@ -1,17 +1,14 @@
 <resources>
     <string name="app_name" translatable="false">QuakeAlert</string>
 
-    <!-- Bottom navigation -->
     <string name="tab_earthquakes">Earthquakes</string>
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
 
-    <!-- Common actions and states -->
     <string name="action_retry">Retry</string>
     <string name="state_loading">Loading</string>
     <string name="offline_banner_message">You\'re offline · Showing data from %1$s</string>
 
-    <!-- Magnitude -->
     <string name="magnitude_value" translatable="false">%.1f</string>
     <string name="magnitude_unknown_value" translatable="false">–</string>
     <string name="magnitude_badge_description">Magnitude %1$s (%2$s)</string>

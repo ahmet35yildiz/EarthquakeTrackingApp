@@ -23,7 +23,6 @@ import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
 
-/** [UserPreferencesRepository] stored in a Preferences DataStore file (one key per field). */
 class DataStoreUserPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : UserPreferencesRepository {
@@ -68,7 +67,6 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         )
     }
 
-    /** An area is stored only as a complete set of keys; anything less reads as the whole world. */
     private fun Preferences.readAlertArea(): AlertArea {
         val city = City(
             name = this[Keys.AREA_CITY_NAME] ?: return AlertArea.WholeWorld,
@@ -100,7 +98,6 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         this[Keys.AREA_RADIUS_KM] = area.radiusKm
     }
 
-    /** Key names are part of the stored file format: renaming one loses the saved value. */
     private object Keys {
         val ONBOARDING_COMPLETED: Preferences.Key<Boolean> = booleanPreferencesKey("onboarding_completed")
         val ALERTS_ENABLED: Preferences.Key<Boolean> = booleanPreferencesKey("alerts_enabled")

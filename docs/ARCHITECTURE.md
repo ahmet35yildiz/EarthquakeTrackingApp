@@ -76,10 +76,16 @@ EarthquakeListScreen ─▶ EarthquakeListViewModel
         ▲                   │ observe: ObserveRecentEarthquakesUseCase (Room Flow + UserPreferences + filters)
         │ UiState           │ refresh: RefreshEarthquakesUseCase
         │                   ▼
-        └────────── EarthquakeRepositoryImpl ── UsgsRemoteDataSource (Retrofit)
-                                             └─ EarthquakeLocalDataSource (Room DAO)
+        └────────── EarthquakeRepositoryImpl ── UsgsApi (Retrofit)
+                                             └─ EarthquakeDao (Room)
 ```
-- Refresh fetches 7 days / M2.5+ worldwide, replaces the cache in one transaction, stores `lastRefreshedAt`.
+- `RefreshEarthquakesUseCase` builds the query (7 days / M2.5+ worldwide) and stores `lastRefreshedAt`; the repository
+  replaces the cache in one transaction. A failed refresh leaves the cache untouched.
+- The repository holds no product rules: every query (time window, magnitude, area, `updatedafter`) comes from a use
+  case as an `EarthquakeQuery`, mapped to USGS parameters in the data layer.
+- Detail by id: cache first, then USGS `eventid` (404 or a non-earthquake event → `NotFound`); the network result is
+  not written to the cache, which always mirrors the last list refresh.
+- Features that are not earthquakes or lack valid coordinates/depth are dropped while mapping.
 - Filters and distances are computed in the domain layer (haversine) on the cached list.
 
 ### 4.2 Background alert check
@@ -87,7 +93,7 @@ EarthquakeListScreen ─▶ EarthquakeListViewModel
 WorkManager (periodic 15 min, NetworkType.CONNECTED)
   └─ AlertCheckWorker (thin) ─▶ CheckForNewAlertsUseCase
         ├─ UserPreferencesRepository (settings, baseline, lastCheckedAt)
-        ├─ EarthquakeRepository.fetchUpdatedSince(query)   ← earthquakes.domain
+        ├─ EarthquakeRepository.fetchEarthquakes(query with updatedAfter)   ← earthquakes.domain
         ├─ AlertMatcher (rules SPEC §5.1, pure Kotlin, unit-tested)
         ├─ NotifiedEarthquakeRepository (dedupe, prune 30 days)
         ├─ AlertNotifier (interface) ─▶ EarthquakeAlertNotifier (Android)
@@ -123,7 +129,7 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
 ## 5. Persistence
 | Store | Content |
 |---|---|
-| Room `earthquakes` | Cached list (id, magnitude, magType, place, time, updated, lat, lon, depth, url, status, tsunami, felt) |
+| Room `earthquakes` | Cached list (id, magnitude, magnitude type, place, time, lat, lon, depth, detail url, reviewed, tsunami flag, felt reports) |
 | Room `notified_earthquakes` | id, notifiedAt — dedupe, pruned after 30 days |
 | Room `analytics_events` | id, name, params (JSON string map), timestamp |
 | DataStore `user_preferences` | onboardingCompleted, alertsEnabled, threshold, area (lat, lon, city, admin, countryCode, radiusKm), alertBaselineAt, lastCheckedAt, lastRefreshedAt |
@@ -167,4 +173,5 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
 - Composables stateless where possible (state hoisting); `LazyColumn` items always keyed; previews use
   `@PreviewLightDark`.
 - Strings via `stringResource`; colours/typography via `MaterialTheme`; no hard-coded UI values.
+- No comments in source, build or resource files; names carry the meaning, rationale lives in these docs.
 - Clock and dispatchers injected so time-based logic is testable.

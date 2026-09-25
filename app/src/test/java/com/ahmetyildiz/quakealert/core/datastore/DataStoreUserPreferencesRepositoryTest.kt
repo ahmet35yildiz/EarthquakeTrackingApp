@@ -17,7 +17,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import java.time.Duration
 
-/** Round-trips through a real DataStore file, so key names and value mapping are covered together. */
 class DataStoreUserPreferencesRepositoryTest {
 
     @TempDir
@@ -26,8 +25,8 @@ class DataStoreUserPreferencesRepositoryTest {
     private val clock = FakeClock()
 
     private val izmir = City(
-        name = "İzmir",
-        adminArea = "İzmir",
+        name = "Izmir",
+        adminArea = "Izmir",
         countryCode = "TR",
         location = GeoPoint(38.4237, 27.1428),
     )

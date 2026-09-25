@@ -8,7 +8,6 @@ import dagger.multibindings.IntoSet
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
 
-/** Debug builds only: logs request lines, status and timing to Logcat (bodies are too large to be useful). */
 @Module
 @InstallIn(SingletonComponent::class)
 object DebugNetworkModule {

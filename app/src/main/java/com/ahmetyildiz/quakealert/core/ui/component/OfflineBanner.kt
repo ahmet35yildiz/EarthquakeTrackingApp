@@ -19,7 +19,6 @@ import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
-/** Refresh failed but cached data is shown; [dataTime] is when that data was fetched, already formatted. */
 @Composable
 fun OfflineBanner(
     dataTime: String,
