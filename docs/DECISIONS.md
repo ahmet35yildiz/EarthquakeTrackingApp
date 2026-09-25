@@ -179,3 +179,14 @@ Add a new record (next number) whenever a significant decision is made; never re
   stored threshold with the default in `alerts` (the list would need the alerts feature).
 - **Consequences:** One class to read to see what is stored and how. Features depend on the interface and are
   tested with a fake. Key names are part of the file format; renaming one drops the stored value.
+
+## ADR-020 — One Room database, versioned with migrations from the first schema
+- **Context:** Analytics events, the earthquake cache and notified ids all live in Room (`QuakeAlertDatabase`). Tables
+  are added task by task, and devices that already run the app must keep working after an update.
+- **Decision:** One database file (`quakealert.db`). Schemas are exported to `app/schemas` and kept in git. Every
+  schema change increases the version and adds a migration (`@AutoMigration` where Room can derive it). No
+  destructive fallback.
+- **Alternatives:** `fallbackToDestructiveMigration` (silently drops the event log and notified ids — the latter
+  would allow duplicate alerts); one database per feature (more setup, no cross-table transactions).
+- **Consequences:** Upgrades are safe and reviewable (schema JSON diffs). Adding a table is a version bump plus
+  one annotation.

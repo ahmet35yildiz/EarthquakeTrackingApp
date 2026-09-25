@@ -104,10 +104,21 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   is created together with its first entity. Tests: haversine, `GeoPoint` validation, `AlertArea`, DataStore
   round-trips on a temp file, error mapping. Verified on API 34 and API 31 with temporary injection (reverted): Hilt
   graph resolves, preferences survive an app restart, a USGS request succeeds and is logged in debug.
-- [ ] **1.2 Analytics core.** `QuakeAlertDatabase` (created here with its first entity, see 1.1),
+- [x] **1.2 Analytics core.** `QuakeAlertDatabase` (created here with its first entity, see 1.1),
   `AnalyticsEvent` sealed class (all events of ANALYTICS.md §2), `AnalyticsTracker`, `LocalAnalyticsTracker`
   (Room + Logcat), DAO, Hilt binding.
   *Done when:* unit test verifies events are persisted with params; `app_opened` logged from `MainActivity`.
+  *Result:* all 25 events as `AnalyticsEvent` subclasses with typed params (enum values in
+  `AnalyticsParameters.kt`); `list_filter_changed` is two classes (`RegionFilterChanged`, `MagnitudeFilterChanged`)
+  so a filter can never be logged with the other filter's value. `track()` is fire-and-forget: the timestamp is
+  taken at call time, the insert runs on the new `@ApplicationScope` (SupervisorJob + IO, now also used by DataStore)
+  and a storage failure is logged, never thrown. Params are stored as a JSON object through a Room
+  `TypeConverter`. `QuakeAlertDatabase` v1, schema exported (ADR-020); the leftover sample schema from 0.3 removed.
+  `app_opened` (source launcher) is logged only when `MainActivity` is created without saved state, so rotation and
+  language switches do not count; the notification source comes with 2.5. Tests: dictionary test for every event
+  (names and params match ANALYTICS.md), tracker with a fake DAO, converter, and an instrumented DAO test on
+  in-memory Room (passed on API 31 and 34). Verified on API 31 and 34: rows in `analytics_events` with params,
+  Logcat `Analytics`, no event on rotation.
 - [ ] **1.3 Earthquakes data.** GeoJSON DTOs, `UsgsApi` (query + eventid), mapper, `EarthquakeEntity` + DAO,
   `EarthquakeRepositoryImpl` (refresh = replace cache in a transaction, observe, get by id with network fallback,
   `fetchUpdatedSince` for alerts).
@@ -144,7 +155,8 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   *Done when:* SPEC §4.4 met; ViewModel tests pass.
 - [ ] **2.5 Notifications.** Channel creation at startup, `AlertNotifier` interface + `EarthquakeAlertNotifier`
   (single, up to 3 individual, summary for more; deep link PendingIntent; localized title with distance),
-  `NotificationPermissionChecker`, suppressed path, `alert_notification_opened` with delay.
+  `NotificationPermissionChecker`, suppressed path, `alert_notification_opened` with delay, `app_opened` with
+  source = notification.
   *Done when:* notification from a test trigger opens the right detail (cold + warm start) on API 31/32 and 34.
 - [ ] **2.6 Worker.** `NotifiedEarthquakeRepository` (Room, prune), `CheckForNewAlertsUseCase` (SPEC §5.2),
   thin `AlertCheckWorker` (`@HiltWorker`), `AlertWorkScheduler` (unique periodic, UPDATE policy, network
@@ -207,3 +219,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 18:12–18:30 | ~18m | 0.5 i18n infrastructure + 0.7 API 31 emulator: generated language list and locale config, AppLanguageManager; EN/TR verified on API 31 and 34 |
 | 2026-09-25 | 18:38–18:50 | ~12m | 0.6 Design system from the UI design: colour schemes, severity scale, type, shapes, spacing, shared state components (ADR-018) |
 | 2026-09-25 | 20:28–20:36 | ~8m | 1.1 Core basics: AppResult/AppError, Clock, IO dispatcher, network + DataStore modules, preferences repository, GeoPoint/City/AlertArea, haversine; 50 unit tests; verified on API 31 and 34 (ADR-019) |
+| 2026-09-25 | 20:40–20:48 | ~8m | 1.2 Analytics core: event dictionary (25 events), LocalAnalyticsTracker (Room + Logcat), QuakeAlertDatabase v1, app scope, `app_opened`; unit + instrumented tests; verified on API 31 and 34 (ADR-020) |

@@ -22,7 +22,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 
 | Event | Params | When |
 |---|---|---|
-| `app_opened` | `source` = launcher \| notification | Activity start from launcher or notification tap |
+| `app_opened` | `source` = launcher \| notification | Main activity created from launcher or notification tap (not on recreation after rotation or a language switch) |
 | `onboarding_started` | – | First onboarding screen shown |
 | `onboarding_step_viewed` | `step` = welcome \| alert_setup \| notifications | Each step shown |
 | `onboarding_completed` | `threshold`, `has_area`, `radius_km`, `notifications_granted` | Finish tapped |
@@ -34,9 +34,9 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `alert_area_cleared` | `context` | Switched to whole world |
 | `city_search_performed` | `country_code`, `result_count` | Search completed |
 | `city_search_failed` | `reason` = network \| unavailable \| unknown | Search failed |
-| `earthquake_list_viewed` | `region_filter`, `magnitude_filter` | List screen shown |
+| `earthquake_list_viewed` | `region_filter` = world \| near_city, `magnitude_filter` = all \| above_threshold | List screen shown |
 | `earthquake_list_refreshed` | `trigger` = initial \| pull \| stale, `result` = success \| failure, `count` | Refresh finished |
-| `list_filter_changed` | `filter` = region \| magnitude, `value` | Chip tapped |
+| `list_filter_changed` | `filter` = region \| magnitude, `value` (same values as above) | Chip tapped |
 | `earthquake_detail_viewed` | `source` = list \| notification, `magnitude` | Detail shown |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
 | `alert_notification_posted` | `event_id`, `magnitude`, `batch_size` | Notification posted |
@@ -44,13 +44,14 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `alert_notification_opened` | `event_id`, `delay_seconds` | Notification tapped |
 | `background_check_completed` | `fetched`, `matched`, `notified`, `duration_ms` | Worker success |
 | `background_check_failed` | `reason` = network \| server \| parsing \| unknown | Worker failure/retry |
-| `language_changed` | `from`, `to` | Language picked |
+| `language_changed` | `from`, `to` = language tag \| system | Language picked |
 | `developer_simulated_alert` | – | Simulate alert (debug) |
 | `developer_check_triggered` | – | Run check now (debug) |
 
 ## 3. Implementation notes
 - Event names and params are defined once in `core/analytics/AnalyticsEvent.kt` (sealed class) — no free-form
-  strings at call sites.
+  strings at call sites. Enum-like values are enums in `AnalyticsParameters.kt`, logged as the constant name in
+  lower case. Numbers are logged with `toString()` (e.g. `4.5`, `250`); booleans as `true` / `false`.
 - Tracking calls happen in ViewModels / use cases / worker, never inside composables' recomposition paths
   (use `LaunchedEffect` keyed on the screen for "viewed" events).
 - `LocalAnalyticsTracker` writes on an IO dispatcher and never throws to callers.

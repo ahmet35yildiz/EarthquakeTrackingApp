@@ -1,0 +1,22 @@
+package com.ahmetyildiz.quakealert.core.di
+
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object CoroutineScopesModule {
+
+    /** A [SupervisorJob], so one failing job does not cancel the others. */
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideApplicationScope(@IoDispatcher ioDispatcher: CoroutineDispatcher): CoroutineScope =
+        CoroutineScope(SupervisorJob() + ioDispatcher)
+}

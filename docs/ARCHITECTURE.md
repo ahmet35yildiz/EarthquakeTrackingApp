@@ -41,7 +41,7 @@ com.ahmetyildiz.quakealert/
 │   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), supported languages
 │   ├── error/                       # AppResult, AppError
 │   ├── time/                        # Clock abstraction (testable "now"), formatters
-│   ├── di/                          # App-wide Hilt modules (network, database, datastore, dispatchers, clock)
+│   ├── di/                          # App-wide Hilt modules (network, database, datastore, dispatchers, app scope, clock)
 │   └── ui/                          # Reusable composables (states, chips, badges) + theme/
 ├── features/
 │   ├── earthquakes/                 # List + detail + USGS data
