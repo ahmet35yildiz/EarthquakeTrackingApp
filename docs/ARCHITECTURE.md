@@ -143,11 +143,12 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
 
 ## 7. Design system
 - Custom light and dark `ColorScheme` (dynamic color **off** for a consistent brand look), typography scale, shapes,
-  spacing tokens in `core/ui/theme`.
-- Magnitude severity colours as an extended theme token set (`LocalSeverityColors`): < 4, 4–5, 5–6, 6–7, ≥ 7.
+  spacing tokens (`Spacing`) in `core/ui/theme`; values come from the UI design (ADR-018).
+- Magnitude severity colours as an extended theme token set (`LocalSeverityColors`, read via
+  `QuakeAlertTheme.severityColors`): < 4, 4–5, 5–6, 6–7, ≥ 7. The bands live in `core/model/MagnitudeSeverity`.
 - Shared state composables: `LoadingState`, `EmptyState`, `ErrorState`, `OfflineBanner`, `MagnitudeBadge`.
-- Icons: `material-icons-core` (`Icons.Default.*`); icons it lacks are added as Material Symbols vector drawables
-  (ADR-016).
+- Icons: `material-icons-core` (`Icons.Rounded.*`); icons it lacks, and the bottom-bar icons (outlined/filled pairs),
+  are Material Symbols Rounded vector drawables (ADR-016).
 - Edge-to-edge, custom adaptive launcher icon, `contentDescription` on all meaningful icons.
 
 ## 8. Error handling
@@ -162,7 +163,7 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
 - Constants `UPPER_CASE` in a per-feature `*Config` object (e.g. `AlertConfig.THRESHOLD_RANGE`,
   `AlertConfig.RADIUS_OPTIONS_KM`, `AlertConfig.CHECK_INTERVAL_MINUTES`) — no magic numbers.
 - Value classes for domain primitives where it helps (e.g. `Magnitude`, `EarthquakeId`).
-- Composables stateless where possible (state hoisting); `LazyColumn` items always keyed; previews named in
-  `snake_case`.
+- Composables stateless where possible (state hoisting); `LazyColumn` items always keyed; previews use
+  `@PreviewLightDark`.
 - Strings via `stringResource`; colours/typography via `MaterialTheme`; no hard-coded UI values.
 - Clock and dispatchers injected so time-based logic is testable.

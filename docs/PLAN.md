@@ -74,10 +74,15 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   outcome, less code. `AppLanguageManager` (interface) + `AppCompatLanguageManager`, bound in `core/di/LocaleModule`.
   Verified with a temporary toggle button (removed afterwards) on API 34 and API 31: instant switch EN ↔ TR, choice
   kept after the app is killed, selected tab kept; on API 34 also via the system per-app language setting.
-- [ ] **0.6 Design system.** Light/dark color schemes (dynamic color off), typography, shapes, spacing tokens,
+- [x] **0.6 Design system.** Light/dark color schemes (dynamic color off), typography, shapes, spacing tokens,
   `LocalSeverityColors`; shared `LoadingState`, `EmptyState`, `ErrorState`, `OfflineBanner`, `MagnitudeBadge` with
   previews.
   *Done when:* previews render in light and dark.
+  *Result:* tokens taken from the UI design (ADR-018): light scheme = design values, dark scheme generated from the
+  same Material 3 palettes (light regeneration matched the design on 34/35 roles), severity scale with a corrected
+  dark "major" colour, system Roboto, shapes 4/8/12/16/28, `Spacing` object. `MagnitudeSeverity` (core/model, unit
+  tested). Tab icons switched to Material Symbols Rounded drawables. Previews use `@PreviewLightDark`; verified on
+  the API 34 emulator in light and dark with a temporary gallery (reverted).
 - [x] **0.7 Emulator for API < 33.** The user installs it manually when needed (API 31 or 32, Google APIs,
   arm64). Remind the user before the first task that needs it (0.5 at the latest); do not download images yourself.
   *Done when:* the app launches on it.
@@ -187,3 +192,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 17:55–18:05 | ~10m | Design brief prompt for the UI design tool (all screens, states, design system) |
 | 2026-09-25 | 18:05–18:12 | ~7m | 0.4 App skeleton: Hilt application + WorkManager factory, AppCompat MainActivity, 3-tab navigation |
 | 2026-09-25 | 18:12–18:30 | ~18m | 0.5 i18n infrastructure + 0.7 API 31 emulator: generated language list and locale config, AppLanguageManager; EN/TR verified on API 31 and 34 |
+| 2026-09-25 | 18:38–18:50 | ~12m | 0.6 Design system from the UI design: colour schemes, severity scale, type, shapes, spacing, shared state components (ADR-018) |

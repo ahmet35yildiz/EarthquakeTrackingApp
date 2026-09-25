@@ -148,3 +148,18 @@ Add a new record (next number) whenever a significant decision is made; never re
   Turbine and kotlinx-coroutines-test. Instrumented tests stay on the JUnit 4 runner that the Compose test rule needs.
 - **Alternatives:** JUnit 4 everywhere (no parameterized tests without extra runners, older API).
 - **Consequences:** Two test APIs in the project, split cleanly by source set (`test` = Jupiter, `androidTest` = JUnit 4).
+
+## ADR-018 — Design system taken from the UI design, with two deliberate deviations
+- **Context:** The screens and the design system ("Seismic Precision Material") were designed in a UI design tool.
+  It provides full light colour roles, a 5-level severity scale, type scale, shapes and spacing, but only hints for
+  the dark scheme, and it specifies Roboto Flex.
+- **Decision:** Light colours are the design's values. The dark scheme is generated with Material Color Utilities
+  from the same palettes (fidelity variant; regenerating the light scheme this way matched the design on 34 of 35
+  roles, the 35th being `surfaceVariant = surfaceContainerHighest`, which we follow). Deviations: (1) dark "major"
+  severity is `#A8353F`/`#FFEDEC` instead of `#FFB2BC`, which was indistinguishable from dark "strong" (`#FFB4AB`,
+  contrast 1.0); (2) the system Roboto font instead of bundling Roboto Flex (same metrics, no download or APK cost).
+  Screens follow the design's visual language but only for in-scope features (no map, account or search elements).
+- **Alternatives:** Hand-picked dark colours (drift from the light palette); downloadable Roboto Flex via Google
+  Fonts (needs Play services, async loading and a fallback).
+- **Consequences:** Both themes derive from one palette definition; every badge colour pair meets WCAG AA
+  (≥ 5.7:1). Changing the brand colour means regenerating `Color.kt` from the same palettes.

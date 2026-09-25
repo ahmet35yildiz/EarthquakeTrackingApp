@@ -5,4 +5,20 @@
     <string name="tab_earthquakes">Earthquakes</string>
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
+
+    <!-- Common actions and states -->
+    <string name="action_retry">Retry</string>
+    <string name="state_loading">Loading</string>
+    <string name="offline_banner_message">You\'re offline · Showing data from %1$s</string>
+
+    <!-- Magnitude -->
+    <string name="magnitude_value" translatable="false">%.1f</string>
+    <string name="magnitude_unknown_value" translatable="false">–</string>
+    <string name="magnitude_badge_description">Magnitude %1$s (%2$s)</string>
+    <string name="magnitude_unknown_description">Magnitude unknown</string>
+    <string name="severity_minor">Minor</string>
+    <string name="severity_light">Light</string>
+    <string name="severity_moderate">Moderate</string>
+    <string name="severity_strong">Strong</string>
+    <string name="severity_major">Major</string>
 </resources>
