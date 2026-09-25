@@ -1,0 +1,56 @@
+# QuakeAlert — Measurement Plan and Event Dictionary
+
+Events are recorded locally (Room `analytics_events` + Logcat tag `Analytics`) through the `AnalyticsTracker`
+interface and can be inspected in Settings → Developer → Event log. A remote backend (e.g. Firebase) can be plugged
+in later as another `AnalyticsTracker` implementation.
+
+## 1. What "the product works" means
+
+| Question | Metric | Events |
+|---|---|---|
+| Do new users finish setting up alerts? | **Activation rate** = `onboarding_completed` / `onboarding_started` | onboarding_* |
+| Can we actually reach them? | **Notification opt-in rate** = granted / requested | notification_permission_result |
+| Do users personalise alerts? | % with an area set; threshold distribution | onboarding_completed, alert_* |
+| Are alerts valuable? (**north star**) | **Alert open rate** = `alert_notification_opened` / `alert_notification_posted`; median time to open | alert_notification_* |
+| Are alerts too noisy? | Threshold raised or alerts disabled within 24 h after a notification | alert_threshold_changed, alerts_toggled |
+| Is the list useful on its own? | Detail views per list view; share/map actions | earthquake_list_viewed, earthquake_detail_viewed, detail_action_clicked |
+| Is the pipeline reliable? | Background check success rate; refresh failure rate | background_check_*, earthquake_list_refreshed |
+
+## 2. Event dictionary
+
+Parameter values are strings. No personal data: never log coordinates or city names.
+
+| Event | Params | When |
+|---|---|---|
+| `app_opened` | `source` = launcher \| notification | Activity start from launcher or notification tap |
+| `onboarding_started` | – | First onboarding screen shown |
+| `onboarding_step_viewed` | `step` = welcome \| alert_setup \| notifications | Each step shown |
+| `onboarding_completed` | `threshold`, `has_area`, `radius_km`, `notifications_granted` | Finish tapped |
+| `notification_permission_requested` | `context` = onboarding \| settings | Before system dialog |
+| `notification_permission_result` | `granted` | Dialog result |
+| `alerts_toggled` | `enabled` | Alerts switch changed |
+| `alert_threshold_changed` | `from`, `to`, `context` | Threshold saved |
+| `alert_area_set` | `country_code`, `radius_km`, `context` | City + radius saved |
+| `alert_area_cleared` | `context` | Switched to whole world |
+| `city_search_performed` | `country_code`, `result_count` | Search completed |
+| `city_search_failed` | `reason` = network \| unavailable \| unknown | Search failed |
+| `earthquake_list_viewed` | `region_filter`, `magnitude_filter` | List screen shown |
+| `earthquake_list_refreshed` | `trigger` = initial \| pull \| stale, `result` = success \| failure, `count` | Refresh finished |
+| `list_filter_changed` | `filter` = region \| magnitude, `value` | Chip tapped |
+| `earthquake_detail_viewed` | `source` = list \| notification, `magnitude` | Detail shown |
+| `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
+| `alert_notification_posted` | `event_id`, `magnitude`, `batch_size` | Notification posted |
+| `alert_notification_suppressed` | `reason` = permission_denied | Match found but cannot notify |
+| `alert_notification_opened` | `event_id`, `delay_seconds` | Notification tapped |
+| `background_check_completed` | `fetched`, `matched`, `notified`, `duration_ms` | Worker success |
+| `background_check_failed` | `reason` = network \| server \| parsing \| unknown | Worker failure/retry |
+| `language_changed` | `from`, `to` | Language picked |
+| `developer_simulated_alert` | – | Simulate alert (debug) |
+| `developer_check_triggered` | – | Run check now (debug) |
+
+## 3. Implementation notes
+- Event names and params are defined once in `core/analytics/AnalyticsEvent.kt` (sealed class) — no free-form
+  strings at call sites.
+- Tracking calls happen in ViewModels / use cases / worker, never inside composables' recomposition paths
+  (use `LaunchedEffect` keyed on the screen for "viewed" events).
+- `LocalAnalyticsTracker` writes on an IO dispatcher and never throws to callers.

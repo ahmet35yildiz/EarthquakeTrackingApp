@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local-only working notes (never commit)
+CLAUDE.local.md
+tasks/
+.claude/settings.local.json
