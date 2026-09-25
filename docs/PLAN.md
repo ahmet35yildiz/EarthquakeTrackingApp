@@ -23,17 +23,18 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 ---
 
 ## Phase 0 — Foundation
-- [ ] **0.1 Toolchain upgrade.** Look up the current stable versions (Google Maven / official release pages) of
+- [x] **0.1 Toolchain upgrade.** Look up the current stable versions (Google Maven / official release pages) of
   AGP, Gradle wrapper, Kotlin, KSP (matching Kotlin), Compose BOM, and all AndroidX libs; update
   `gradle/libs.versions.toml` and the wrapper. Java 17 toolchain. Replace deprecated `kotlinOptions` with
   `kotlin { compilerOptions { … } }` (and follow AGP 9 migration notes if AGP 9 is the latest stable, e.g. built-in
   Kotlin support).
   *Done when:* `./gradlew assembleDebug testDebugUnitTest lintDebug` passes with no deprecation errors **and** the
   project syncs in Android Studio.
-  *Status:* postponed until Android Studio is updated (see Open items). Research notes from the first attempt: stay on
-  compileSdk 36 (user decision) → Compose BOM 2026.06.01, core-ktx 1.18.0, lifecycle 2.10.0 (newer releases need
-  compileSdk 37); Gradle 9.8.0, AGP 9.4.1 (built-in Kotlin, remove `kotlin-android`, `jvmTarget` follows
-  `compileOptions`), Kotlin 2.4.20, KSP 2.3.12. Re-check versions when resuming.
+  *Result:* Gradle 9.8.0, AGP 9.4.1 (built-in Kotlin, `kotlin-android` plugin removed), Kotlin 2.4.20, KSP 2.3.12
+  (declared, applied in 0.3), Compose BOM 2026.06.01, core-ktx 1.18.0, lifecycle 2.10.0, Java 17. Newer Compose BOM,
+  core and lifecycle releases need compileSdk 37 and stay pinned (ADR-015). `kotlinOptions` removed: with built-in
+  Kotlin `jvmTarget` follows `compileOptions`. Remaining warning: `Configuration.setVisible` deprecation raised
+  inside AGP 9.4.1 itself (not our build scripts). Requires Android Studio Quail 4 (2026.1.4)+.
 - [x] **0.2 Rename and base config.** namespace + applicationId `com.ahmetyildiz.quakealert`; move main/test/androidTest
   sources to the new package; `rootProject.name = "QuakeAlert"`; `app_name` = "QuakeAlert"; theme `Theme.QuakeAlert`;
   minSdk 26, target/compile 36; `buildConfig = true`.
@@ -152,7 +153,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 |---|---|
 | Rewrite the initial commit's author email | ✅ done (4291b49, force-pushed 2026-09-25) |
 | API 31/32 emulator | user installs manually when needed |
-| Update Android Studio to Quail 4 (2026.1.4)+ — the installed Otter 2025.2.1 supports AGP ≤ 8.13, latest AGP is 9.4 | **blocks 0.1**; user updates later |
+| Update Android Studio to Quail 4 (2026.1.4)+ (required by AGP 9.4) | ✅ done 2026-09-25 |
 | App display name "QuakeAlert" | ✅ confirmed |
 | Keep `docs/PLAN.md` in the repo at delivery | decide in 4.4 |
 
@@ -162,3 +163,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 15:30–16:45 | ~1h15 | Requirement analysis, USGS/AFAD/geocoding research, product & architecture decisions, planning docs |
 | 2026-09-25 | 16:55–17:20 | ~25m | 0.1 attempt: version research, upgrade built on CLI but IDE sync failed (Studio too old for AGP 9.4); reverted, postponed |
 | 2026-09-25 | 17:20–17:30 | ~10m | 0.2 Rename and base config: new package/id, QuakeAlert naming, minSdk 26, BuildConfig; verified on API 34 |
+| 2026-09-25 | 17:40–17:50 | ~10m | 0.1 Toolchain upgrade (after Studio update): Gradle 9.8.0, AGP 9.4.1, Kotlin 2.4.20, KSP 2.3.12, Java 17 (ADR-015) |

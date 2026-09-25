@@ -11,8 +11,8 @@
 ## 2. Tech stack
 | Concern | Choice |
 |---|---|
-| Language / build | Kotlin (latest stable), AGP (latest stable), Gradle version catalog, KSP, Java 17 toolchain |
-| UI | Jetpack Compose (latest BOM), Material 3, Navigation Compose (type-safe routes with kotlinx.serialization) |
+| Language / build | Kotlin 2.4 (AGP built-in Kotlin), AGP 9, Gradle 9, version catalog, KSP, Java 17, compileSdk 36 |
+| UI | Jetpack Compose (BOM pinned for compileSdk 36), Material 3, Navigation Compose (type-safe routes with kotlinx.serialization) |
 | DI | Hilt (+ `hilt-navigation-compose`, `hilt-work`) |
 | Networking | Retrofit + OkHttp + kotlinx.serialization converter |
 | Persistence | Room (cache, notified ids, analytics events), DataStore Preferences (user preferences) |
@@ -20,7 +20,8 @@
 | Localization | Android resources + AppCompat per-app language API (`AppCompatDelegate.setApplicationLocales`) |
 | Tests | JUnit 5 (android-junit5 plugin), MockK, kotlinx-coroutines-test, Turbine; Compose UI tests (JUnit 4 rule) |
 
-Exact versions are resolved to the latest stable in Phase 0 and pinned in `gradle/libs.versions.toml`.
+Exact versions are pinned in `gradle/libs.versions.toml`: the latest stable release that supports compileSdk 36
+(ADR-015).
 
 ## 3. Package structure
 ```

@@ -118,3 +118,15 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Decision:** Debug-only "Simulate alert" (fake matching event through the real matcher + notifier) and "Run check
   now" (one-time run of the real worker).
 - **Consequences:** The full notification loop can be verified in seconds; not shipped in release builds.
+
+## ADR-015 — Toolchain: AGP 9 with built-in Kotlin, compileSdk 36 with pinned libraries
+- **Context:** The build starts on current stable tooling. The newest Compose BOM (2026.08.00+), `androidx.core`
+  1.19 and `androidx.lifecycle` 2.11 require compileSdk 37 (Android 17 SDK).
+- **Decision:** Gradle 9.8.0, AGP 9.4.1 with its built-in Kotlin support (no `org.jetbrains.kotlin.android` plugin),
+  Kotlin 2.4.20 (set through the Compose compiler plugin version), KSP 2.3.12, Java 17. Stay on compileSdk/targetSdk
+  36 and pin the latest library versions that support it: Compose BOM 2026.06.01, core-ktx 1.18.0, lifecycle 2.10.0.
+- **Alternatives:** compileSdk 37 with target 36 (newest libraries, needs the API 37 SDK platform on every dev
+  machine); compileSdk + target 37 (also brings Android 17 behaviour changes into the QA matrix).
+- **Consequences:** Builds on the SDK platforms already used for testing, with no extra setup. Compose stays one minor
+  release behind. Moving to compileSdk 37 later means changing one number plus the pinned versions in
+  `gradle/libs.versions.toml`. AGP 9.4 requires Android Studio Quail 4 (2026.1.4) or newer.
