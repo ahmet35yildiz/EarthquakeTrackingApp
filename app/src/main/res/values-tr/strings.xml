@@ -1,0 +1,6 @@
+<resources>
+    <!-- Bottom navigation -->
+    <string name="tab_earthquakes">Depremler</string>
+    <string name="tab_alerts">Alarmlar</string>
+    <string name="tab_settings">Ayarlar</string>
+</resources>

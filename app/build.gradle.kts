@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -22,6 +24,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Languages for the in-app language picker, generated from the res/values-* folders.
+        buildConfigField(
+            "String[]",
+            "SUPPORTED_LANGUAGE_TAGS",
+            findSupportedLanguageTags().joinToString(prefix = "{", postfix = "}") { "\"$it\"" },
+        )
+    }
+
+    androidResources {
+        // Generates locales_config.xml (system per-app language settings, Android 13+) from the same folders.
+        generateLocaleConfig = true
     }
 
     buildTypes {
@@ -45,6 +59,26 @@ android {
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+/**
+ * Returns the default language (from res/resources.properties) followed by the language of every
+ * `values-<language>/strings.xml`, e.g. ["en", "tr"]. Adding a translation folder is all it takes to add a language.
+ */
+fun findSupportedLanguageTags(): List<String> {
+    val resDirectory: File = file("src/main/res")
+    val resourceProperties = Properties().apply {
+        File(resDirectory, "resources.properties").inputStream().use(::load)
+    }
+    val defaultTag: String = resourceProperties.getProperty("unqualifiedResLocale")
+    val languageQualifier = Regex("^[a-z]{2,3}(-r[A-Z]{2})?$")
+    val translatedTags: List<String> = resDirectory.listFiles().orEmpty()
+        .filter { it.name.startsWith("values-") && File(it, "strings.xml").exists() }
+        .map { it.name.removePrefix("values-") }
+        .filter { languageQualifier.matches(it) }
+        .map { it.replace("-r", "-") }
+        .sorted()
+    return listOf(defaultTag) + translatedTags
 }
 
 dependencies {

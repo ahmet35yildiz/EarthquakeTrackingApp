@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">QuakeAlert</string>
+
+    <!-- Bottom navigation -->
+    <string name="tab_earthquakes">Earthquakes</string>
+    <string name="tab_alerts">Alerts</string>
+    <string name="tab_settings">Settings</string>
 </resources>

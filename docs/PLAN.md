@@ -54,22 +54,34 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   Room Gradle plugin exports schemas to `app/schemas`. Icons: `material-icons-core` (ADR-016). Tests: JUnit Jupiter 6
   (ADR-017). Hilt, Room and serialization code generation verified with Kotlin 2.4.20 using temporary sample classes
   (then removed).
-- [ ] **0.4 App skeleton.** `QuakeAlertApplication` (`@HiltAndroidApp`, `Configuration.Provider` with
+- [x] **0.4 App skeleton.** `QuakeAlertApplication` (`@HiltAndroidApp`, `Configuration.Provider` with
   `HiltWorkerFactory`, default WorkManager initializer removed in manifest); `MainActivity : AppCompatActivity`,
   edge-to-edge, `QuakeAlertTheme`, NavHost with 3 placeholder tabs (Earthquakes, Alerts, Settings) in a bottom bar;
   empty package tree per ARCHITECTURE §3.
   *Done when:* tabs switch; rotation keeps the selected tab.
-- [ ] **0.5 i18n infrastructure.** `values-tr/strings.xml`; `generateLocaleConfig = true` +
+  *Result:* `navigation/` holds routes (`TopLevelRoute`), `TopLevelDestination`, bottom bar, NavHost and the app
+  shell; placeholder screens live in each feature's `presentation/screen`. Packages are created by the task that
+  first puts a file in them (git does not track empty directories). Tab labels added in EN and TR
+  (`values-tr/strings.xml` created early; 0.5 adds the locale infrastructure). Template `colors.xml` removed.
+  Verified on API 34: tab switching, selected tab kept across rotation, back from a tab returns to Earthquakes,
+  default WorkManager initializer absent from the merged manifest.
+- [x] **0.5 i18n infrastructure.** `values-tr/strings.xml`; `generateLocaleConfig = true` +
   `res/resources.properties`; Gradle task that writes `BuildConfig.SUPPORTED_LANGUAGE_TAGS` from `values-*` folders;
   `AppLocalesMetadataHolderService` (`autoStoreLocales=true`); `core/locale/AppLanguageManager`.
   *Done when:* switching EN ↔ TR (temporary debug button or adb) changes placeholder texts on API 34 **and** API 31/32.
+  *Result:* the language list is computed when Gradle configures the build (`findSupportedLanguageTags()` in
+  `app/build.gradle.kts`, reads `res/resources.properties` + `values-*/strings.xml`) instead of a separate task — same
+  outcome, less code. `AppLanguageManager` (interface) + `AppCompatLanguageManager`, bound in `core/di/LocaleModule`.
+  Verified with a temporary toggle button (removed afterwards) on API 34 and API 31: instant switch EN ↔ TR, choice
+  kept after the app is killed, selected tab kept; on API 34 also via the system per-app language setting.
 - [ ] **0.6 Design system.** Light/dark color schemes (dynamic color off), typography, shapes, spacing tokens,
   `LocalSeverityColors`; shared `LoadingState`, `EmptyState`, `ErrorState`, `OfflineBanner`, `MagnitudeBadge` with
   previews.
   *Done when:* previews render in light and dark.
-- [ ] **0.7 Emulator for API < 33.** The user installs it manually when needed (API 31 or 32, Google APIs,
+- [x] **0.7 Emulator for API < 33.** The user installs it manually when needed (API 31 or 32, Google APIs,
   arm64). Remind the user before the first task that needs it (0.5 at the latest); do not download images yourself.
   *Done when:* the app launches on it.
+  *Result:* AVD `Pixel_6` (API 31, Google APIs, arm64).
 
 ## Phase 1 — Core and Earthquakes
 - [ ] **1.1 Core basics.** `AppResult`/`AppError`, `Clock` (+ `FakeClock` for tests), dispatcher qualifiers,
@@ -159,7 +171,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | Item | Status |
 |---|---|
 | Rewrite the initial commit's author email | ✅ done (4291b49, force-pushed 2026-09-25) |
-| API 31/32 emulator | user installs manually when needed |
+| API 31/32 emulator | ✅ `Pixel_6` (API 31) installed 2026-09-25 |
 | Update Android Studio to Quail 4 (2026.1.4)+ (required by AGP 9.4) | ✅ done 2026-09-25 |
 | App display name "QuakeAlert" | ✅ confirmed |
 | Keep `docs/PLAN.md` in the repo at delivery | decide in 4.4 |
@@ -172,3 +184,6 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 17:20–17:30 | ~10m | 0.2 Rename and base config: new package/id, QuakeAlert naming, minSdk 26, BuildConfig; verified on API 34 |
 | 2026-09-25 | 17:30–17:45 | ~15m | 0.1 Toolchain upgrade (after Studio update): Gradle 9.8.0, AGP 9.4.1, Kotlin 2.4.20, KSP 2.3.12, Java 17 (ADR-015) |
 | 2026-09-25 | 17:45–17:55 | ~10m | 0.3 Dependencies: Hilt, Room, DataStore, WorkManager, Navigation, Retrofit/OkHttp, serialization, test stack (ADR-016, ADR-017) |
+| 2026-09-25 | 17:55–18:05 | ~10m | Design brief prompt for the UI design tool (all screens, states, design system) |
+| 2026-09-25 | 18:05–18:12 | ~7m | 0.4 App skeleton: Hilt application + WorkManager factory, AppCompat MainActivity, 3-tab navigation |
+| 2026-09-25 | 18:12–18:30 | ~18m | 0.5 i18n infrastructure + 0.7 API 31 emulator: generated language list and locale config, AppLanguageManager; EN/TR verified on API 31 and 34 |

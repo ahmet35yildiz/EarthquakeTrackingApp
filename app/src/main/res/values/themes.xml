@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.QuakeAlert" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- AppCompat parent is required by AppCompatActivity; the UI itself is themed in Compose (QuakeAlertTheme). -->
+    <style name="Theme.QuakeAlert" parent="Theme.AppCompat.DayNight.NoActionBar" />
 </resources>

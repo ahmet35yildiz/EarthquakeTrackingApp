@@ -1,47 +1,23 @@
 package com.ahmetyildiz.quakealert
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.appcompat.app.AppCompatActivity
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
+import com.ahmetyildiz.quakealert.navigation.QuakeAlertApp
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : ComponentActivity() {
+// AppCompatActivity (not ComponentActivity) so the per-app language API also works below Android 13.
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             QuakeAlertTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                QuakeAlertApp()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    QuakeAlertTheme {
-        Greeting("Android")
     }
 }
