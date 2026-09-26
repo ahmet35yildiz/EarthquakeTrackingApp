@@ -377,10 +377,24 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   İzmir", 400 km → no notification; runs arrived 0–1 min after the chosen time.
 
 ## Phase 3 — Settings, event log, polish, QA
-- [ ] **3.1 Settings screen.** Language picker (System default + generated list, names in their own language),
+- [x] **3.1 Settings screen.** Language picker (System default + generated list, names in their own language),
   about (USGS attribution, disclaimer, version), permission status, developer entries (debug only).
   From 2.8: `SettingsScreen` already has a top bar, a scrolling column and the debug-only `developerTools` slot
   filled by `DeveloperToolsEntry`; add the event log entry there (3.2).
+  *Result:* `SettingsEntry` / `SettingsScreen` (Scaffold, snackbar) with four cards: Language (current choice → radio
+  dialog "System default" + generated languages in their own names, applied at once), Notifications (permission
+  status, "Open settings" → the app's system notification page), About (USGS attribution + "Visit the USGS website",
+  not-an-early-warning note, version from `BuildConfig`), then the debug-only developer slot. `SettingsViewModel`
+  reads `AppLanguageManager` / `NotificationPermissionChecker` directly (no settings domain), re-reads both on resume
+  and logs `language_changed` only for a real change. The permission row moved to `core/ui/component`
+  (`NotificationPermissionStatus`, also used by Alerts) and the outgoing intents to `core/navigation/ExternalIntents`,
+  so `settings` depends on `core` only; `notification_permission_requested` stays onboarding-only (ADR-038). New
+  `ic_language` (Material Symbols). Tests: 5 unit tests (ViewModel), 5 Compose UI tests; full suites 349 unit,
+  58/58 instrumented on API 31 and 34. Verified on API 34 and 31: EN → Türkçe at once with the Settings tab kept and
+  `language_changed {from=system, to=tr}`, choice kept after the app is killed, dialog kept across rotation, back to
+  System default (`from=tr, to=system`); API 34: per-app language changed in the system (`cmd locale`) shows on
+  return, "Open settings" → system page → permission granted → row updates on return, USGS link opens the browser,
+  dark mode.
 - [ ] **3.2 Event log screen.** List, filter by name, clear, share as text.
 - [ ] **3.3 Polish.** Adaptive launcher icon, copy review (EN + TR), accessibility labels, dark mode, landscape (list:
   header + bottom bar leave room for ~1 card; consider scrolling the header away or a navigation rail),
@@ -445,3 +459,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 18:45–19:05 | ~20m | 2.7 Onboarding: welcome / alert setup / notifications pages, permission request and denial path, finish saves settings + schedules (ADR-035); 13 unit + 6 Compose UI tests; verified allow and deny paths on API 34 and the no-dialog path on API 31 |
 | 2026-09-26 | 19:53–20:08 | ~15m | 2.8 Developer tools: simulate alert through the shared delivery step, repeat from the cache, run check now (ADR-036); 17 unit tests; verified simulate → tap → detail → no duplicate and run check now on API 31 and 34 |
 | 2026-09-26 | 20:16–20:38 | ~22m | 2.8 follow-up: simulation with magnitude / distance / delay, scheduled delivery with the app closed, `outcome` on the developer event (ADR-037); +13 unit tests; verified matching vs non-matching on API 31 and 34 |
+| 2026-09-26 | 20:52–21:09 | ~17m | 3.1 Settings screen: language picker, notification status, about (USGS, disclaimer, version), shared permission row and outgoing intents moved to core (ADR-038); 5 unit + 5 Compose UI tests; verified on API 31 and 34 incl. system per-app language, rotation, dark mode |

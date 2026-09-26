@@ -38,12 +38,12 @@ com.ahmetyildiz.quakealert/
 │   ├── location/                    # Distance (haversine) utilities
 │   ├── network/                     # Retrofit/OkHttp/Json setup
 │   ├── notification/                # NotificationChannels, NotificationPermissionChecker, AlertNotificationTap extras
-│   ├── navigation/                  # DeepLinkConfig (scheme + detail deep link builder, shared by notifications)
+│   ├── navigation/                  # DeepLinkConfig (detail deep link builder), ExternalIntents (browser, notification settings)
 │   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), DeviceRegionProvider
 │   ├── error/                       # AppResult, AppError
 │   ├── time/                        # Clock abstraction (testable "now"), formatters
 │   ├── di/                          # App-wide Hilt modules (network, database, datastore, dispatchers, app scope, clock)
-│   └── ui/                          # Reusable composables (states, badges, SectionCard) + theme/
+│   └── ui/                          # Reusable composables (states, badges, SectionCard, NotificationPermissionStatus) + theme/
 ├── features/
 │   ├── earthquakes/                 # List + detail + USGS data
 │   │   ├── data/model | source | repository
@@ -58,6 +58,7 @@ com.ahmetyildiz.quakealert/
 │   │   ├── presentation/viewmodel | screen | component   (settings, onboarding, developer tools)
 │   │   └── di/
 │   ├── settings/                    # Language, about, permission status, developer entry points
+│   │   └── presentation/viewmodel | screen | component   (+ SettingsConfig; no data/domain: reads core only)
 │   └── eventlog/                    # Developer event log (reads core/analytics)
 ```
 
@@ -68,6 +69,10 @@ com.ahmetyildiz.quakealert/
   `core/preferences` because both the list (filters, distance) and alerts need them.
 - Features never import each other's screens; the `navigation` package wires all routes.
 - Onboarding lives in `alerts` because it is the alert setup flow (reuses the same threshold/area components).
+- `settings` depends on `core` only (ADR-038): `SettingsViewModel` reads `AppLanguageManager` and
+  `NotificationPermissionChecker` directly. Pieces used by more than one feature moved to `core` — the permission
+  status row (`core/ui/component/NotificationPermissionStatus`) and the outgoing intents
+  (`core/navigation/ExternalIntents`). The developer tools card still comes in as a slot from `navigation`.
 
 ## 4. Key flows
 
@@ -235,6 +240,10 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   `BuildConfig.SUPPORTED_LANGUAGE_TAGS`, which the in-app language picker reads.
 - ⇒ **Adding a language = adding `values-<tag>/strings.xml`. Nothing else.**
 - Language names shown in their own language (`Locale.forLanguageTag(tag).getDisplayName(thatLocale)`).
+- Settings tab: "System default" + `AppLanguageManager.getSupportedLanguages()` in a radio dialog; a pick is applied
+  at once (`setSelectedLanguage`, AppCompat recreates the activity, the Settings tab stays selected) and logs
+  `language_changed`. The screen re-reads the language on resume, so a change in the system per-app language
+  page (API 33+) shows up when the user returns.
 - `MainActivity` extends `AppCompatActivity`; manifest declares `AppLocalesMetadataHolderService` with
   `autoStoreLocales=true` for API < 33. Must be verified on API < 33 and ≥ 33.
 - Text built outside the UI (notifications, channel name) uses `LocalizedContextProvider`, a context in the language

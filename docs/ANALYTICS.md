@@ -26,7 +26,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `onboarding_started` | – | First onboarding screen shown |
 | `onboarding_step_viewed` | `step` = welcome \| alert_setup \| notifications | Each step shown |
 | `onboarding_completed` | `threshold`, `has_area`, `radius_km`, `notifications_granted` | Finish tapped |
-| `notification_permission_requested` | `context` = onboarding \| settings | Before system dialog |
+| `notification_permission_requested` | `context` = onboarding | Before system dialog (Alerts and Settings open the system notification page instead of the dialog, ADR-038) |
 | `notification_permission_result` | `granted` | Dialog result |
 | `alerts_toggled` | `enabled` | Alerts switch changed |
 | `alert_threshold_changed` | `from`, `to`, `context` | Threshold saved |

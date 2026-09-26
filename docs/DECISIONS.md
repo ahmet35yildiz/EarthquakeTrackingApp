@@ -439,3 +439,20 @@ Add a new record (next number) whenever a significant decision is made; never re
   the city is what the rule checks).
 - **Consequences:** Delivery follows WorkManager timing (seen 0–1 min late on API 31 and 34). Force-stopping the app
   cancels a scheduled simulation.
+
+## ADR-038 — Settings reads core directly; shared pieces move to core
+- **Context:** The Settings tab shows the language picker, the notification permission status, the about section
+  and the developer tools slot. The permission row already existed privately in `alerts`, and the browser intent
+  helper in `earthquakes`; `settings` must not depend on other features.
+- **Decision:** `settings` has only a presentation layer. `SettingsViewModel` reads `AppLanguageManager` and
+  `NotificationPermissionChecker` (both `core` interfaces) and logs `language_changed` only when the pick differs from
+  the current language. Language and permission are re-read on resume. The permission row became
+  `core/ui/component/NotificationPermissionStatus` (used by Alerts and Settings) and the outgoing intents
+  (`browserIntent`, `notificationSettingsIntent`, `tryStartActivity`) moved to `core/navigation/ExternalIntents`.
+  "Open settings" opens the app's system notification page in both places; the in-app permission dialog stays in
+  onboarding. The USGS link and version (`BuildConfig`) live in the about section; the URL is `SettingsConfig`.
+- **Alternatives:** Use cases wrapping each `core` call (no logic to hold); `settings` importing the `alerts` row (a
+  second cross-feature dependency); requesting the permission dialog again from Settings (Android stops showing it
+  after two denials, so the system page is the path that always works).
+- **Consequences:** `notification_permission_requested` is only sent from onboarding (`context=onboarding`). Adding
+  a setting that needs logic (e.g. a stored preference) is the point to add a `domain` layer to `settings`.

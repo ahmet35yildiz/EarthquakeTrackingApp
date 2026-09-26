@@ -219,4 +219,15 @@
     <string name="developer_schedule_description">Delivers the earthquake after the delay, also when the app is closed. Force-stopping the app cancels it.</string>
     <string name="developer_result_not_matched">Doesn\'t match your alert settings, so there is no notification.</string>
     <string name="developer_result_scheduled">Scheduled for %1$s. You can close the app now.</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_system_default">System default</string>
+    <string name="settings_language_change">Change language</string>
+    <string name="settings_language_dialog_title">Choose language</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_data_source">Earthquake data comes from the U.S. Geological Survey (USGS).</string>
+    <string name="settings_about_open_usgs">Visit the USGS website</string>
+    <string name="settings_about_disclaimer_title">Not an early-warning system</string>
+    <string name="settings_about_disclaimer_message">Alerts can arrive several minutes after an earthquake. Always follow the guidance of local authorities.</string>
+    <string name="settings_about_version">Version %1$s (%2$d)</string>
 </resources>

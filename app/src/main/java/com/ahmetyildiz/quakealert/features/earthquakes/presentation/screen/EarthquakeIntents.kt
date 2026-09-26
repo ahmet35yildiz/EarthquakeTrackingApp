@@ -1,7 +1,5 @@
 package com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen
 
-import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
@@ -13,8 +11,6 @@ fun mapsIntent(location: GeoPoint, label: String): Intent {
     return Intent(Intent.ACTION_VIEW, uri)
 }
 
-fun browserIntent(url: String): Intent = Intent(Intent.ACTION_VIEW, url.toUri())
-
 fun shareIntent(text: String, chooserTitle: String): Intent {
     val send: Intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
@@ -22,11 +18,3 @@ fun shareIntent(text: String, chooserTitle: String): Intent {
     }
     return Intent.createChooser(send, chooserTitle)
 }
-
-fun Context.tryStartActivity(intent: Intent): Boolean =
-    try {
-        startActivity(intent)
-        true
-    } catch (exception: ActivityNotFoundException) {
-        false
-    }

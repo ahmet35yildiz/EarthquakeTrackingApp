@@ -25,6 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.navigation.notificationSettingsIntent
 import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
 import com.ahmetyildiz.quakealert.core.ui.format.rememberCurrentTime
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
@@ -67,7 +68,7 @@ fun AlertSettingsEntry(
         onAlertsToggled = viewModel::onAlertsToggled,
         onThresholdChanged = viewModel::onThresholdChanged,
         onAreaSelectionChanged = viewModel::onAreaSelectionChanged,
-        onOpenNotificationSettings = { context.startActivity(createNotificationSettingsIntent(context)) },
+        onOpenNotificationSettings = { context.startActivity(notificationSettingsIntent(context)) },
     )
     AlertSettingsScreen(uiState = uiState, actions = actions, snackbarHostState = snackbarHostState, modifier = modifier) {
         AreaSelectorEntry(selection = uiState.areaSelection, onSelectionChange = actions.onAreaSelectionChanged)

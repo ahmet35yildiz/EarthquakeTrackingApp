@@ -17,7 +17,7 @@ import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSetti
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.OnboardingEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeDetailEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeListEntry
-import com.ahmetyildiz.quakealert.features.settings.presentation.screen.SettingsScreen
+import com.ahmetyildiz.quakealert.features.settings.presentation.screen.SettingsEntry
 
 @Composable
 fun QuakeAlertNavHost(
@@ -49,7 +49,7 @@ fun QuakeAlertNavHost(
             }
             composable<AlertsRoute> { AlertSettingsEntry() }
             composable<SettingsRoute> {
-                SettingsScreen(developerTools = if (BuildConfig.DEBUG) { { DeveloperToolsEntry() } } else null)
+                SettingsEntry(developerTools = if (BuildConfig.DEBUG) { { DeveloperToolsEntry() } } else null)
             }
         }
     }

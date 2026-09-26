@@ -39,6 +39,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.navigation.notificationSettingsIntent
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AreaSelectorEntry
@@ -92,7 +93,7 @@ fun OnboardingEntry(
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         },
-        onOpenNotificationSettings = { context.startActivity(createNotificationSettingsIntent(context)) },
+        onOpenNotificationSettings = { context.startActivity(notificationSettingsIntent(context)) },
         onFinish = viewModel::onFinish,
     )
     OnboardingScreen(
