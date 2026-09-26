@@ -9,6 +9,7 @@ import android.os.SystemClock
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.locale.AppCompatLanguageManager
 import com.ahmetyildiz.quakealert.core.locale.LocalizedContextProvider
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
 import com.ahmetyildiz.quakealert.core.notification.NotificationChannels
@@ -28,8 +29,9 @@ class EarthquakeAlertNotifierTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationManager: NotificationManager = context.getSystemService(NotificationManager::class.java)
-    private val localizedContextProvider = LocalizedContextProvider(context)
+    private val localizedContextProvider = LocalizedContextProvider(context, AppCompatLanguageManager(context))
     private val notifier = EarthquakeAlertNotifier(context, localizedContextProvider) { Instant.parse(POSTED_AT) }
+    private val appContext: Context = localizedContextProvider.createLocalizedContext()
 
     @Before
     fun setUp() {
@@ -57,14 +59,14 @@ class EarthquakeAlertNotifierTest {
     @Test
     fun alertWithoutAreaHasTheShortTitle() {
         notifier.showAlerts(listOf(alert("a", 5.0, hasDistance = false)))
-        val expected: String = context.getString(R.string.notification_alert_title, magnitude(5.0))
+        val expected: String = appContext.getString(R.string.notification_alert_title, magnitude(5.0))
         assertEquals(expected, titleOf(waitForNotifications(count = 1).single()))
     }
 
     @Test
     fun summaryCountsTheAlertsAboveTheThreshold() {
         notifier.showSummary((1..5).map { alert("id$it", 5.0) }, magnitudeThreshold = 4.5)
-        val expected: String = context.resources.getQuantityString(R.plurals.notification_summary_title, 5, 5, magnitude(4.5))
+        val expected: String = appContext.resources.getQuantityString(R.plurals.notification_summary_title, 5, 5, magnitude(4.5))
         assertEquals(expected, titleOf(waitForNotifications(count = 1).single()))
     }
 
@@ -93,10 +95,10 @@ class EarthquakeAlertNotifierTest {
     private fun titleOf(notification: Notification): String =
         notification.extras.getCharSequence(Notification.EXTRA_TITLE).toString()
 
-    private fun magnitude(value: Double): String = context.getString(R.string.magnitude_value, value)
+    private fun magnitude(value: Double): String = appContext.getString(R.string.magnitude_value, value)
 
     private fun distanceTitle(value: Double): String =
-        context.getString(R.string.notification_alert_title_with_distance, magnitude(value), "100", "Center")
+        appContext.getString(R.string.notification_alert_title_with_distance, magnitude(value), "100", "Center")
 
     private fun alert(id: String, magnitude: Double, hasDistance: Boolean = true): EarthquakeAlert =
         EarthquakeAlert(

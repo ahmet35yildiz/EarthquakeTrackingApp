@@ -12,6 +12,7 @@ import javax.inject.Inject
 class UpdateAlertSettingsUseCase @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val clock: Clock,
+    private val syncAlertSchedule: SyncAlertScheduleUseCase,
 ) {
 
     private val mutex = Mutex()
@@ -20,7 +21,10 @@ class UpdateAlertSettingsUseCase @Inject constructor(
         mutex.withLock {
             val previous: AlertSettings = userPreferencesRepository.userPreferences.first().alertSettings
             val update = AlertSettingsUpdate(previous = previous, updated = transform(previous))
-            if (update.isChanged) userPreferencesRepository.saveAlertSettings(update.updated, clock.now())
+            if (update.isChanged) {
+                userPreferencesRepository.saveAlertSettings(update.updated, clock.now())
+                syncAlertSchedule()
+            }
             update
         }
 }

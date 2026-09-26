@@ -307,7 +307,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   killed), tap after process death with a restored stack, summary for 5, back → list, rotation after a deep link logs
   nothing, TR texts ("M5,2 deprem · İzmir merkezine 15.851 km", 24 h time). Android bundles 4+ notifications of an app
   automatically; tapping that system group opens the app normally.
-- [ ] **2.6 Worker.** `NotifiedEarthquakeRepository` (Room, prune), `CheckForNewAlertsUseCase` (SPEC §5.2),
+- [x] **2.6 Worker.** `NotifiedEarthquakeRepository` (Room, prune), `CheckForNewAlertsUseCase` (SPEC §5.2),
   thin `AlertCheckWorker` (`@HiltWorker`), `AlertWorkScheduler` (unique periodic, UPDATE policy, network
   constraint, schedule on app start/settings change, cancel on disable). From 2.4: settings changes go through
   `UpdateAlertSettingsUseCase` — schedule / cancel from there after a saved change. From 2.5: notify through
@@ -316,14 +316,32 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   process without an activity (`LocalizedContextProvider` reads AppCompat's locales).
   *Done when:* use case unit tests pass; `dumpsys jobscheduler` shows the job; "Run check now" logs
   `background_check_completed`; reboot keeps the schedule.
+  *Result:* Room `notified_earthquakes` (DB v3, auto-migration; only the candidate ids are queried) behind
+  `NotifiedEarthquakeRepository`. `CheckForNewAlertsUseCase` implements SPEC §5.2: skipped until alert settings were
+  saved or while disabled; query = last 6 h, threshold, area, `updatedAfter = (lastCheckedAt ?: baseline) − 10 min`;
+  `AlertMatcher` with the stored ids → `NotifyAlertsUseCase`; only posted matches are remembered (suppressed ones can
+  still alert within 6 h once allowed); prune after 30 days; `lastCheckedAt` = check start; network/server errors →
+  retry, parsing/unknown → failure (ADR-033). Thin `@HiltWorker AlertCheckWorker`; `AlertWorkScheduler` (unique
+  periodic 15 min, network, UPDATE) behind `AlertCheckScheduler`; `SyncAlertScheduleUseCase` runs on app start and
+  after every saved settings change. Found on API 31: in a worker-only process the notification came in English
+  although the app language was Turkish (AppCompat loads the per-app locale only when an activity starts) — the
+  language manager now also stores the tag and the localized context falls back to it below API 33 (ADR-034).
+  Tests: 20 unit tests (check use case, schedule sync, settings update → schedule), DAO + scheduler instrumented tests;
+  full instrumented suite 47/47 on API 31 and 34. Verified: v2 → v3 upgrade keeps analytics rows; enabling alerts
+  runs a first check at once (`background_check_completed`, fetched 1 / matched 0) and `dumpsys jobscheduler` shows the
+  job with the network constraint; the job survives a reboot; in a killed-process worker run on API 31 (temporary
+  preparation code, reverted) 7 matches → one Turkish summary ("7 yeni M4,5+ deprem"), next runs matched 0. A forced
+  run of the periodic job before its time is postponed by WorkManager, so manual checks need "Run check now" (2.8).
 - [ ] **2.7 Onboarding.** Welcome (with not-an-early-warning disclaimer) → alert setup (reuses 2.3) → notification
   permission (API 33+ request; < 33 confirm only) → finish; completion flag; start destination logic; analytics.
   Graph, start destination and completion flag exist since 1.7; replace the placeholder `OnboardingScreen`.
-  Alert setup step: same components and `AreaSelection` handling as 2.4.
+  Alert setup step: same components and `AreaSelection` handling as 2.4. From 2.6: finishing must save the settings
+  through `UpdateAlertSettingsUseCase` (sets the baseline and schedules the check); until then no check runs.
   *Done when:* SPEC §4.1 met on API 31/32 and 34; denial path works.
 - [ ] **2.8 Developer tools.** Debug-only section: Simulate alert (fake matching event through matcher + notifier),
   Run check now (expedited one-time worker).
   From 2.5: simulate through `NotifyAlertsUseCase` (same policy, analytics and tap handling as real alerts).
+  From 2.6: "Run check now" = expedited `OneTimeWorkRequest<AlertCheckWorker>` (a forced periodic job is postponed).
   *Done when:* simulate → notification → tap → detail; repeated simulate of the same id → no duplicate.
 
 ## Phase 3 — Settings, event log, polish, QA
@@ -389,3 +407,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 15:44–16:08 | ~24m | 2.3 Area components: threshold slider, area selector (country picker, city search, selected city, radius, whole-world warning), shared CitySearchViewModel with device-region default (ADR-028); 39 unit + 9 Compose UI tests; verified on API 31 and 34 incl. TR, dark, offline, landscape |
 | 2026-09-26 | 16:19–16:34 | ~15m | 2.4 Alert settings screen: summary switch, threshold, area, status (permission + last check), auto-save with new baseline and snackbar, analytics from the settings difference (ADR-029); declared POST_NOTIFICATIONS after the emulator showed it missing; 18 unit + 6 Compose UI tests; verified end to end on API 31 and 34 |
 | 2026-09-26 | 16:46–17:20 | ~34m | 2.5 Notifications: channel, notify policy use case + Android notifier (single / up to 3 / summary), localized texts, tap extras, app-open tracking (ADR-030); fixed deep links after process death (ADR-031); language splits off (ADR-032); 17 unit + 5 instrumented tests; verified warm / cold / restored taps and summary on API 31 and 34 |
+| 2026-09-26 | 17:45–18:10 | ~25m | 2.6 Worker: notified ids in Room (DB v3), background check use case, worker, scheduler + schedule sync (ADR-033); stored app language for worker processes below API 33 after the emulator showed English texts (ADR-034); 20 unit + 6 instrumented tests; verified migration, job, reboot and a killed-process run on API 31 and 34 |

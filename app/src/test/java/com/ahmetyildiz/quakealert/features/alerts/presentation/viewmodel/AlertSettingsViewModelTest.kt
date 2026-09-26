@@ -11,7 +11,9 @@ import com.ahmetyildiz.quakealert.core.preferences.FakeUserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferences
 import com.ahmetyildiz.quakealert.core.testing.MainDispatcherExtension
 import com.ahmetyildiz.quakealert.core.time.FakeClock
+import com.ahmetyildiz.quakealert.features.alerts.domain.FakeAlertCheckScheduler
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.ObserveAlertSettingsUseCase
+import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.SyncAlertScheduleUseCase
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.UpdateAlertSettingsUseCase
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -40,7 +42,11 @@ class AlertSettingsViewModelTest {
     private val viewModel: AlertSettingsViewModel by lazy {
         AlertSettingsViewModel(
             observeAlertSettings = ObserveAlertSettingsUseCase(preferencesRepository),
-            updateAlertSettings = UpdateAlertSettingsUseCase(preferencesRepository, clock),
+            updateAlertSettings = UpdateAlertSettingsUseCase(
+                preferencesRepository,
+                clock,
+                SyncAlertScheduleUseCase(preferencesRepository, FakeAlertCheckScheduler()),
+            ),
             notificationPermissionChecker = { areNotificationsAllowed },
             analyticsTracker = analyticsTracker,
         )

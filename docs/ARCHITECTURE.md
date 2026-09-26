@@ -115,8 +115,16 @@ WorkManager (periodic 15 min, NetworkType.CONNECTED)
         ├─ AlertNotifier (interface) ─▶ EarthquakeAlertNotifier (Android)
         └─ AnalyticsTracker
 ```
-- `AlertWorkScheduler` enqueues unique periodic work (`ExistingPeriodicWorkPolicy.UPDATE`) on app start and on
-  settings change when alerts are enabled; cancels it when disabled.
+- `CheckForNewAlertsUseCase` (ADR-033): skipped while alerts are off or before settings were ever saved; USGS query
+  = `starttime now − 6 h`, `minmagnitude` threshold, circle of the area, `updatedafter (lastCheckedAt ?: baseline) −
+  10 min`; matches notified through `NotifyAlertsUseCase`; only posted ids are stored; ids older than 30 days pruned;
+  `lastCheckedAt` = start of the check; result `Skipped` / `Completed(fetched, matched, notified)` / `Failed(error)` →
+  worker `success` / `retry` (network, server) / `failure`.
+- `SyncAlertScheduleUseCase` (app start in `QuakeAlertApplication`, and after every saved change in
+  `UpdateAlertSettingsUseCase`) → `AlertCheckScheduler`: `AlertWorkScheduler` enqueues unique periodic work
+  `periodic_alert_check` (15 min, network, `ExistingPeriodicWorkPolicy.UPDATE`) when alerts are enabled and settings
+  were saved; cancels it otherwise. Enabling alerts runs a first check right away; WorkManager postpones a forced run
+  of the periodic job before its time.
 - Developer "Simulate alert" builds a fake `Earthquake` matching current settings and runs it through the same
   matcher + notifier path. "Run check now" enqueues an expedited `OneTimeWorkRequest` of the same worker.
 - The worker uses Hilt via `HiltWorkerFactory`; the default WorkManager initializer is removed from the manifest.
@@ -206,6 +214,7 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
 | Room `analytics_events` | id, name, params (JSON string map), timestamp |
 | DataStore `user_preferences` | onboardingCompleted, alertsEnabled, threshold, area (lat, lon, city, admin, countryCode, radiusKm), alertBaselineAt, lastCheckedAt, lastRefreshedAt |
 | AppCompat locale storage | Selected app language (system-managed on API 33+, `autoStoreLocales` below) |
+| SharedPreferences `app_language` | Copy of the selected language tag, read below API 33 when no activity has loaded AppCompat's locales (worker process, ADR-034) |
 
 ## 6. Localization
 - Default `values/strings.xml` = English, `values-tr/strings.xml` = Turkish. Plurals for counts/relative times.
@@ -217,8 +226,9 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
 - Language names shown in their own language (`Locale.forLanguageTag(tag).getDisplayName(thatLocale)`).
 - `MainActivity` extends `AppCompatActivity`; manifest declares `AppLocalesMetadataHolderService` with
   `autoStoreLocales=true` for API < 33. Must be verified on API < 33 and ≥ 33.
-- Text built outside the UI (notifications, channel name) uses `LocalizedContextProvider`, a context with AppCompat's
-  application locales applied. App bundles keep every language in the base APK (`bundle.language.enableSplit =
+- Text built outside the UI (notifications, channel name) uses `LocalizedContextProvider`, a context in the language
+  from `AppLanguageManager.getSelectedLanguage()` (AppCompat's locales; below API 33 in a process without an activity,
+  the stored tag — ADR-034). App bundles keep every language in the base APK (`bundle.language.enableSplit =
   false`, ADR-032) so switching the in-app language never misses resources.
 - USGS `place` text is English-only and shown as is (documented limitation); everything we render ourselves
   (distance, dates, numbers, labels) is localized.

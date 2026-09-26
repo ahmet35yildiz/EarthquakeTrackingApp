@@ -4,6 +4,7 @@ import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.preferences.FakeUserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferences
 import com.ahmetyildiz.quakealert.core.time.FakeClock
+import com.ahmetyildiz.quakealert.features.alerts.domain.FakeAlertCheckScheduler
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertSettingsUpdate
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,7 +17,8 @@ class UpdateAlertSettingsUseCaseTest {
 
     private val clock = FakeClock()
     private val repository = FakeUserPreferencesRepository()
-    private val useCase = UpdateAlertSettingsUseCase(repository, clock)
+    private val scheduler = FakeAlertCheckScheduler()
+    private val useCase = UpdateAlertSettingsUseCase(repository, clock, SyncAlertScheduleUseCase(repository, scheduler))
 
     private val preferences: UserPreferences
         get() = repository.userPreferences.value
@@ -42,5 +44,19 @@ class UpdateAlertSettingsUseCaseTest {
         useCase { it.copy(isEnabled = false) }
         useCase { it.copy(magnitudeThreshold = 5.0) }
         assertEquals(AlertSettings.DEFAULT.copy(isEnabled = false, magnitudeThreshold = 5.0), preferences.alertSettings)
+    }
+
+    @Test
+    fun `saved change schedules the check, turning alerts off cancels it`() = runTest {
+        useCase { it.copy(magnitudeThreshold = 6.0) }
+        assertTrue(scheduler.isScheduled)
+        useCase { it.copy(isEnabled = false) }
+        assertFalse(scheduler.isScheduled)
+    }
+
+    @Test
+    fun `unchanged settings do not touch the schedule`() = runTest {
+        useCase { it }
+        assertEquals(0, scheduler.scheduleCount)
     }
 }

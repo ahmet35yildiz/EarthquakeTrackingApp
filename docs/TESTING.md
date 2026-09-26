@@ -53,7 +53,9 @@ Emulators must use a **Google APIs** image (Geocoder backend needs Google Play s
 - [ ] Reboot emulator → periodic work still scheduled.
 - [ ] Event log shows expected events for the flows above; no coordinates or city names in params.
 
-## 4. Verifying notification taps
+## 4. Verifying notifications and background checks
+
+### Notification taps
 A notification can open the app in three different ways, and each one takes a different code path (ADR-031):
 
 | Scenario | How to get there | Expected |
@@ -80,6 +82,18 @@ the same path real alerts use. Started with
   app normally, which hides the scenario being tested.
 - Language check: `adb shell cmd locale set-app-locales com.ahmetyildiz.quakealert --locales tr` (API 33+), post
   again, read titles with `adb shell dumpsys notification --noredact | grep android.title`.
+
+### Background check
+- Job present (and after a reboot): `adb shell dumpsys jobscheduler | grep -A 12 "com.ahmetyildiz.quakealert/androidx.work"`
+  (network constraint visible under `Network type`).
+- Enabling alerts (or saving settings) runs a first check at once → `background_check_completed` in Logcat `Analytics`.
+- A forced run of the periodic job (`adb shell cmd jobscheduler run -f [-n androidx.work.systemjobscheduler]
+  com.ahmetyildiz.quakealert <jobId>`, the namespace on API 34+) is postponed by WorkManager before its time; use
+  Developer → Run check now (2.8) or a one-time request for manual checks.
+- Worker in a fresh process: end the app process (see above), then run the job; the notification texts must follow
+  the in-app language on API 31/32 too (ADR-034).
+- Database upgrades: install the previous build, create data, install the new build over it, check
+  `pragma user_version` and the rows (`adb shell run-as com.ahmetyildiz.quakealert cat databases/quakealert.db`).
 
 ## 5. Definition of done for any task
 `./gradlew assembleDebug testDebugUnitTest lintDebug` passes, new logic has unit tests, affected flows checked on at

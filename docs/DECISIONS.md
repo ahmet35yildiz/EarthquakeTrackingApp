@@ -363,3 +363,34 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Alternatives:** Play Core on-demand language downloads (extra dependency and a download step for a few strings).
 - **Consequences:** Every install carries all `values-*` strings (a few KB per language). Adding a language is still
   one `strings.xml`.
+
+## ADR-033 — Background check: skip until set up, remember only shown alerts, retry only transient errors
+- **Context:** SPEC §5.2 defines the periodic check. Some details were open: what to do before the user saved any
+  alert settings, whether matches that could not be shown (permission missing) count as notified, which errors
+  should be retried, and where the schedule is kept in sync with the settings.
+- **Decision:** `CheckForNewAlertsUseCase` skips (no network call) while alerts are off or no baseline exists. Only ids
+  of posted notifications are stored; suppressed matches stay eligible, so allowing notifications within 6 h still
+  delivers them (each check logs one suppressed event meanwhile). `lastCheckedAt` is the check's start time, so events
+  updated during the check are caught by the next overlap. Network and server errors return `retry` (WorkManager
+  backoff), parsing and unknown errors `failure` (no endless retries). `SyncAlertScheduleUseCase` is the one place
+  that schedules or cancels: on app start and after every saved settings change.
+- **Alternatives:** Mark suppressed matches as notified (the user never learns about them after allowing
+  notifications); schedule from the Alerts screen (onboarding and future entry points would repeat it); retry every
+  error (a broken response would retry forever).
+- **Consequences:** No checks run before onboarding saves the settings (2.7). Nothing alerts twice; a late permission
+  grant still delivers recent alerts. Scheduling rules are unit tested without WorkManager.
+
+## ADR-034 — The selected app language is also stored by the app for background processes below API 33
+- **Context:** Below API 33, AppCompat restores the per-app language only when an activity is created. The alert
+  worker usually runs in a process without an activity, so notifications came out in the system language
+  (verified on API 31: "7 new M4.5+ earthquakes" with the app set to Turkish).
+- **Decision:** `AppCompatLanguageManager.setSelectedLanguage` also writes the tag to SharedPreferences
+  (`app_language`); `getSelectedLanguage` falls back to it below API 33 when AppCompat has no locales.
+  `LocalizedContextProvider` builds its context from `getSelectedLanguage()`. On API 33+ the platform keeps the
+  per-app locale in every process, so the stored copy is not read there.
+- **Alternatives:** Reading AppCompat's internal storage file (restricted API, format may change); creating an
+  AppCompat delegate in `Application` (not supported); DataStore (asynchronous; the notifier needs the value
+  synchronously).
+- **Consequences:** Notifications and the channel name follow the in-app language on all API levels (verified: "7 yeni
+  M4,5+ deprem" in a worker-only process on API 31). The language picker (3.1) must go through `AppLanguageManager`,
+  which it does by design.
