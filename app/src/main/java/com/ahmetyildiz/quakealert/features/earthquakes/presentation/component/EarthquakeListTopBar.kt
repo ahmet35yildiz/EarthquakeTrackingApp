@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
 import com.ahmetyildiz.quakealert.core.ui.format.relativeTimeText
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.EarthquakesConfig
 import java.time.Instant
@@ -31,7 +32,7 @@ fun EarthquakeListTopBar(
         modifier = modifier,
         title = {
             Column {
-                Text(text = stringResource(R.string.tab_earthquakes))
+                ScreenTitle(text = stringResource(R.string.tab_earthquakes))
                 Text(
                     text = subtitleText(lastRefreshedAt, now),
                     style = MaterialTheme.typography.bodyMedium,

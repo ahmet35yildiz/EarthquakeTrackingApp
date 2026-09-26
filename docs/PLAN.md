@@ -413,9 +413,21 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   events", query kept across rotation, share sheet with the filtered lines, "zzz" → no-match state with share
   disabled; API 31: clear → confirmation "9 recorded events will be deleted" → empty state, back → developer tools →
   Settings, TR texts and date format ("26.09.2026 21:33:12").
-- [ ] **3.3 Polish.** Adaptive launcher icon, copy review (EN + TR), accessibility labels, dark mode, landscape (list:
+- [x] **3.3 Polish.** Adaptive launcher icon, copy review (EN + TR), accessibility labels, dark mode, landscape (list:
   header + bottom bar leave room for ~1 card; consider scrolling the header away or a navigation rail),
   font scale, empty/error texts, consistent spacing.
+  *Result:* launcher icon from the design as vector adaptive layers (teal background; rings + seismograph line scaled
+  into the safe zone; monochrome = foreground) and the unused template bitmaps removed (minSdk 26). Landscape / large
+  text: list controls scroll away with the list, navigation rail from 600 dp window width, one-line tab and segmented
+  labels (ADR-040). Copy review: Turkish uses "alarm" for the feature everywhere (developer texts said "uyarı"; "erken
+  uyarı" stays), one name for USGS, smoother TR sentences, two EN fixes. Accessibility: screen titles are headings
+  (`ScreenTitle`), city results have a button role; all remaining `contentDescription = null` icons are decorative
+  next to text. Event log item spacing aligned with the earthquake list. Lint's `ConfigurationScreenWidthHeight`
+  fixed by using the window size. Tests: 361 unit, 71/71 instrumented on API 31 and 34 (the first API 31 run crashed
+  in the emulator's RenderThread — native SIGSEGV in libhwui — and passed on rerun). Verified on API 34: icon in the
+  launcher, landscape list with the rail (2+ cards), Alerts in landscape, font scale 2.0 (list, Alerts, Settings,
+  detail, tab label "Earthqua…"), dark mode (list, developer tools, event log); API 31: icon, landscape with the rail
+  next to the 3-button navigation.
 - [ ] **3.4 Instrumented tests.** Compose UI tests for list states, onboarding happy path, alert settings;
   worker test with fakes.
 - [ ] **3.5 Full QA matrix.** Every item of `docs/TESTING.md` §3 and the scenarios of §4 on API 31/32 and API 34/35; fix findings.
@@ -479,3 +491,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 20:52–21:09 | ~17m | 3.1 Settings screen: language picker, notification status, about (USGS, disclaimer, version), shared permission row and outgoing intents moved to core (ADR-038); 5 unit + 5 Compose UI tests; verified on API 31 and 34 incl. system per-app language, rotation, dark mode |
 | 2026-09-26 | 21:10–21:22 | ~12m | 3.1 follow-up: developer tools moved to their own screen behind a Settings entry, alert testing card renamed (ADR-039); +4 Compose UI tests; verified on API 34 |
 | 2026-09-26 | 21:22–21:34 | ~12m | 3.2 Event log: eventlog feature over the analytics table, filter / share / clear with confirmation, live list (ADR-039); 12 unit + 9 instrumented tests; verified on API 31 and 34 incl. rotation, share sheet, TR |
+| 2026-09-26 | 21:35–22:01 | ~26m | 3.3 Polish: adaptive launcher icon, scrolling list controls + navigation rail for landscape (ADR-040), copy review EN/TR, heading semantics, one-line labels at large font scale; verified on API 31 and 34 incl. font scale 2.0 and dark mode |

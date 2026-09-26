@@ -29,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -134,7 +135,7 @@ private fun CityResults(cities: List<City>, onCitySelected: (City) -> Unit) {
             cities.forEach { city ->
                 ListItem(
                     headlineContent = { Text(text = city.name) },
-                    modifier = Modifier.clickable { onCitySelected(city) },
+                    modifier = Modifier.clickable(role = Role.Button) { onCitySelected(city) },
                     supportingContent = city.adminArea?.let { { Text(text = it) } },
                     leadingContent = { Icon(imageVector = Icons.Rounded.Place, contentDescription = null) },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),

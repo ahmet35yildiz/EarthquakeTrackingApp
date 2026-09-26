@@ -177,7 +177,7 @@
 
     <string name="onboarding_step_indicator">Step %1$d of %2$d</string>
     <string name="onboarding_feature_list_title">See recent earthquakes worldwide</string>
-    <string name="onboarding_feature_list_message">Updated data from the U.S. Geological Survey (USGS).</string>
+    <string name="onboarding_feature_list_message">Up-to-date data from the U.S. Geological Survey (USGS).</string>
     <string name="onboarding_feature_filter_title">Choose your magnitude and area</string>
     <string name="onboarding_feature_filter_message">A minimum magnitude and, if you like, a city with a radius.</string>
     <string name="onboarding_feature_alert_title">Get alerts for what matters</string>
@@ -199,7 +199,7 @@
 
     <string name="developer_tools_title">Developer tools</string>
     <string name="developer_simulate_alert">Simulate now</string>
-    <string name="developer_simulate_alert_description">Delivers a made-up earthquake with these values. It is notified only if it matches your alert settings.</string>
+    <string name="developer_simulate_alert_description">Delivers a test earthquake with these values. It is notified only if it matches your alert settings.</string>
     <string name="developer_simulate_again">Simulate the same alert again</string>
     <string name="developer_simulate_again_description">The same earthquake is never notified twice, so no notification should appear.</string>
     <string name="developer_run_check">Run check now</string>

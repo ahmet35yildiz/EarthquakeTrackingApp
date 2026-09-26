@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.City
@@ -69,7 +70,7 @@ private fun AreaModeSelector(mode: AreaMode, onModeSelected: (AreaMode) -> Unit)
                 selected = option == mode,
                 onClick = { onModeSelected(option) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
-                label = { Text(text = stringResource(option.labelRes)) },
+                label = { Text(text = stringResource(option.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis) },
             )
         }
     }

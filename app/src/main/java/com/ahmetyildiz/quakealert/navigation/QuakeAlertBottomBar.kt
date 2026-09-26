@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -22,19 +23,25 @@ fun QuakeAlertBottomBar(
             NavigationBarItem(
                 selected = isSelected,
                 onClick = { onDestinationSelected(destination) },
-                icon = {
-                    Icon(
-                        painter = painterResource(
-                            if (isSelected) destination.selectedIconRes else destination.unselectedIconRes,
-                        ),
-                        contentDescription = null,
-                    )
-                },
-                label = { Text(text = stringResource(destination.labelRes)) },
+                icon = { TopLevelDestinationIcon(destination = destination, isSelected = isSelected) },
+                label = { TopLevelDestinationLabel(destination = destination) },
             )
         }
     }
 }
 
-private fun NavDestination?.isInHierarchyOf(destination: TopLevelDestination): Boolean =
+@Composable
+internal fun TopLevelDestinationIcon(destination: TopLevelDestination, isSelected: Boolean) {
+    Icon(
+        painter = painterResource(if (isSelected) destination.selectedIconRes else destination.unselectedIconRes),
+        contentDescription = null,
+    )
+}
+
+@Composable
+internal fun TopLevelDestinationLabel(destination: TopLevelDestination) {
+    Text(text = stringResource(destination.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis)
+}
+
+internal fun NavDestination?.isInHierarchyOf(destination: TopLevelDestination): Boolean =
     this?.hierarchy?.any { it.hasRoute(destination.route::class) } == true

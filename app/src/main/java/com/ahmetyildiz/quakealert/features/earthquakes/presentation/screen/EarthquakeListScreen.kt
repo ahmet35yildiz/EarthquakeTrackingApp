@@ -131,13 +131,25 @@ fun EarthquakeListScreen(
 
 @Composable
 private fun EarthquakeList(uiState: EarthquakeListUiState, actions: EarthquakeListActions, now: Instant) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    if (uiState.content == EarthquakeListContent.EMPTY_FILTERED) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            ListControls(uiState = uiState, actions = actions, now = now)
+            FilteredEmptyState(uiState = uiState, onShowAll = actions.onShowAllClicked, modifier = Modifier.weight(1f))
+        }
+        return
+    }
+    EarthquakeItems(uiState = uiState, actions = actions, now = now)
+}
+
+@Composable
+private fun ListControls(uiState: EarthquakeListUiState, actions: EarthquakeListActions, now: Instant) {
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
         if (uiState.isShowingStaleData) {
             StaleDataHeader(
                 uiState = uiState,
                 now = now,
                 onRetry = actions.onRefresh,
-                modifier = Modifier.padding(horizontal = Spacing.screenMargin, vertical = Spacing.small),
+                modifier = Modifier.padding(horizontal = Spacing.screenMargin),
             )
         }
         EarthquakeFilterChips(
@@ -148,39 +160,35 @@ private fun EarthquakeList(uiState: EarthquakeListUiState, actions: EarthquakeLi
             onMagnitudeFilterSelected = actions.onMagnitudeFilterSelected,
             modifier = Modifier.padding(horizontal = Spacing.screenMargin),
         )
-        if (uiState.content == EarthquakeListContent.EMPTY_FILTERED) {
-            FilteredEmptyState(uiState = uiState, onShowAll = actions.onShowAllClicked, modifier = Modifier.weight(1f))
-        } else {
-            ListHeader(
-                uiState = uiState,
-                onSortOrderSelected = actions.onSortOrderSelected,
-                modifier = Modifier.padding(start = Spacing.screenMargin, end = Spacing.small),
-            )
-            EarthquakeItems(uiState = uiState, actions = actions, now = now, modifier = Modifier.weight(1f))
-        }
     }
 }
 
 @Composable
-private fun EarthquakeItems(
-    uiState: EarthquakeListUiState,
-    actions: EarthquakeListActions,
-    now: Instant,
-    modifier: Modifier = Modifier,
-) {
+private fun EarthquakeItems(uiState: EarthquakeListUiState, actions: EarthquakeListActions, now: Instant) {
     val listState: LazyListState = rememberSaveable(uiState.options, saver = LazyListState.Saver) { LazyListState() }
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         state = listState,
-        contentPadding = PaddingValues(horizontal = Spacing.screenMargin, vertical = Spacing.small),
+        contentPadding = PaddingValues(vertical = Spacing.small),
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
     ) {
+        item(key = CONTROLS_KEY) {
+            Column {
+                ListControls(uiState = uiState, actions = actions, now = now)
+                ListHeader(
+                    uiState = uiState,
+                    onSortOrderSelected = actions.onSortOrderSelected,
+                    modifier = Modifier.padding(start = Spacing.screenMargin, end = Spacing.small),
+                )
+            }
+        }
         items(items = uiState.earthquakes, key = { it.earthquake.id }) { item ->
             EarthquakeListItem(
                 item = item,
                 cityName = uiState.nearCityName,
                 now = now,
                 onClick = { actions.onEarthquakeClick(item.earthquake.id) },
+                modifier = Modifier.padding(horizontal = Spacing.screenMargin),
             )
         }
     }
@@ -255,6 +263,8 @@ private fun errorMessage(error: AppError?): String =
     } else {
         stringResource(R.string.error_message_generic)
     }
+
+private const val CONTROLS_KEY: String = "controls"
 
 private val PreviewNow: Instant = Instant.parse("2026-09-25T12:00:00Z")
 

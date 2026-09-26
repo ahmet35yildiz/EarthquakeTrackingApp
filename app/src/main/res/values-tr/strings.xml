@@ -4,7 +4,7 @@
     <string name="tab_settings">Ayarlar</string>
 
     <string name="onboarding_welcome_title">Önemli olduğunda haberin olsun</string>
-    <string name="onboarding_welcome_message">Dünyadaki son depremler ve senin için önemli olanlar için sakin bildirimler.</string>
+    <string name="onboarding_welcome_message">Dünyadaki son depremler ve yalnızca önemsediklerin için sakin bildirimler.</string>
     <string name="action_get_started">Başla</string>
 
     <string name="action_retry">Tekrar dene</string>
@@ -98,7 +98,7 @@
     <string name="detail_row_tsunami">Tsunami işareti</string>
     <string name="detail_tsunami_flag_set">Var · resmî uyarıları takip et</string>
     <string name="detail_tsunami_flag_not_set">Yok</string>
-    <string name="detail_row_felt_reports">Hissedildi bildirimi</string>
+    <string name="detail_row_felt_reports">Hissedenler</string>
     <plurals name="detail_felt_reports_value">
         <item quantity="one">%d kişi hissetti</item>
         <item quantity="other">%d kişi hissetti</item>
@@ -142,7 +142,7 @@
     <string name="alert_status_title">Durum</string>
     <string name="notifications_allowed">Bildirimlere izin verildi</string>
     <string name="notifications_blocked">Bildirim izni kapalı</string>
-    <string name="notifications_blocked_message">Bildirimlere izin verene kadar QuakeAlert uyarı gösteremez.</string>
+    <string name="notifications_blocked_message">Bildirimlere izin verene kadar QuakeAlert sana haber veremez.</string>
     <string name="action_open_settings">Ayarları aç</string>
     <string name="last_checked">Son kontrol: %1$s</string>
     <string name="last_checked_never">Henüz arka plan kontrolü yapılmadı</string>
@@ -163,15 +163,15 @@
 
     <string name="onboarding_step_indicator">Adım %1$d / %2$d</string>
     <string name="onboarding_feature_list_title">Dünyadaki son depremleri gör</string>
-    <string name="onboarding_feature_list_message">ABD Jeolojik Araştırmalar Kurumu (USGS) verileri.</string>
+    <string name="onboarding_feature_list_message">ABD Jeoloji Araştırmaları Kurumu\'ndan (USGS) güncel veriler.</string>
     <string name="onboarding_feature_filter_title">Büyüklük ve bölgeni seç</string>
     <string name="onboarding_feature_filter_message">En düşük büyüklük ve istersen bir şehir ile yarıçap.</string>
     <string name="onboarding_feature_alert_title">Önemli olanlar için bildirim al</string>
-    <string name="onboarding_feature_alert_message">Yalnızca seçimine uyan yeni depremler; aynı deprem için asla iki kez değil.</string>
+    <string name="onboarding_feature_alert_message">Yalnızca seçimine uyan yeni depremler, her biri yalnızca bir kez.</string>
     <string name="onboarding_disclaimer">QuakeAlert bir erken uyarı sistemi değildir. Bildirimler depremden birkaç dakika sonra gelebilir.</string>
     <string name="onboarding_setup_title">Hangi depremler için bildirim alalım?</string>
     <string name="onboarding_setup_message">Bunu istediğin zaman Alarmlar sekmesinden değiştirebilirsin.</string>
-    <string name="onboarding_setup_city_required">Bir şehir seç ya da Tüm dünya\'yı seç.</string>
+    <string name="onboarding_setup_city_required">Bir şehir seç ya da Tüm dünya\'ya geç.</string>
     <string name="onboarding_notifications_title">Haberdar ol</string>
     <plurals name="onboarding_notifications_message">
         <item quantity="one">QuakeAlert yeni depremleri arka planda yaklaşık %d dakikada bir kontrol eder ve bildirim göstermek için iznine ihtiyaç duyar.</item>
@@ -185,25 +185,25 @@
 
     <string name="developer_tools_title">Geliştirici araçları</string>
     <string name="developer_simulate_alert">Şimdi simüle et</string>
-    <string name="developer_simulate_alert_description">Bu değerlerle uydurma bir deprem iletir. Yalnızca uyarı ayarlarına uyarsa bildirilir.</string>
-    <string name="developer_simulate_again">Aynı uyarıyı tekrar simüle et</string>
+    <string name="developer_simulate_alert_description">Bu değerlerle deneme amaçlı bir deprem iletir. Yalnızca alarm ayarlarına uyarsa bildirilir.</string>
+    <string name="developer_simulate_again">Aynı alarmı tekrar simüle et</string>
     <string name="developer_simulate_again_description">Aynı deprem iki kez bildirilmez; bu yüzden bildirim gelmemeli.</string>
     <string name="developer_run_check">Şimdi kontrol et</string>
-    <string name="developer_run_check_description">Arka plan kontrolü gibi USGS\'te yeni depremleri hemen kontrol eder.</string>
+    <string name="developer_run_check_description">Arka plan kontrolünün yaptığı gibi USGS\'teki yeni depremlere hemen bakar.</string>
     <string name="developer_result_posted">Bildirim gönderildi.</string>
     <string name="developer_result_already_notified">Zaten bildirildi. Tekrar bildirim gönderilmedi.</string>
     <string name="developer_result_notifications_off">Bildirimler kapalı olduğu için hiçbir şey gösterilmedi.</string>
     <string name="developer_result_alerts_off">Deprem bildirimleri kapalı. Alarmlar sekmesinden açabilirsin.</string>
     <string name="developer_result_check_started">Kontrol başladı. Sonuç olay kaydında görünür.</string>
     <string name="simulated_earthquake_place">Simüle edilmiş deprem (test)</string>
-    <string name="developer_result_nothing_to_repeat">Önce bir uyarı simüle et.</string>
+    <string name="developer_result_nothing_to_repeat">Önce bir alarm simüle et.</string>
     <string name="developer_simulation_magnitude">Büyüklük</string>
-    <string name="developer_simulation_distance">%1$s merkezine km</string>
-    <string name="developer_simulation_whole_world_note">Bölgen Tüm dünya olduğu için her konum uyar.</string>
+    <string name="developer_simulation_distance">%1$s merkezinden km</string>
+    <string name="developer_simulation_whole_world_note">Bölgen Tüm dünya olduğu için her konum eşleşir.</string>
     <string name="developer_simulation_delay">Gecikme (dk)</string>
     <string name="developer_schedule">Zamanla</string>
     <string name="developer_schedule_description">Depremi gecikmeden sonra, uygulama kapalıyken de iletir. Uygulamayı zorla durdurmak bunu iptal eder.</string>
-    <string name="developer_result_not_matched">Uyarı ayarlarına uymadığı için bildirim yok.</string>
+    <string name="developer_result_not_matched">Alarm ayarlarına uymadığı için bildirim gönderilmedi.</string>
     <string name="developer_result_scheduled">%1$s için zamanlandı. Uygulamayı şimdi kapatabilirsin.</string>
     <string name="settings_language_title">Dil</string>
     <string name="settings_language_system_default">Sistem varsayılanı</string>
@@ -216,10 +216,10 @@
     <string name="settings_about_disclaimer_title">Erken uyarı sistemi değildir</string>
     <string name="settings_about_disclaimer_message">Bildirimler depremden birkaç dakika sonra gelebilir. Her zaman yerel yetkililerin yönlendirmelerine uy.</string>
     <string name="settings_about_version">Sürüm %1$s (%2$d)</string>
-    <string name="settings_developer_tools_description">Uyarı simüle et, hemen kontrol çalıştır ve olay kaydını gör.</string>
-    <string name="developer_alert_testing_title">Uyarı testi</string>
+    <string name="settings_developer_tools_description">Alarm simüle et, hemen kontrol çalıştır ve olay kaydını gör.</string>
+    <string name="developer_alert_testing_title">Alarm testi</string>
     <string name="event_log_title">Olay kaydı</string>
-    <string name="event_log_description">Kaydedilen analitik olayları. Filtrele, paylaş ya da temizle.</string>
+    <string name="event_log_description">Kaydedilen analitik olaylar. Filtrele, paylaş ya da temizle.</string>
     <string name="event_log_filter_label">Olay adına göre filtrele</string>
     <string name="action_clear_filter">Filtreyi temizle</string>
     <plurals name="event_log_count">

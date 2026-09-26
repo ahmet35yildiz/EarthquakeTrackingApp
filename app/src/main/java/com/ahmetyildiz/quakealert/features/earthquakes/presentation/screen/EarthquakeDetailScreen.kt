@@ -51,6 +51,7 @@ import com.ahmetyildiz.quakealert.core.navigation.tryStartActivity
 import com.ahmetyildiz.quakealert.core.ui.component.EmptyState
 import com.ahmetyildiz.quakealert.core.ui.component.ErrorState
 import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
+import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
 import com.ahmetyildiz.quakealert.core.ui.format.formatLocalDateTime
 import com.ahmetyildiz.quakealert.core.ui.format.formatWholeNumber
 import com.ahmetyildiz.quakealert.core.ui.format.rememberCurrentTime
@@ -167,7 +168,7 @@ fun EarthquakeDetailScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.detail_title)) },
+                title = { ScreenTitle(text = stringResource(R.string.detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = actions.onBack) {
                         Icon(

@@ -45,6 +45,7 @@ import com.ahmetyildiz.quakealert.core.navigation.shareIntent
 import com.ahmetyildiz.quakealert.core.navigation.tryStartActivity
 import com.ahmetyildiz.quakealert.core.ui.component.EmptyState
 import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
+import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.component.EventLogItem
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.viewmodel.EventLogUiState
@@ -137,7 +138,7 @@ fun EventLogScreen(
 @Composable
 private fun EventLogTopBar(uiState: EventLogUiState, onBack: () -> Unit, onShare: () -> Unit, onClear: () -> Unit) {
     TopAppBar(
-        title = { Text(text = stringResource(R.string.event_log_title)) },
+        title = { ScreenTitle(text = stringResource(R.string.event_log_title)) },
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
@@ -208,7 +209,7 @@ private fun EventList(uiState: EventLogUiState) {
             end = Spacing.screenMargin,
             bottom = Spacing.large,
         ),
-        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(Spacing.small),
     ) {
         item(key = COUNT_KEY) {
             Text(

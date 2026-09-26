@@ -28,7 +28,7 @@ Exact versions are pinned in `gradle/libs.versions.toml`: the latest stable rele
 com.ahmetyildiz.quakealert/
 ├── QuakeAlertApplication.kt         # @HiltAndroidApp, WorkManager Configuration.Provider
 ├── MainActivity.kt                  # AppCompatActivity (needed for per-app language < API 33), hosts NavHost
-├── navigation/                      # Routes, NavHost, onboarding graph, main graph, bottom bar, deep links
+├── navigation/                      # Routes, NavHost, onboarding graph, main graph, bottom bar / rail, deep links
 ├── core/
 │   ├── analytics/                   # AnalyticsTracker (interface), AnalyticsEvent, LocalAnalyticsTracker
 │   ├── database/                    # QuakeAlertDatabase, entities, DAOs (earthquake cache, notified ids, events)
@@ -195,13 +195,16 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
 - Maps (`geo:` intent), USGS page (browser) and share (chooser) are launched by the entry composable; the ViewModel
   only logs `detail_action_clicked`. A missing handler app shows a snackbar instead of crashing.
 - The bottom bar is shown only on top-level destinations; pushed screens (detail) use the full height.
+- The list's controls (stale-data banner, filter chips, count + sort) are the first item of the `LazyColumn`, so they
+  scroll away with the list and landscape / large font scales keep room for the cards (ADR-040).
 
 ### 4.5 Navigation and deep links
 - Root `NavHost` with two graphs: `OnboardingGraphRoute` (onboarding) and `MainGraphRoute` (three tabs + detail). The
   start graph comes from `StartDestinationViewModel`, which reads `isOnboardingCompleted` once per session (the
   first frame stays empty for that read); finishing onboarding navigates to the main graph and pops onboarding.
-- Tabs pop up to `MainGraphRoute` with save/restore state; the bottom bar is shown only on the three tab
-  destinations.
+- Tabs pop up to `MainGraphRoute` with save/restore state; the tab navigation is shown only on the three tab
+  destinations: a bottom bar below 600 dp window width, a navigation rail from 600 dp (landscape phones, tablets),
+  decided in `QuakeAlertApp` from `LocalWindowInfo.containerSize` (ADR-040). Tab labels stay on one line.
 - `EarthquakeDetailRoute` declares `navDeepLink` `quakealert://earthquake/{earthquakeId}?isFromNotification={bool}`
   (manifest: `VIEW` + scheme `quakealert`, `launchMode="singleTop"`). Cold start: the NavController handles the
   activity intent while setting the graph; any later intent (`onNewIntent`, also right after a restore from process
@@ -271,7 +274,9 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   which ignores the in-app language), numbers and dates with `LocalLocale`, a once-per-minute `rememberCurrentTime()`.
 - Icons: `material-icons-core` (`Icons.Rounded.*`); icons it lacks, and the bottom-bar icons (outlined/filled pairs),
   are Material Symbols Rounded vector drawables (ADR-016).
-- Edge-to-edge, custom adaptive launcher icon, `contentDescription` on all meaningful icons.
+- Edge-to-edge, custom adaptive launcher icon (vector layers only: background, foreground, monochrome = foreground;
+  no bitmap fallbacks because minSdk 26 always uses the adaptive icon), `contentDescription` on all meaningful icons
+  (decorative icons next to text use `null`), screen titles through `ScreenTitle` (marked as heading for TalkBack).
 
 ## 8. Error handling
 - `AppResult<T>` = `Success(data)` | `Failure(error: AppError)` for expected failures.

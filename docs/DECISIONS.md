@@ -471,3 +471,16 @@ Add a new record (next number) whenever a significant decision is made; never re
   at once); share as JSON/CSV (plain lines are readable in any chat or issue).
 - **Consequences:** One more tap to reach the developer tools. Clearing the log only affects the local table; Logcat
   keeps its copy. Release builds have neither route nor entry.
+
+## ADR-040 — Landscape and large text: scrolling list controls and a navigation rail
+- **Context:** In landscape the list's fixed header (filters, count, sort) plus the top and bottom bars left room for
+  about one card; large font scales had the same effect in portrait and broke the "Earthquakes" tab label mid-word.
+- **Decision:** The list controls are the first item of the list and scroll away with it. From a 600 dp window width
+  (Material's medium width: landscape phones, tablets) the three tabs move from the bottom bar to a navigation rail on
+  the start side; the width comes from `LocalWindowInfo.containerSize`. Tab and segmented button labels stay on one
+  line with an ellipsis.
+- **Alternatives:** Collapsing top app bar tied to scroll (more nested-scroll wiring, the title still takes space when
+  expanded); `NavigationSuiteScaffold` (an extra adaptive dependency for one switch); `Configuration.screenWidthDp`
+  (lint `ConfigurationScreenWidthHeight`: rounded and inset-dependent).
+- **Consequences:** Landscape shows two to three cards instead of one. After changing a filter the list starts at the
+  top again (the list state is keyed on the options), so the controls are visible right after a change.
