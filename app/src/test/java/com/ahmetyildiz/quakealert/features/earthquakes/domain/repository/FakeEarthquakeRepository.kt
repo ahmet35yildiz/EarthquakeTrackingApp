@@ -38,4 +38,8 @@ class FakeEarthquakeRepository(cached: List<Earthquake> = emptyList()) : Earthqu
         failure?.let { return AppResult.Failure(it) }
         return AppResult.Success(remoteEarthquakes)
     }
+
+    override suspend fun addToCache(earthquake: Earthquake) {
+        cachedEarthquakes.value = cachedEarthquakes.value.filterNot { it.id == earthquake.id } + earthquake
+    }
 }

@@ -172,7 +172,10 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("from" to from.paramValue, "to" to to.paramValue),
     )
 
-    data object DeveloperSimulatedAlert : AnalyticsEvent(name = "developer_simulated_alert")
+    data class DeveloperSimulatedAlert(val outcome: SimulationOutcomeValue, val isScheduled: Boolean) : AnalyticsEvent(
+        name = "developer_simulated_alert",
+        params = mapOf("outcome" to outcome.paramValue, "scheduled" to isScheduled.toString()),
+    )
 
     data object DeveloperCheckTriggered : AnalyticsEvent(name = "developer_check_triggered")
 

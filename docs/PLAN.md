@@ -350,15 +350,37 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   53/53 on API 31 and 34. Verified on API 34: allow path (İzmir → list with "Near İzmir", job scheduled, first check
   logged, full event sequence), deny path (message, Finish, Alerts shows permission off, job still scheduled), back
   button and rotation keep the page, TR texts; API 31: no dialog, "Notifications allowed", Finish, job scheduled.
-- [ ] **2.8 Developer tools.** Debug-only section: Simulate alert (fake matching event through matcher + notifier),
+- [x] **2.8 Developer tools.** Debug-only section: Simulate alert (fake matching event through matcher + notifier),
   Run check now (expedited one-time worker).
   From 2.5: simulate through `NotifyAlertsUseCase` (same policy, analytics and tap handling as real alerts).
   From 2.6: "Run check now" = expedited `OneTimeWorkRequest<AlertCheckWorker>` (a forced periodic job is postponed).
   *Done when:* simulate → notification → tap → detail; repeated simulate of the same id → no duplicate.
+  *Result:* "Developer tools" card on the Settings tab, shown only in debug builds (`SettingsScreen` gets it as a
+  slot from `QuakeAlertNavHost`, so `settings` does not depend on `alerts`). Simulate alert: `SimulateAlertUseCase`
+  builds an event that matches the saved settings (now, threshold + 0.5, 20 km from the city or 0°/0° for the whole
+  world, localized "Simulated earthquake (test)"), adds it to the cache so the detail opens, and delivers it through
+  the new `DeliverAlertsUseCase` — the same match → notify → remember step the background check now uses. "Simulate
+  the same alert again" takes the newest simulated event from the cache (an in-memory reference was lost when the
+  notification deep link rebuilt the back stack) and shows "Already notified" when nothing is posted. Run check now
+  = `AlertCheckScheduler.runCheckNow()`: a unique one-time `AlertCheckWorker` request with the network constraint —
+  not expedited, because expedited work below API 31 needs a foreground notification in the worker (ADR-036).
+  Outcome messages for alerts off, notifications off, nothing to repeat and check started. Tests: 17 unit tests
+  (deliver, simulate, ViewModel); full suites 336 unit, 53/53 instrumented on API 31 and 34. Verified on API 34 and
+  31: simulate → "M5.0 earthquake" → tap → detail of the simulated event → back → simulate again → "Already
+  notified", no new notification; run check now → `background_check_completed`.
+  *Follow-up (requested):* the simulation takes a magnitude, a distance from the selected city (hidden for the whole
+  world) and a delay; "Schedule" enqueues `SimulatedAlertWorker` with these values, which runs even with the app
+  closed and goes through the same delivery step, so a matching event is notified and a non-matching one is not
+  (`outcome=not_matched`). `developer_simulated_alert` now carries `outcome` and `scheduled` (ADR-037). Tests: +13 unit
+  tests (344 unit, 53/53 instrumented on API 31 and 34). Verified with the app process killed: API 34 (whole world,
+  M4.5+) M5.0 → notification, M3.0 → no notification; API 31 (İzmir 250 km) 50 km → "M5.0 earthquake · 50 km from
+  İzmir", 400 km → no notification; runs arrived 0–1 min after the chosen time.
 
 ## Phase 3 — Settings, event log, polish, QA
 - [ ] **3.1 Settings screen.** Language picker (System default + generated list, names in their own language),
   about (USGS attribution, disclaimer, version), permission status, developer entries (debug only).
+  From 2.8: `SettingsScreen` already has a top bar, a scrolling column and the debug-only `developerTools` slot
+  filled by `DeveloperToolsEntry`; add the event log entry there (3.2).
 - [ ] **3.2 Event log screen.** List, filter by name, clear, share as text.
 - [ ] **3.3 Polish.** Adaptive launcher icon, copy review (EN + TR), accessibility labels, dark mode, landscape (list:
   header + bottom bar leave room for ~1 card; consider scrolling the header away or a navigation rail),
@@ -421,3 +443,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 16:46–17:20 | ~34m | 2.5 Notifications: channel, notify policy use case + Android notifier (single / up to 3 / summary), localized texts, tap extras, app-open tracking (ADR-030); fixed deep links after process death (ADR-031); language splits off (ADR-032); 17 unit + 5 instrumented tests; verified warm / cold / restored taps and summary on API 31 and 34 |
 | 2026-09-26 | 17:45–18:10 | ~25m | 2.6 Worker: notified ids in Room (DB v3), background check use case, worker, scheduler + schedule sync (ADR-033); stored app language for worker processes below API 33 after the emulator showed English texts (ADR-034); 20 unit + 6 instrumented tests; verified migration, job, reboot and a killed-process run on API 31 and 34 |
 | 2026-09-26 | 18:45–19:05 | ~20m | 2.7 Onboarding: welcome / alert setup / notifications pages, permission request and denial path, finish saves settings + schedules (ADR-035); 13 unit + 6 Compose UI tests; verified allow and deny paths on API 34 and the no-dialog path on API 31 |
+| 2026-09-26 | 19:53–20:08 | ~15m | 2.8 Developer tools: simulate alert through the shared delivery step, repeat from the cache, run check now (ADR-036); 17 unit tests; verified simulate → tap → detail → no duplicate and run check now on API 31 and 34 |
+| 2026-09-26 | 20:16–20:38 | ~22m | 2.8 follow-up: simulation with magnitude / distance / delay, scheduled delivery with the app closed, `outcome` on the developer event (ADR-037); +13 unit tests; verified matching vs non-matching on API 31 and 34 |

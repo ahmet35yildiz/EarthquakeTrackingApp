@@ -5,4 +5,6 @@ interface AlertCheckScheduler {
     fun schedulePeriodicCheck()
 
     fun cancelPeriodicCheck()
+
+    fun runCheckNow()
 }

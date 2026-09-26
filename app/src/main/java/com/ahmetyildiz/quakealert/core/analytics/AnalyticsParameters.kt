@@ -23,3 +23,5 @@ enum class DetailAction { MAP, USGS, SHARE }
 enum class SuppressionReason { PERMISSION_DENIED }
 
 enum class BackgroundCheckFailureReason { NETWORK, SERVER, PARSING, UNKNOWN }
+
+enum class SimulationOutcomeValue { POSTED, ALREADY_NOTIFIED, NOT_MATCHED, NOTIFICATIONS_OFF, ALERTS_OFF, NOTHING_TO_REPEAT }

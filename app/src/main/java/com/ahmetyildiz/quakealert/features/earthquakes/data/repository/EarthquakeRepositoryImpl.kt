@@ -46,6 +46,10 @@ class EarthquakeRepositoryImpl @Inject constructor(
         safeApiCall { api.getEarthquakes(query.toUsgsQueryParameters()) }
             .map { collection -> collection.features.mapNotNull(UsgsFeatureDto::toEarthquakeOrNull) }
 
+    override suspend fun addToCache(earthquake: Earthquake) {
+        dao.insertAll(listOf(earthquake.toEntity()))
+    }
+
     private fun Earthquake?.toResultOrNotFound(): AppResult<Earthquake> =
         if (this != null) AppResult.Success(this) else AppResult.Failure(AppError.NotFound)
 }

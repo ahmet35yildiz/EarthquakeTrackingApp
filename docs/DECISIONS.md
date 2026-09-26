@@ -410,3 +410,32 @@ Add a new record (next number) whenever a significant decision is made; never re
   saving only when the choice differs from the defaults (no baseline, no schedule).
 - **Consequences:** Rotation and back keep the flow; process death restarts the setup page with the default area
   (the city draft is not saved). Every finished onboarding starts background checks right away.
+
+## ADR-036 — Developer tools reuse the real delivery path and live behind a debug-only slot
+- **Context:** Alerts must be demonstrable on demand (a real matching earthquake may take hours), including the tap
+  into the detail and the "never twice" rule, and a check must be triggerable without waiting 15 minutes.
+- **Decision:** A "Developer tools" card on the Settings tab, passed by `QuakeAlertNavHost` as a slot only when
+  `BuildConfig.DEBUG`. Simulate alert builds an earthquake that matches the saved settings, stores it in the cache so
+  the detail can open it, and delivers it through `DeliverAlertsUseCase` — the step the background check uses too.
+  "Simulate the same alert again" re-delivers the newest simulated event found in the cache, so it still works after
+  a notification tap has rebuilt the back stack. Run check now enqueues a unique, non-expedited one-time request of
+  the same worker.
+- **Alternatives:** A fake id without caching (the notification would open "not found"); keeping the last simulated
+  event in the ViewModel (lost after the deep link); expedited work (needs `getForegroundInfo` and a notification in
+  the worker below API 31); a separate debug source set (more wiring for a small screen).
+- **Consequences:** The simulated event appears in the list until the next refresh replaces the cache. Release builds
+  never show the card; the use cases stay in the main source set but are unreachable there.
+
+## ADR-037 — Simulated alerts take their values and can be scheduled
+- **Context:** Extends ADR-036. The alert rules should be demonstrable in both directions (a matching earthquake
+  notifies, a non-matching one does not) and with the app closed, a few minutes ahead.
+- **Decision:** The developer card takes a magnitude, a distance from the selected city (ignored for the whole world)
+  and a delay. "Simulate now" delivers at once; "Schedule" enqueues a one-time `SimulatedAlertWorker` with the values
+  as input data and the delay as initial delay. The worker builds the event when it runs (its time is the delivery
+  time, so baseline and max-age rules hold) and uses the same delivery step as real checks. The outcome of every
+  simulation is logged as `developer_simulated_alert` with `outcome` and `scheduled`.
+- **Alternatives:** Exact alarms (an extra permission for a debug tool); building the event at scheduling time (its time
+  would be in the past or future relative to the check); free latitude/longitude input (harder to type, distance from
+  the city is what the rule checks).
+- **Consequences:** Delivery follows WorkManager timing (seen 0–1 min late on API 31 and 34). Force-stopping the app
+  cancels a scheduled simulation.

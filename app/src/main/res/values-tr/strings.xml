@@ -182,4 +182,27 @@
     <string name="action_allow_notifications">Bildirimlere izin ver</string>
     <string name="action_not_now">Şimdi değil</string>
     <string name="action_finish">Bitir</string>
+
+    <string name="developer_tools_title">Geliştirici araçları</string>
+    <string name="developer_simulate_alert">Şimdi simüle et</string>
+    <string name="developer_simulate_alert_description">Bu değerlerle uydurma bir deprem iletir. Yalnızca uyarı ayarlarına uyarsa bildirilir.</string>
+    <string name="developer_simulate_again">Aynı uyarıyı tekrar simüle et</string>
+    <string name="developer_simulate_again_description">Aynı deprem iki kez bildirilmez; bu yüzden bildirim gelmemeli.</string>
+    <string name="developer_run_check">Şimdi kontrol et</string>
+    <string name="developer_run_check_description">Arka plan kontrolü gibi USGS\'te yeni depremleri hemen kontrol eder.</string>
+    <string name="developer_result_posted">Bildirim gönderildi.</string>
+    <string name="developer_result_already_notified">Zaten bildirildi. Tekrar bildirim gönderilmedi.</string>
+    <string name="developer_result_notifications_off">Bildirimler kapalı olduğu için hiçbir şey gösterilmedi.</string>
+    <string name="developer_result_alerts_off">Deprem bildirimleri kapalı. Alarmlar sekmesinden açabilirsin.</string>
+    <string name="developer_result_check_started">Kontrol başladı. Sonuç olay kaydında görünür.</string>
+    <string name="simulated_earthquake_place">Simüle edilmiş deprem (test)</string>
+    <string name="developer_result_nothing_to_repeat">Önce bir uyarı simüle et.</string>
+    <string name="developer_simulation_magnitude">Büyüklük</string>
+    <string name="developer_simulation_distance">%1$s merkezine km</string>
+    <string name="developer_simulation_whole_world_note">Bölgen Tüm dünya olduğu için her konum uyar.</string>
+    <string name="developer_simulation_delay">Gecikme (dk)</string>
+    <string name="developer_schedule">Zamanla</string>
+    <string name="developer_schedule_description">Depremi gecikmeden sonra, uygulama kapalıyken de iletir. Uygulamayı zorla durdurmak bunu iptal eder.</string>
+    <string name="developer_result_not_matched">Uyarı ayarlarına uymadığı için bildirim yok.</string>
+    <string name="developer_result_scheduled">%1$s için zamanlandı. Uygulamayı şimdi kapatabilirsin.</string>
 </resources>

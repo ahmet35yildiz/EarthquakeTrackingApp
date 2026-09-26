@@ -155,7 +155,11 @@ class AnalyticsEventTest {
                 "language_changed",
                 "from" to "system", "to" to "tr",
             ),
-            entry(AnalyticsEvent.DeveloperSimulatedAlert, "developer_simulated_alert"),
+            entry(
+                AnalyticsEvent.DeveloperSimulatedAlert(SimulationOutcomeValue.NOT_MATCHED, isScheduled = true),
+                "developer_simulated_alert",
+                "outcome" to "not_matched", "scheduled" to "true",
+            ),
             entry(AnalyticsEvent.DeveloperCheckTriggered, "developer_check_triggered"),
         )
 

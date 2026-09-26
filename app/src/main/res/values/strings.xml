@@ -196,4 +196,27 @@
     <string name="action_allow_notifications">Allow notifications</string>
     <string name="action_not_now">Not now</string>
     <string name="action_finish">Finish</string>
+
+    <string name="developer_tools_title">Developer tools</string>
+    <string name="developer_simulate_alert">Simulate now</string>
+    <string name="developer_simulate_alert_description">Delivers a made-up earthquake with these values. It is notified only if it matches your alert settings.</string>
+    <string name="developer_simulate_again">Simulate the same alert again</string>
+    <string name="developer_simulate_again_description">The same earthquake is never notified twice, so no notification should appear.</string>
+    <string name="developer_run_check">Run check now</string>
+    <string name="developer_run_check_description">Checks USGS for new earthquakes right away, like the background check.</string>
+    <string name="developer_result_posted">Notification posted.</string>
+    <string name="developer_result_already_notified">Already notified. No duplicate was posted.</string>
+    <string name="developer_result_notifications_off">Notifications are off, so nothing was shown.</string>
+    <string name="developer_result_alerts_off">Earthquake alerts are off. Turn them on in the Alerts tab.</string>
+    <string name="developer_result_check_started">Check started. The result appears in the event log.</string>
+    <string name="simulated_earthquake_place">Simulated earthquake (test)</string>
+    <string name="developer_result_nothing_to_repeat">Simulate an alert first.</string>
+    <string name="developer_simulation_magnitude">Magnitude</string>
+    <string name="developer_simulation_distance">km from %1$s</string>
+    <string name="developer_simulation_whole_world_note">Your area is Whole world, so any location matches.</string>
+    <string name="developer_simulation_delay">Delay (min)</string>
+    <string name="developer_schedule">Schedule</string>
+    <string name="developer_schedule_description">Delivers the earthquake after the delay, also when the app is closed. Force-stopping the app cancels it.</string>
+    <string name="developer_result_not_matched">Doesn\'t match your alert settings, so there is no notification.</string>
+    <string name="developer_result_scheduled">Scheduled for %1$s. You can close the app now.</string>
 </resources>

@@ -3,7 +3,10 @@ package com.ahmetyildiz.quakealert.features.alerts.worker
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -18,7 +21,7 @@ class AlertWorkScheduler @Inject constructor(
 
     override fun schedulePeriodicCheck() {
         val request: PeriodicWorkRequest = PeriodicWorkRequestBuilder<AlertCheckWorker>(AlertConfig.CHECK_INTERVAL)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .setConstraints(networkConstraints())
             .build()
         WorkManager.getInstance(context)
             .enqueueUniquePeriodicWork(PERIODIC_CHECK_WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
@@ -28,7 +31,18 @@ class AlertWorkScheduler @Inject constructor(
         WorkManager.getInstance(context).cancelUniqueWork(PERIODIC_CHECK_WORK_NAME)
     }
 
+    override fun runCheckNow() {
+        val request: OneTimeWorkRequest = OneTimeWorkRequestBuilder<AlertCheckWorker>()
+            .setConstraints(networkConstraints())
+            .build()
+        WorkManager.getInstance(context).enqueueUniqueWork(MANUAL_CHECK_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
+    }
+
+    private fun networkConstraints(): Constraints =
+        Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
     companion object {
         const val PERIODIC_CHECK_WORK_NAME: String = "periodic_alert_check"
+        const val MANUAL_CHECK_WORK_NAME: String = "manual_alert_check"
     }
 }

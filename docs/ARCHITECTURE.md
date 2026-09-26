@@ -125,8 +125,14 @@ WorkManager (periodic 15 min, NetworkType.CONNECTED)
   `periodic_alert_check` (15 min, network, `ExistingPeriodicWorkPolicy.UPDATE`) when alerts are enabled and settings
   were saved; cancels it otherwise. Enabling alerts runs a first check right away; WorkManager postpones a forced run
   of the periodic job before its time.
-- Developer "Simulate alert" builds a fake `Earthquake` matching current settings and runs it through the same
-  matcher + notifier path. "Run check now" enqueues an expedited `OneTimeWorkRequest` of the same worker.
+- `DeliverAlertsUseCase` is the shared "match against stored ids → `NotifyAlertsUseCase` → remember posted ids" step
+  of the background check and of the developer tools.
+- Developer tools (debug builds only, ADR-036): "Simulate alert" (`SimulateAlertUseCase`) builds an earthquake that
+  matches the saved settings, adds it to the cache (so the notification opens a detail) and delivers it through
+  `DeliverAlertsUseCase`; "Simulate the same alert again" re-delivers the newest cached simulated event (nothing is
+  posted — dedupe); "Run check now" enqueues a unique one-time `AlertCheckWorker` request (network constraint, not
+  expedited). The simulation takes a magnitude, a distance from the city and a delay (`SimulationRequest`);
+  "Schedule" enqueues `SimulatedAlertWorker` through `SimulatedAlertScheduler` with an initial delay (ADR-037). The card is a slot of `SettingsScreen`, filled in `QuakeAlertNavHost` when `BuildConfig.DEBUG`.
 - The worker uses Hilt via `HiltWorkerFactory`; the default WorkManager initializer is removed from the manifest.
 
 ### 4.3 City search (Geocoder wrapper)

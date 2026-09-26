@@ -42,8 +42,11 @@ class CheckForNewAlertsUseCaseTest {
         userPreferencesRepository = preferencesRepository,
         earthquakeRepository = earthquakeRepository,
         notifiedEarthquakeRepository = notifiedRepository,
-        alertMatcher = AlertMatcher(),
-        notifyAlerts = NotifyAlertsUseCase(notifier, { areNotificationsAllowed }, analyticsTracker),
+        deliverAlerts = DeliverAlertsUseCase(
+            notifiedRepository,
+            AlertMatcher(),
+            NotifyAlertsUseCase(notifier, { areNotificationsAllowed }, analyticsTracker),
+        ),
         analyticsTracker = analyticsTracker,
         clock = clock,
     )
