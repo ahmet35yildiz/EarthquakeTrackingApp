@@ -241,14 +241,31 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   "Izmir"/"İzmir" → İzmir, "Tokyo" → Tokyo, Paris US → Texas/Illinois/Kentucky, nonsense → empty, airplane mode →
   `Network`; 253/249 countries, TR names sorted with Turkish rules; first request ~1–2.5 s, then ~0.1–0.5 s. The
   hidden-search path is exposed through `SearchCitiesUseCase.isAvailable()` (unit tested); the UI part is in 2.3.
-- [ ] **2.3 Area components.** Reusable composables: threshold slider, country picker (searchable), city search
+- [x] **2.3 Area components.** Reusable composables: threshold slider, country picker (searchable), city search
   field + results ("type and search", no live suggestions), radius selector, "Whole world" warning card.
   From 2.2: city search hidden when `SearchCitiesUseCase.isAvailable()` is false; default country = device region
   (SPEC §4.4); rebuild the country list when the app language changes; log `city_search_performed` /
   `city_search_failed` from the ViewModel.
   *Done when:* previews + usable in both onboarding and settings.
+  *Result:* stateless composables in `alerts/presentation/component`: `MagnitudeThresholdSelector` (stepped slider,
+  M badge, range labels, hint; reports the value when the drag ends), `AreaSelector` (Whole world / Near a city
+  segmented choice, `WholeWorldWarningCard`, `SelectedCityCard` with Change, `CitySearchPanel` with
+  `CountryPickerField` + full-screen searchable `CountryPickerDialog` (flags, accent-insensitive filter),
+  `RadiusSelector`), plus the shared `SectionCard` in `core/ui`. The caller owns the choice as an `AreaSelection`
+  (mode, city, radius; `toAlertAreaOrNull()` is null while "Near a city" has no city); `AreaSelectorEntry` wires the
+  shared `CitySearchViewModel` (countries per app language, default = device region from the new
+  `DeviceRegionProvider`, search states, analytics) — ADR-028. The design's dark tertiary container made the
+  warning card unreadable in light mode, so it uses the stale-data banner style. Tests: 39 unit tests (ViewModel,
+  area selection, country filter, slider steps, flags) and 9 Compose UI tests (passed on API 31 and 34). Verified on
+  API 34 and 31 with a temporary wiring into the Alerts tab (reverted): default country from the device region,
+  "turk" → Türkiye / Turkmenistan / Turks & Caicos, keyboard search, İzmir picked, radius, Change → Cancel, slider
+  tap → 6.5, `city_search_performed` logged, TR + dark (decimal comma, TR texts), airplane mode → network message →
+  Retry → Ankara, landscape scrolls; on API 31 the country is "Turkey" (older platform data).
 - [ ] **2.4 Alert settings screen.** Toggle, threshold, area, warning when no area, permission status row with
   "Open settings", last checked time; saving resets baseline; schedules/cancels work; analytics.
+  From 2.3: use `MagnitudeThresholdSelector` + `AreaSelectorEntry`; keep the `AreaSelection` in the ViewModel (it
+  must survive rotation and language changes); save only when `toAlertAreaOrNull()` is not null; log
+  `alert_threshold_changed` / `alert_area_set` / `alert_area_cleared` from the ViewModel.
   *Done when:* SPEC §4.4 met; ViewModel tests pass.
 - [ ] **2.5 Notifications.** Channel creation at startup, `AlertNotifier` interface + `EarthquakeAlertNotifier`
   (single, up to 3 individual, summary for more; deep link PendingIntent; localized title with distance),
@@ -264,6 +281,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 - [ ] **2.7 Onboarding.** Welcome (with not-an-early-warning disclaimer) → alert setup (reuses 2.3) → notification
   permission (API 33+ request; < 33 confirm only) → finish; completion flag; start destination logic; analytics.
   Graph, start destination and completion flag exist since 1.7; replace the placeholder `OnboardingScreen`.
+  Alert setup step: same components and `AreaSelection` handling as 2.4.
   *Done when:* SPEC §4.1 met on API 31/32 and 34; denial path works.
 - [ ] **2.8 Developer tools.** Debug-only section: Simulate alert (fake matching event through matcher + notifier),
   Run check now (expedited one-time worker).
@@ -329,3 +347,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 11:41–12:09 | ~28m | 1.7 Navigation: onboarding/main graphs, start destination, onboarding placeholder, deep link to detail handled in place (ADR-025); unit tests; verified cold/warm deep links on API 31 and 34 |
 | 2026-09-26 | 15:15–15:30 | ~15m | 2.1 Alert domain: AlertConfig, pure AlertMatcher with criteria object (ADR-026); 23 unit tests covering every SPEC §5.1 rule and its boundaries |
 | 2026-09-26 | 15:27–15:42 | ~15m | 2.2 City search: country list, Geocoder wrapper with API 33 split, repository rules tested with a fake geocoder (ADR-027); fixed country-level results found on the emulator; 26 unit tests; verified on API 31 and 34 incl. airplane mode |
+| 2026-09-26 | 15:44–16:08 | ~24m | 2.3 Area components: threshold slider, area selector (country picker, city search, selected city, radius, whole-world warning), shared CitySearchViewModel with device-region default (ADR-028); 39 unit + 9 Compose UI tests; verified on API 31 and 34 incl. TR, dark, offline, landscape |

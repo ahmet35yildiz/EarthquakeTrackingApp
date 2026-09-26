@@ -119,4 +119,31 @@
     <string name="error_no_app_for_action">No app found to open this.</string>
     <string name="share_chooser_title">Share earthquake</string>
     <string name="share_text">M%1$s earthquake · %2$s\n%3$s · %4$s km deep\n%5$s</string>
+
+    <string name="alert_threshold_title">Minimum magnitude</string>
+    <string name="alert_threshold_badge" translatable="false">M%1$s+</string>
+    <string name="alert_threshold_hint">You\'ll get alerts for M%1$s and stronger earthquakes.</string>
+    <string name="alert_area_title">Area</string>
+    <string name="alert_area_whole_world">Whole world</string>
+    <string name="alert_area_near_city">Near a city</string>
+    <string name="alert_area_whole_world_warning_title">Alerts for the whole world</string>
+    <string name="alert_area_whole_world_warning_message">You\'ll get alerts for earthquakes anywhere in the world. With a low threshold this can mean several alerts a day.</string>
+    <string name="alert_area_city_search_unavailable">City search isn\'t available on this device, so alerts cover the whole world.</string>
+    <string name="alert_radius_title">Alert radius</string>
+    <string name="radius_km_value" translatable="false">%1$d km</string>
+    <string name="country_label">Country</string>
+    <string name="country_placeholder">Select a country</string>
+    <string name="country_search_hint">Search countries</string>
+    <string name="country_no_match">No country matches \"%1$s\"</string>
+    <string name="city_search_label">City</string>
+    <string name="city_search_prompt">Type a city name and tap Search.</string>
+    <string name="city_search_loading">Searching…</string>
+    <string name="city_search_no_results">No city named \"%1$s\" found in %2$s.</string>
+    <string name="city_search_error_unavailable">City search isn\'t available on this device.</string>
+    <string name="selected_city_label">Selected city</string>
+    <string name="city_region_pair" translatable="false">%1$s, %2$s</string>
+    <string name="action_search">Search</string>
+    <string name="action_change">Change</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
 </resources>

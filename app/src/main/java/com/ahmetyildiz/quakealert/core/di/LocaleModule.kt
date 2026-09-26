@@ -2,6 +2,8 @@ package com.ahmetyildiz.quakealert.core.di
 
 import com.ahmetyildiz.quakealert.core.locale.AppCompatLanguageManager
 import com.ahmetyildiz.quakealert.core.locale.AppLanguageManager
+import com.ahmetyildiz.quakealert.core.locale.DeviceRegionProvider
+import com.ahmetyildiz.quakealert.core.locale.SystemDeviceRegionProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,4 +15,7 @@ interface LocaleModule {
 
     @Binds
     fun bindAppLanguageManager(manager: AppCompatLanguageManager): AppLanguageManager
+
+    @Binds
+    fun bindDeviceRegionProvider(provider: SystemDeviceRegionProvider): DeviceRegionProvider
 }

@@ -110,4 +110,28 @@
     <string name="error_no_app_for_action">Bunu açabilecek bir uygulama bulunamadı.</string>
     <string name="share_chooser_title">Depremi paylaş</string>
     <string name="share_text">M%1$s deprem · %2$s\n%3$s · %4$s km derinlikte\n%5$s</string>
+
+    <string name="alert_threshold_title">En düşük büyüklük</string>
+    <string name="alert_threshold_hint">M%1$s ve daha büyük depremler için bildirim alırsın.</string>
+    <string name="alert_area_title">Bölge</string>
+    <string name="alert_area_whole_world">Tüm dünya</string>
+    <string name="alert_area_near_city">Şehir çevresi</string>
+    <string name="alert_area_whole_world_warning_title">Tüm dünya için bildirim</string>
+    <string name="alert_area_whole_world_warning_message">Dünyanın her yerindeki depremler için bildirim alırsın. Eşik düşükse günde birkaç bildirim gelebilir.</string>
+    <string name="alert_area_city_search_unavailable">Bu cihazda şehir arama kullanılamıyor; bildirimler tüm dünyayı kapsar.</string>
+    <string name="alert_radius_title">Alarm yarıçapı</string>
+    <string name="country_label">Ülke</string>
+    <string name="country_placeholder">Ülke seç</string>
+    <string name="country_search_hint">Ülke ara</string>
+    <string name="country_no_match">\"%1$s\" ile eşleşen ülke yok</string>
+    <string name="city_search_label">Şehir</string>
+    <string name="city_search_prompt">Şehir adını yaz ve Ara\'ya dokun.</string>
+    <string name="city_search_loading">Aranıyor…</string>
+    <string name="city_search_no_results">%2$s içinde \"%1$s\" adında bir şehir bulunamadı.</string>
+    <string name="city_search_error_unavailable">Bu cihazda şehir arama kullanılamıyor.</string>
+    <string name="selected_city_label">Seçili şehir</string>
+    <string name="action_search">Ara</string>
+    <string name="action_change">Değiştir</string>
+    <string name="action_cancel">Vazgeç</string>
+    <string name="action_close">Kapat</string>
 </resources>

@@ -38,11 +38,11 @@ com.ahmetyildiz.quakealert/
 │   ├── location/                    # Distance (haversine) utilities
 │   ├── network/                     # Retrofit/OkHttp/Json setup
 │   ├── notification/                # Channels, NotificationPermissionChecker
-│   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), supported languages
+│   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), DeviceRegionProvider
 │   ├── error/                       # AppResult, AppError
 │   ├── time/                        # Clock abstraction (testable "now"), formatters
 │   ├── di/                          # App-wide Hilt modules (network, database, datastore, dispatchers, app scope, clock)
-│   └── ui/                          # Reusable composables (states, chips, badges) + theme/
+│   └── ui/                          # Reusable composables (states, badges, SectionCard) + theme/
 ├── features/
 │   ├── earthquakes/                 # List + detail + USGS data
 │   │   ├── data/model | source | repository
@@ -122,7 +122,7 @@ WorkManager (periodic 15 min, NetworkType.CONNECTED)
 
 ### 4.3 City search (Geocoder wrapper)
 ```
-CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (domain interface)
+AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (domain interface)
                                                   └─ CitySearchRepositoryImpl (data, rules)
                                                        └─ CityGeocoder ─▶ AndroidCityGeocoder (android.location)
 ```
@@ -144,6 +144,13 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
   - Addresses without coordinates are skipped; the rest become plain `GeocodedAddress` values.
 - `GetCountriesUseCase(displayLocale)`: `Locale.getISOCountries()` with names in the display locale, sorted with that
   locale's `Collator`.
+- Presentation (ADR-028): the alert settings screen and the onboarding setup step own the user's choice as an
+  `AreaSelection` (mode, city, radius) and render the stateless `MagnitudeThresholdSelector` and
+  `AreaSelectorEntry`. The entry wires `CitySearchViewModel`, shared by both screens: country list for the app
+  language (rebuilt on language change, keeps the selected code), default country = device region
+  (`DeviceRegionProvider`, system locale — not the per-app language), search states Idle / Loading / Found /
+  NoResults / Failed, `city_search_performed` / `city_search_failed`. Picking a city, the radius or the mode is
+  reported back as a new `AreaSelection`; `toAlertAreaOrNull()` is null while "Near a city" has no city yet.
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
 
 ### 4.4 Earthquake detail

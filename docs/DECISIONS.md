@@ -291,3 +291,20 @@ Add a new record (next number) whenever a significant decision is made; never re
   dropping every country-level result (loses Singapore, Monaco, Hong Kong).
 - **Consequences:** The Android-specific part is ~50 lines and verified on both API sides; everything else is
   covered by fast unit tests. A city state is found by its name in the app language only ("Singapur" in Turkish).
+
+## ADR-028 — Area components are stateless; one shared ViewModel owns city search
+- **Context:** The threshold and area controls appear in the alert settings screen (2.4) and in the onboarding setup
+  step (2.7). City search has its own state (countries, default country, loading / results / errors, analytics),
+  while the chosen threshold and area belong to the screen that saves them.
+- **Decision:** All controls are stateless composables. The hosting screen keeps the choice as an `AreaSelection`
+  (mode, city, radius) and saves it only when `toAlertAreaOrNull()` returns an area. `AreaSelectorEntry` connects the
+  controls to `CitySearchViewModel`, which both screens use: it builds the country list for the app language, picks
+  the device region as the default country, runs searches and logs the search events. Transient UI state (typed
+  text, open picker, "changing city") stays in `rememberSaveable`. The threshold slider reports a value when the drag
+  ends, so a drag is one change. The whole-world warning uses the stale-data banner colours because the design's
+  tertiary container is dark in both themes.
+- **Alternatives:** City search inside each screen's ViewModel (the same logic twice); one ViewModel for the whole
+  alert setup shared by settings and onboarding (the two flows save at different moments); country selection in the
+  host screen (every host would need the device region and country list).
+- **Consequences:** Screens stay small: they hold one `AreaSelection` and save it. The components have previews and
+  Compose tests without Hilt. A city-search change is made in one ViewModel.
