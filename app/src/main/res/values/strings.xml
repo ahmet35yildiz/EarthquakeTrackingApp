@@ -163,4 +163,15 @@
         <item quantity="other">QuakeAlert checks for new earthquakes about every %d minutes. Alerts can arrive a few minutes after an earthquake.</item>
     </plurals>
     <string name="alert_settings_saved">Alert settings saved</string>
+
+    <string name="notification_channel_alerts_name">Earthquake alerts</string>
+    <string name="notification_channel_alerts_description">New earthquakes that match your magnitude and area.</string>
+    <string name="notification_alert_title">M%1$s earthquake</string>
+    <string name="notification_alert_title_with_distance">M%1$s earthquake · %2$s km from %3$s</string>
+    <string name="notification_alert_text" translatable="false">%1$s · %2$s</string>
+    <string name="notification_summary_line" translatable="false">M%1$s · %2$s</string>
+    <plurals name="notification_summary_title">
+        <item quantity="one">%1$d new M%2$s+ earthquake</item>
+        <item quantity="other">%1$d new M%2$s+ earthquakes</item>
+    </plurals>
 </resources>

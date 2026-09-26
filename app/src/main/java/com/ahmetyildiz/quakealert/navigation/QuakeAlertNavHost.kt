@@ -10,6 +10,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.ahmetyildiz.quakealert.core.analytics.DetailSource
+import com.ahmetyildiz.quakealert.core.navigation.DeepLinkConfig
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSettingsEntry
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.OnboardingEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeDetailEntry
@@ -35,7 +36,7 @@ fun QuakeAlertNavHost(
                 EarthquakeListEntry(onEarthquakeClick = { id -> navController.navigate(EarthquakeDetailRoute(id)) })
             }
             composable<EarthquakeDetailRoute>(
-                deepLinks = listOf(navDeepLink<EarthquakeDetailRoute>(NavigationConfig.EARTHQUAKE_DEEP_LINK_BASE)),
+                deepLinks = listOf(navDeepLink<EarthquakeDetailRoute>(DeepLinkConfig.EARTHQUAKE_BASE)),
             ) { backStackEntry ->
                 val route: EarthquakeDetailRoute = backStackEntry.toRoute()
                 EarthquakeDetailEntry(

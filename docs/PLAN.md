@@ -6,7 +6,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 ## How to use this plan (every session)
 1. Read `CLAUDE.md`, `CLAUDE.local.md` (if present) and this file; check **Open items** and the **Work log**.
 2. Take the first unchecked task in order (dependencies flow top-down). Do not skip ahead to stretch items.
-3. Meet the task's acceptance criteria and the definition of done (`docs/TESTING.md` §4).
+3. Meet the task's acceptance criteria and the definition of done (`docs/TESTING.md` §5).
 4. Tick the task, add a work-log row (date, start–end, duration, summary), record any new decision as an ADR,
    update the README draft if the change affects run steps, decisions, scope or limitations.
 5. Leave changes uncommitted unless the user asks for a commit.
@@ -281,17 +281,39 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   İzmir picked in Alerts → "Near İzmir" chip and distances in the Earthquakes tab, kept after the app is killed,
   radius / switch saved with the right analytics, Open settings → system page → permission granted → row updates on
   return, TR texts; API 31 shows notifications allowed by default.
-- [ ] **2.5 Notifications.** Channel creation at startup, `AlertNotifier` interface + `EarthquakeAlertNotifier`
+- [x] **2.5 Notifications.** Channel creation at startup, `AlertNotifier` interface + `EarthquakeAlertNotifier`
   (single, up to 3 individual, summary for more; deep link PendingIntent; localized title with distance),
   `NotificationPermissionChecker` (exists since 2.4, as does the `POST_NOTIFICATIONS` declaration), suppressed
   path, `alert_notification_opened` with delay, `app_opened` with
   source = notification. The notification `PendingIntent` uses the deep link
   `quakealert://earthquake/{id}?isFromNotification=true` (already handled since 1.7).
   *Done when:* notification from a test trigger opens the right detail (cold + warm start) on API 31/32 and 34.
+  *Result:* channel "Earthquake alerts" (high importance) registered in `QuakeAlertApplication.onCreate`.
+  `NotifyAlertsUseCase` (domain) owns the policy: nothing to show / permission missing → suppressed event / up to 3 →
+  one notification per earthquake (oldest first) / more → one summary; one `alert_notification_posted` per shown
+  notification (summary: `event_id=summary`, largest magnitude, batch size) so the open rate stays per notification
+  (ADR-030). `EarthquakeAlertNotifier` only renders (`AlertNotificationBuilder`): title "M5.2 earthquake · 15,851 km
+  from İzmir" (distance only with an area, from the shared `AlertArea.distanceFromCityOrNull`, also used by the
+  detail), text place · local time, inbox-style summary, texts from `LocalizedContextProvider` (app language).
+  Tap intents carry `AlertNotificationTap` extras (event id + posting time); the detail uses the deep link from
+  `DeepLinkConfig` (moved from `navigation` to `core/navigation` so the feature can build it). `AppOpenTracker`
+  (singleton) logs `app_opened` with source notification and `alert_notification_opened` with the delay. Found on the
+  emulator: after process death a tapped notification restored the *previous* screen (the new intent arrived before
+  the Compose `OnNewIntentListener` existed) and `app_opened` was not logged — new intents now go through a pending
+  deep-link state consumed by the NavHost, and restored-after-process-death opens are tracked (ADR-031). Lint led to
+  disabling language splits in app bundles (ADR-032) and to one permission-checked `post()`. Tests: 17 unit tests
+  (notify policy, app-open tracking), 5 notifier instrumented tests; full instrumented suite 41/41 on API 31 and 34.
+  Verified with a temporary trigger (reverted) on API 34 and 31: warm tap, cold tap (activity finished + process
+  killed), tap after process death with a restored stack, summary for 5, back → list, rotation after a deep link logs
+  nothing, TR texts ("M5,2 deprem · İzmir merkezine 15.851 km", 24 h time). Android bundles 4+ notifications of an app
+  automatically; tapping that system group opens the app normally.
 - [ ] **2.6 Worker.** `NotifiedEarthquakeRepository` (Room, prune), `CheckForNewAlertsUseCase` (SPEC §5.2),
   thin `AlertCheckWorker` (`@HiltWorker`), `AlertWorkScheduler` (unique periodic, UPDATE policy, network
   constraint, schedule on app start/settings change, cancel on disable). From 2.4: settings changes go through
-  `UpdateAlertSettingsUseCase` — schedule / cancel from there after a saved change.
+  `UpdateAlertSettingsUseCase` — schedule / cancel from there after a saved change. From 2.5: notify through
+  `NotifyAlertsUseCase` (returns POSTED / SUPPRESSED / NOTHING_TO_NOTIFY); decide whether suppressed matches are
+  stored as notified; verify on API 31 that notification texts follow the in-app language when the worker runs in a
+  process without an activity (`LocalizedContextProvider` reads AppCompat's locales).
   *Done when:* use case unit tests pass; `dumpsys jobscheduler` shows the job; "Run check now" logs
   `background_check_completed`; reboot keeps the schedule.
 - [ ] **2.7 Onboarding.** Welcome (with not-an-early-warning disclaimer) → alert setup (reuses 2.3) → notification
@@ -301,6 +323,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   *Done when:* SPEC §4.1 met on API 31/32 and 34; denial path works.
 - [ ] **2.8 Developer tools.** Debug-only section: Simulate alert (fake matching event through matcher + notifier),
   Run check now (expedited one-time worker).
+  From 2.5: simulate through `NotifyAlertsUseCase` (same policy, analytics and tap handling as real alerts).
   *Done when:* simulate → notification → tap → detail; repeated simulate of the same id → no duplicate.
 
 ## Phase 3 — Settings, event log, polish, QA
@@ -312,7 +335,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   font scale, empty/error texts, consistent spacing.
 - [ ] **3.4 Instrumented tests.** Compose UI tests for list states, onboarding happy path, alert settings;
   worker test with fakes.
-- [ ] **3.5 Full QA matrix.** Every item of `docs/TESTING.md` §3 on API 31/32 and API 34/35; fix findings.
+- [ ] **3.5 Full QA matrix.** Every item of `docs/TESTING.md` §3 and the scenarios of §4 on API 31/32 and API 34/35; fix findings.
 
 ## Phase 4 — Documentation and delivery
 - [ ] **4.1 README (Turkish) complete.** All sections filled (see README template), screenshots in `docs/images/`.
@@ -365,3 +388,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 15:27–15:42 | ~15m | 2.2 City search: country list, Geocoder wrapper with API 33 split, repository rules tested with a fake geocoder (ADR-027); fixed country-level results found on the emulator; 26 unit tests; verified on API 31 and 34 incl. airplane mode |
 | 2026-09-26 | 15:44–16:08 | ~24m | 2.3 Area components: threshold slider, area selector (country picker, city search, selected city, radius, whole-world warning), shared CitySearchViewModel with device-region default (ADR-028); 39 unit + 9 Compose UI tests; verified on API 31 and 34 incl. TR, dark, offline, landscape |
 | 2026-09-26 | 16:19–16:34 | ~15m | 2.4 Alert settings screen: summary switch, threshold, area, status (permission + last check), auto-save with new baseline and snackbar, analytics from the settings difference (ADR-029); declared POST_NOTIFICATIONS after the emulator showed it missing; 18 unit + 6 Compose UI tests; verified end to end on API 31 and 34 |
+| 2026-09-26 | 16:46–17:20 | ~34m | 2.5 Notifications: channel, notify policy use case + Android notifier (single / up to 3 / summary), localized texts, tap extras, app-open tracking (ADR-030); fixed deep links after process death (ADR-031); language splits off (ADR-032); 17 unit + 5 instrumented tests; verified warm / cold / restored taps and summary on API 31 and 34 |

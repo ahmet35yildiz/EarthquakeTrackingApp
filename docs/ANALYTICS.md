@@ -22,7 +22,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 
 | Event | Params | When |
 |---|---|---|
-| `app_opened` | `source` = launcher \| notification | Main activity created from launcher or notification tap (not on recreation after rotation or a language switch) |
+| `app_opened` | `source` = launcher \| notification | Main activity opened from launcher or notification tap, including a restore after the process was killed (not on recreation after rotation or a language switch) |
 | `onboarding_started` | – | First onboarding screen shown |
 | `onboarding_step_viewed` | `step` = welcome \| alert_setup \| notifications | Each step shown |
 | `onboarding_completed` | `threshold`, `has_area`, `radius_km`, `notifications_granted` | Finish tapped |
@@ -40,9 +40,9 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `list_sort_changed` | `sort` = newest_first \| largest_first \| nearest_first | Sort order picked |
 | `earthquake_detail_viewed` | `source` = list \| notification, `magnitude` (omitted when unknown) | Detail loaded; once per opened detail (not for not-found / error, not again after rotation) |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
-| `alert_notification_posted` | `event_id`, `magnitude`, `batch_size` | Notification posted |
+| `alert_notification_posted` | `event_id` (`summary` for the summary), `magnitude` (largest for the summary), `batch_size` | Once per notification shown (up to 3 individual ones, or 1 summary) |
 | `alert_notification_suppressed` | `reason` = permission_denied | Match found but cannot notify |
-| `alert_notification_opened` | `event_id`, `delay_seconds` | Notification tapped |
+| `alert_notification_opened` | `event_id` (`summary` for the summary), `delay_seconds` | Notification tapped (cold or warm start) |
 | `background_check_completed` | `fetched`, `matched`, `notified`, `duration_ms` | Worker success |
 | `background_check_failed` | `reason` = network \| server \| parsing \| unknown | Worker failure/retry |
 | `language_changed` | `from`, `to` = language tag \| system | Language picked |

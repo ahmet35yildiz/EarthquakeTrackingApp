@@ -53,6 +53,34 @@ Emulators must use a **Google APIs** image (Geocoder backend needs Google Play s
 - [ ] Reboot emulator → periodic work still scheduled.
 - [ ] Event log shows expected events for the flows above; no coordinates or city names in params.
 
-## 4. Definition of done for any task
+## 4. Verifying notification taps
+A notification can open the app in three different ways, and each one takes a different code path (ADR-031):
+
+| Scenario | How to get there | Expected |
+|---|---|---|
+| Warm | App running (e.g. on the Alerts tab), tap the notification | Detail opens; `alert_notification_opened` only |
+| Cold | Leave the app with Back, end the process, tap the notification | Detail opens, Back → list; `app_opened` (source notification) + `alert_notification_opened` |
+| Restored | Leave the app with Home, end the process, tap the notification | The tapped event opens (not the previous screen); same events as cold |
+| Summary | Post more than 3 alerts at once | One "N new M… earthquakes" notification; tap opens the app; `event_id=summary` |
+
+**Posting a notification.** Until Developer → Simulate alert exists (task 2.8), notifications were posted with a
+temporary, never-committed hook in `MainActivity`: when the activity received an intent extra with a count, it took
+that many earthquakes from the local cache and passed them to `NotifyAlertsUseCase` with the saved alert settings —
+the same path real alerts use. Started with
+`adb shell am start -n com.ahmetyildiz.quakealert/.MainActivity --ei <extra> <count>`. After 2.8, use Simulate alert.
+
+**Useful commands**
+- Open the notification shade: `adb shell cmd statusbar expand-notifications`.
+- End the app process (debug build): `adb shell run-as com.ahmetyildiz.quakealert kill $(adb shell pidof com.ahmetyildiz.quakealert)`
+  (`am kill` does not stop a recently used process; `am force-stop` also removes the notifications). Alternative:
+  Developer options → "Don't keep activities", or Android Studio → Logcat → Terminate app.
+- Allow notifications on API 33+ without the dialog: `adb shell pm grant com.ahmetyildiz.quakealert android.permission.POST_NOTIFICATIONS`.
+- Check the events: Logcat tag `Analytics` (later also Developer → Event log).
+- Clear the shade between runs: Android groups 4+ notifications of an app into a system group whose tap opens the
+  app normally, which hides the scenario being tested.
+- Language check: `adb shell cmd locale set-app-locales com.ahmetyildiz.quakealert --locales tr` (API 33+), post
+  again, read titles with `adb shell dumpsys notification --noredact | grep android.title`.
+
+## 5. Definition of done for any task
 `./gradlew assembleDebug testDebugUnitTest lintDebug` passes, new logic has unit tests, affected flows checked on at
 least one emulator (both API sides for Geocoder / permission / language changes).

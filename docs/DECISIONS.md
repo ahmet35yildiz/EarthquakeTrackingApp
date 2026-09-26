@@ -323,3 +323,43 @@ Add a new record (next number) whenever a significant decision is made; never re
   (would also log no-op taps).
 - **Consequences:** What the user sees is always what is stored, and the list reflects it immediately. Rapid changes
   cannot overwrite each other. Each change restarts the "only newer events" window, which is the intended behaviour.
+
+## ADR-030 — Notification policy in the domain, rendering on Android, analytics per notification
+- **Context:** SPEC §5.2 says one notification per event up to 3, otherwise one summary. The background check (2.6)
+  and "Simulate alert" (2.8) both notify. The north-star metric is opened / posted notifications.
+- **Decision:** `NotifyAlertsUseCase` decides: nothing, suppressed (permission missing, logged), individual (≤ 3,
+  oldest first) or summary. `AlertNotifier` (domain interface) only renders: `EarthquakeAlertNotifier` +
+  `AlertNotificationBuilder` build localized texts and tap intents. `alert_notification_posted` is logged once per
+  notification shown (the summary as `event_id=summary` with the largest magnitude and the batch size), and taps
+  carry the event id and posting time in intent extras (`AlertNotificationTap`) so `alert_notification_opened` has a
+  delay. The detail deep link builder moved to `core/navigation/DeepLinkConfig` so a feature can create it.
+- **Alternatives:** Policy inside the Android notifier (only testable on a device); posted event per earthquake
+  (a summary tap would count as 1 open of 5 posts); posting time in the deep link URI (adds a route argument that the
+  screen does not need); Android's own group summary with children (more notifications than SPEC allows).
+- **Consequences:** Policy and analytics are unit tested; the Android part is covered by instrumented tests. Android
+  still bundles 4+ notifications from successive checks into a system group, which opens the app normally.
+
+## ADR-031 — Deep links from new intents go through a pending state; app opens are tracked per process
+- **Context:** ADR-025 handled warm deep links with an `OnNewIntentListener` registered from Compose. After the
+  process is killed, a notification tap recreates the activity from saved state and delivers the tap through
+  `onNewIntent` before Compose has registered the listener: the tap was lost and the previous screen came back. The
+  same restore skipped `app_opened` (saved state looked like a rotation).
+- **Decision:** `MainActivity.onNewIntent` stores app deep links in a `pendingDeepLink` state; `QuakeAlertApp` hands it
+  to `navController.handleDeepLink` once the NavHost exists and clears it. `AppOpenTracker` is a singleton: a fresh
+  activity is an open; a restore in the same process is not; a restore after process death becomes an open on the
+  first `onNewIntent` (source notification when it carries a tap) or `onResume` (source launcher).
+- **Alternatives:** Registering the listener in `onCreate` (NavController does not exist yet); `setIntent` + reading it
+  in Compose (the NavController would not know it has not handled it); logging opens only when there is no saved
+  state (misses process death, the common case for notification taps).
+- **Consequences:** Cold, warm and restored taps all open the tapped event, verified on API 31 and 34. The restored
+  screen can show for a moment before the deep link replaces it, and logs one `earthquake_list_viewed`. Supersedes the
+  warm-start part of ADR-025.
+
+## ADR-032 — App bundles keep all languages in the base module
+- **Context:** The app switches languages at runtime (AppCompat per-app locales, ADR-012) and builds notification text
+  with a context in that language. With the default bundle language splits, Play installs only the device's
+  languages, so an in-app switch could miss resources (lint `AppBundleLocaleChanges`).
+- **Decision:** `bundle { language { enableSplit = false } }`.
+- **Alternatives:** Play Core on-demand language downloads (extra dependency and a download step for a few strings).
+- **Consequences:** Every install carries all `values-*` strings (a few KB per language). Adding a language is still
+  one `strings.xml`.

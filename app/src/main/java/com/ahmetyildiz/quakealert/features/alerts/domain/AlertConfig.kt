@@ -15,4 +15,5 @@ object AlertConfig {
     val UPDATED_AFTER_OVERLAP: Duration = Duration.ofMinutes(10)
     val NOTIFIED_ID_RETENTION: Duration = Duration.ofDays(30)
     const val MAX_INDIVIDUAL_NOTIFICATIONS: Int = 3
+    const val SUMMARY_NOTIFICATION_MAX_LINES: Int = 5
 }

@@ -37,7 +37,8 @@ com.ahmetyildiz.quakealert/
 │   ├── model/                       # GeoPoint, City, AlertArea, MagnitudeSeverity … pure Kotlin shared models
 │   ├── location/                    # Distance (haversine) utilities
 │   ├── network/                     # Retrofit/OkHttp/Json setup
-│   ├── notification/                # Channels, NotificationPermissionChecker
+│   ├── notification/                # NotificationChannels, NotificationPermissionChecker, AlertNotificationTap extras
+│   ├── navigation/                  # DeepLinkConfig (scheme + detail deep link builder, shared by notifications)
 │   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), DeviceRegionProvider
 │   ├── error/                       # AppResult, AppError
 │   ├── time/                        # Clock abstraction (testable "now"), formatters
@@ -177,14 +178,25 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   destinations.
 - `EarthquakeDetailRoute` declares `navDeepLink` `quakealert://earthquake/{earthquakeId}?isFromNotification={bool}`
   (manifest: `VIEW` + scheme `quakealert`, `launchMode="singleTop"`). Cold start: the NavController handles the
-  activity intent while setting the graph; warm start: `onNewIntent` → `navController.handleDeepLink(intent)`.
-  Both run in place (ADR-025): the back stack becomes list → detail, the activity is not recreated.
+  activity intent while setting the graph; any later intent (`onNewIntent`, also right after a restore from process
+  death) is stored as a pending deep link in `MainActivity` and handled by `QuakeAlertApp` once the NavHost exists
+  (ADR-031). Both run in place (ADR-025): the back stack becomes list → detail, the activity is not recreated.
 - A deep link before onboarding is completed opens the detail with onboarding underneath (only reachable from adb
   or another app; notifications exist only after onboarding).
 
-### 4.6 Notification tap → detail
-- `PendingIntent` to `MainActivity` with deep link `quakealert://earthquake/{id}?isFromNotification=true`.
-- Detail route declares `navDeepLink`; analytics logs `alert_notification_opened` with delay since posting.
+### 4.6 Notifications (ADR-030)
+- Channel `earthquake_alerts` ("Earthquake alerts", high importance) is registered in `QuakeAlertApplication.onCreate`
+  (every process start, including a worker-only process).
+- `NotifyAlertsUseCase(earthquakes, settings)`: empty → `NOTHING_TO_NOTIFY`; no permission → `SUPPRESSED` +
+  `alert_notification_suppressed`; ≤ `AlertConfig.MAX_INDIVIDUAL_NOTIFICATIONS` (3) → `AlertNotifier.showAlerts`
+  (oldest first), more → `showSummary`; one `alert_notification_posted` per shown notification.
+- `EarthquakeAlertNotifier` builds with `AlertNotificationBuilder` from a context in the app language
+  (`LocalizedContextProvider`): title with distance when an area is set, text place · local time, notification id =
+  event id hash (the same event replaces its notification), summary = inbox style of the strongest events.
+- Tap: detail `PendingIntent` = `VIEW` of `DeepLinkConfig.createEarthquakeDetailUri(id, isFromNotification = true)` for
+  this package; summary = the launcher intent. Both carry `AlertNotificationTap` extras (event id or `summary`, posting
+  time). `AppOpenTracker` (singleton) logs `app_opened` (source notification) and `alert_notification_opened` with the
+  delay; a restore in the same process (rotation, language) is not an open, a restore after process death is.
 
 ## 5. Persistence
 | Store | Content |
@@ -205,6 +217,9 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
 - Language names shown in their own language (`Locale.forLanguageTag(tag).getDisplayName(thatLocale)`).
 - `MainActivity` extends `AppCompatActivity`; manifest declares `AppLocalesMetadataHolderService` with
   `autoStoreLocales=true` for API < 33. Must be verified on API < 33 and ≥ 33.
+- Text built outside the UI (notifications, channel name) uses `LocalizedContextProvider`, a context with AppCompat's
+  application locales applied. App bundles keep every language in the base APK (`bundle.language.enableSplit =
+  false`, ADR-032) so switching the in-app language never misses resources.
 - USGS `place` text is English-only and shown as is (documented limitation); everything we render ourselves
   (distance, dates, numbers, labels) is localized.
 

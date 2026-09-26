@@ -151,4 +151,13 @@
         <item quantity="other">QuakeAlert yeni depremleri yaklaşık %d dakikada bir kontrol eder. Bildirimler depremden birkaç dakika sonra gelebilir.</item>
     </plurals>
     <string name="alert_settings_saved">Alarm ayarları kaydedildi</string>
+
+    <string name="notification_channel_alerts_name">Deprem bildirimleri</string>
+    <string name="notification_channel_alerts_description">Büyüklük ve bölge seçimine uyan yeni depremler.</string>
+    <string name="notification_alert_title">M%1$s deprem</string>
+    <string name="notification_alert_title_with_distance">M%1$s deprem · %3$s merkezine %2$s km</string>
+    <plurals name="notification_summary_title">
+        <item quantity="one">%1$d yeni M%2$s+ deprem</item>
+        <item quantity="other">%1$d yeni M%2$s+ deprem</item>
+    </plurals>
 </resources>
