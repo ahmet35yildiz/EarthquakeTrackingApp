@@ -394,3 +394,19 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** Notifications and the channel name follow the in-app language on all API levels (verified: "7 yeni
   M4,5+ deprem" in a worker-only process on API 31). The language picker (3.1) must go through `AppLanguageManager`,
   which it does by design.
+
+## ADR-035 — Onboarding is one route with pages; finishing always saves the settings
+- **Context:** SPEC §4.1 has three steps (welcome, alert setup, notification permission). Alert checks only run once
+  settings were saved with a baseline (ADR-033), and saving through `UpdateAlertSettingsUseCase` skips unchanged
+  settings — a user who keeps the defaults would never get a check.
+- **Decision:** A single `OnboardingRoute` whose `OnboardingViewModel` holds the current page (and threshold) in
+  `SavedStateHandle`; Back goes to the previous page. The setup page reuses the Alerts components. The notifications
+  page asks for `POST_NOTIFICATIONS` on API 33+ with "Not now" as an equal way out; a denial is accepted with a short
+  explanation and an "Open settings" link; below API 33 it only shows the status. Finish calls
+  `CompleteOnboardingUseCase`, which always saves the chosen settings with `baselineAt = now`, marks onboarding
+  completed and syncs the schedule. Analytics of the choice reuse `toAnalyticsEvents(ONBOARDING)`.
+- **Alternatives:** One navigation destination per step (three routes, arguments to carry the draft, more back-stack
+  handling for the same result); asking for the permission on first launch before explaining it (lower grant rate);
+  saving only when the choice differs from the defaults (no baseline, no schedule).
+- **Consequences:** Rotation and back keep the flow; process death restarts the setup page with the default area
+  (the city draft is not saved). Every finished onboarding starts background checks right away.

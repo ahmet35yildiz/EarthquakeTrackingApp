@@ -1,8 +1,6 @@
 package com.ahmetyildiz.quakealert.features.alerts.presentation.screen
 
 import android.content.Context
-import android.content.Intent
-import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -69,7 +67,7 @@ fun AlertSettingsEntry(
         onAlertsToggled = viewModel::onAlertsToggled,
         onThresholdChanged = viewModel::onThresholdChanged,
         onAreaSelectionChanged = viewModel::onAreaSelectionChanged,
-        onOpenNotificationSettings = { context.startActivity(notificationSettingsIntent(context)) },
+        onOpenNotificationSettings = { context.startActivity(createNotificationSettingsIntent(context)) },
     )
     AlertSettingsScreen(uiState = uiState, actions = actions, snackbarHostState = snackbarHostState, modifier = modifier) {
         AreaSelectorEntry(selection = uiState.areaSelection, onSelectionChange = actions.onAreaSelectionChanged)
@@ -117,6 +115,3 @@ fun AlertSettingsScreen(
         }
     }
 }
-
-private fun notificationSettingsIntent(context: Context): Intent =
-    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)

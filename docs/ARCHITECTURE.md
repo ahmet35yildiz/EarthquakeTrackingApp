@@ -191,6 +191,11 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   (ADR-031). Both run in place (ADR-025): the back stack becomes list → detail, the activity is not recreated.
 - A deep link before onboarding is completed opens the detail with onboarding underneath (only reachable from adb
   or another app; notifications exist only after onboarding).
+- Onboarding (ADR-035) is one route, `OnboardingEntry` → `OnboardingViewModel`, with pages `WELCOME` →
+  `ALERT_SETUP` → `NOTIFICATIONS` held in the ViewModel (page and threshold in `SavedStateHandle`, `BackHandler` for
+  the previous page). The setup page reuses `MagnitudeThresholdSelector` + `AreaSelectorEntry`; the notifications
+  page requests `POST_NOTIFICATIONS` through `rememberLauncherForActivityResult` on API 33+. Finish →
+  `CompleteOnboardingUseCase` (save settings + baseline, completion flag, schedule) → `navigateToMainGraph()`.
 
 ### 4.6 Notifications (ADR-030)
 - Channel `earthquake_alerts` ("Earthquake alerts", high importance) is registered in `QuakeAlertApplication.onCreate`

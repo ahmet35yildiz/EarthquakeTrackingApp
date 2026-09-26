@@ -5,8 +5,8 @@
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
 
-    <string name="onboarding_welcome_title">Welcome to QuakeAlert</string>
-    <string name="onboarding_welcome_message">Calm alerts for the earthquakes that matter to you.</string>
+    <string name="onboarding_welcome_title">Know when it matters</string>
+    <string name="onboarding_welcome_message">Recent earthquakes around the world, and calm alerts for the ones you care about.</string>
     <string name="action_get_started">Get started</string>
 
     <string name="action_retry">Retry</string>
@@ -174,4 +174,26 @@
         <item quantity="one">%1$d new M%2$s+ earthquake</item>
         <item quantity="other">%1$d new M%2$s+ earthquakes</item>
     </plurals>
+
+    <string name="onboarding_step_indicator">Step %1$d of %2$d</string>
+    <string name="onboarding_feature_list_title">See recent earthquakes worldwide</string>
+    <string name="onboarding_feature_list_message">Updated data from the U.S. Geological Survey (USGS).</string>
+    <string name="onboarding_feature_filter_title">Choose your magnitude and area</string>
+    <string name="onboarding_feature_filter_message">A minimum magnitude and, if you like, a city with a radius.</string>
+    <string name="onboarding_feature_alert_title">Get alerts for what matters</string>
+    <string name="onboarding_feature_alert_message">Only new earthquakes that match your choice, never the same one twice.</string>
+    <string name="onboarding_disclaimer">QuakeAlert is not an early-warning system. Alerts can arrive several minutes after an earthquake.</string>
+    <string name="onboarding_setup_title">What should we alert you about?</string>
+    <string name="onboarding_setup_message">You can change this any time in the Alerts tab.</string>
+    <string name="onboarding_setup_city_required">Pick a city, or choose Whole world.</string>
+    <string name="onboarding_notifications_title">Get notified</string>
+    <plurals name="onboarding_notifications_message">
+        <item quantity="one">QuakeAlert checks for new earthquakes in the background about every minute and needs your permission to show alerts.</item>
+        <item quantity="other">QuakeAlert checks for new earthquakes in the background about every %d minutes and needs your permission to show alerts.</item>
+    </plurals>
+    <string name="onboarding_notifications_denied">No problem. The app works without notifications, and you can allow them later in Settings.</string>
+    <string name="action_next">Next</string>
+    <string name="action_allow_notifications">Allow notifications</string>
+    <string name="action_not_now">Not now</string>
+    <string name="action_finish">Finish</string>
 </resources>

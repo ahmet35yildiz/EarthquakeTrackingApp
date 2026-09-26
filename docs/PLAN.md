@@ -332,12 +332,24 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   job with the network constraint; the job survives a reboot; in a killed-process worker run on API 31 (temporary
   preparation code, reverted) 7 matches → one Turkish summary ("7 yeni M4,5+ deprem"), next runs matched 0. A forced
   run of the periodic job before its time is postponed by WorkManager, so manual checks need "Run check now" (2.8).
-- [ ] **2.7 Onboarding.** Welcome (with not-an-early-warning disclaimer) → alert setup (reuses 2.3) → notification
+- [x] **2.7 Onboarding.** Welcome (with not-an-early-warning disclaimer) → alert setup (reuses 2.3) → notification
   permission (API 33+ request; < 33 confirm only) → finish; completion flag; start destination logic; analytics.
   Graph, start destination and completion flag exist since 1.7; replace the placeholder `OnboardingScreen`.
   Alert setup step: same components and `AreaSelection` handling as 2.4. From 2.6: finishing must save the settings
   through `UpdateAlertSettingsUseCase` (sets the baseline and schedules the check); until then no check runs.
   *Done when:* SPEC §4.1 met on API 31/32 and 34; denial path works.
+  *Result:* one onboarding route with three pages kept in `OnboardingViewModel` (page and threshold in
+  `SavedStateHandle`; system Back and the top arrow go to the previous page): welcome (hero, 3 feature cards, the
+  not-an-early-warning disclaimer), alert setup (the 2.3 components; Next disabled with a hint while "Near a city" has
+  no city), notifications (API 33+: Allow / Not now → system dialog; denied → message, Finish, Open settings; below
+  33: status only, Finish). Finish goes through `CompleteOnboardingUseCase`, which always saves the settings with a
+  baseline (even unchanged defaults), sets the completion flag and syncs the schedule (ADR-035). Analytics:
+  `onboarding_started`, each `onboarding_step_viewed`, permission requested / result, the settings difference with
+  `context=onboarding`, `onboarding_completed`. The page title "Allow notifications" duplicated the button label, so
+  it became "Get notified". Tests: 13 unit tests (use case, ViewModel), 6 Compose UI tests; full instrumented suite
+  53/53 on API 31 and 34. Verified on API 34: allow path (İzmir → list with "Near İzmir", job scheduled, first check
+  logged, full event sequence), deny path (message, Finish, Alerts shows permission off, job still scheduled), back
+  button and rotation keep the page, TR texts; API 31: no dialog, "Notifications allowed", Finish, job scheduled.
 - [ ] **2.8 Developer tools.** Debug-only section: Simulate alert (fake matching event through matcher + notifier),
   Run check now (expedited one-time worker).
   From 2.5: simulate through `NotifyAlertsUseCase` (same policy, analytics and tap handling as real alerts).
@@ -408,3 +420,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 16:19–16:34 | ~15m | 2.4 Alert settings screen: summary switch, threshold, area, status (permission + last check), auto-save with new baseline and snackbar, analytics from the settings difference (ADR-029); declared POST_NOTIFICATIONS after the emulator showed it missing; 18 unit + 6 Compose UI tests; verified end to end on API 31 and 34 |
 | 2026-09-26 | 16:46–17:20 | ~34m | 2.5 Notifications: channel, notify policy use case + Android notifier (single / up to 3 / summary), localized texts, tap extras, app-open tracking (ADR-030); fixed deep links after process death (ADR-031); language splits off (ADR-032); 17 unit + 5 instrumented tests; verified warm / cold / restored taps and summary on API 31 and 34 |
 | 2026-09-26 | 17:45–18:10 | ~25m | 2.6 Worker: notified ids in Room (DB v3), background check use case, worker, scheduler + schedule sync (ADR-033); stored app language for worker processes below API 33 after the emulator showed English texts (ADR-034); 20 unit + 6 instrumented tests; verified migration, job, reboot and a killed-process run on API 31 and 34 |
+| 2026-09-26 | 18:45–19:05 | ~20m | 2.7 Onboarding: welcome / alert setup / notifications pages, permission request and denial path, finish saves settings + schedules (ADR-035); 13 unit + 6 Compose UI tests; verified allow and deny paths on API 34 and the no-dialog path on API 31 |

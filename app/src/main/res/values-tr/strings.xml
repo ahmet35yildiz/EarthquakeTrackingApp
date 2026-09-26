@@ -3,8 +3,8 @@
     <string name="tab_alerts">Alarmlar</string>
     <string name="tab_settings">Ayarlar</string>
 
-    <string name="onboarding_welcome_title">QuakeAlert\'e hoş geldin</string>
-    <string name="onboarding_welcome_message">Senin için önemli depremler için sakin uyarılar.</string>
+    <string name="onboarding_welcome_title">Önemli olduğunda haberin olsun</string>
+    <string name="onboarding_welcome_message">Dünyadaki son depremler ve senin için önemli olanlar için sakin bildirimler.</string>
     <string name="action_get_started">Başla</string>
 
     <string name="action_retry">Tekrar dene</string>
@@ -160,4 +160,26 @@
         <item quantity="one">%1$d yeni M%2$s+ deprem</item>
         <item quantity="other">%1$d yeni M%2$s+ deprem</item>
     </plurals>
+
+    <string name="onboarding_step_indicator">Adım %1$d / %2$d</string>
+    <string name="onboarding_feature_list_title">Dünyadaki son depremleri gör</string>
+    <string name="onboarding_feature_list_message">ABD Jeolojik Araştırmalar Kurumu (USGS) verileri.</string>
+    <string name="onboarding_feature_filter_title">Büyüklük ve bölgeni seç</string>
+    <string name="onboarding_feature_filter_message">En düşük büyüklük ve istersen bir şehir ile yarıçap.</string>
+    <string name="onboarding_feature_alert_title">Önemli olanlar için bildirim al</string>
+    <string name="onboarding_feature_alert_message">Yalnızca seçimine uyan yeni depremler; aynı deprem için asla iki kez değil.</string>
+    <string name="onboarding_disclaimer">QuakeAlert bir erken uyarı sistemi değildir. Bildirimler depremden birkaç dakika sonra gelebilir.</string>
+    <string name="onboarding_setup_title">Hangi depremler için bildirim alalım?</string>
+    <string name="onboarding_setup_message">Bunu istediğin zaman Alarmlar sekmesinden değiştirebilirsin.</string>
+    <string name="onboarding_setup_city_required">Bir şehir seç ya da Tüm dünya\'yı seç.</string>
+    <string name="onboarding_notifications_title">Haberdar ol</string>
+    <plurals name="onboarding_notifications_message">
+        <item quantity="one">QuakeAlert yeni depremleri arka planda yaklaşık %d dakikada bir kontrol eder ve bildirim göstermek için iznine ihtiyaç duyar.</item>
+        <item quantity="other">QuakeAlert yeni depremleri arka planda yaklaşık %d dakikada bir kontrol eder ve bildirim göstermek için iznine ihtiyaç duyar.</item>
+    </plurals>
+    <string name="onboarding_notifications_denied">Sorun değil. Uygulama bildirimler olmadan da çalışır; izni daha sonra ayarlardan verebilirsin.</string>
+    <string name="action_next">İleri</string>
+    <string name="action_allow_notifications">Bildirimlere izin ver</string>
+    <string name="action_not_now">Şimdi değil</string>
+    <string name="action_finish">Bitir</string>
 </resources>
