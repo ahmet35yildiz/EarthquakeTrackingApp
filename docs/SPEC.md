@@ -129,13 +129,14 @@ An earthquake triggers an alert when **all** hold:
 2. `magnitude >= threshold` (events with null magnitude never alert).
 3. Area is whole world, or distance(area center, epicenter) `<= radiusKm`.
 4. Its id has never been notified before (stored in Room).
-5. Its origin time is `>= alertBaseline` (time the alert settings were last saved/changed).
-6. Its origin time is within the last **6 hours** (`ALERT_MAX_EVENT_AGE`) — stale events after long offline periods
+5. Its origin time is `>= alertBaseline` (time the alert settings were last saved/changed). No baseline yet (settings
+   never saved) → nothing alerts.
+6. Its origin time is within the last **6 hours** (`AlertConfig.MAX_EVENT_AGE`) — stale events after long offline periods
    stay in the list but do not notify.
 
 ### 5.2 Background check (periodic, every 15 min, requires network)
 1. Read settings; if alerts disabled → finish.
-2. Query USGS with `starttime = now - ALERT_MAX_EVENT_AGE`, `updatedafter = lastCheckedAt - 10 min overlap`
+2. Query USGS with `starttime = now - MAX_EVENT_AGE`, `updatedafter = lastCheckedAt - 10 min overlap`
    (first run: baseline), `minmagnitude = threshold`, and circle params when an area is set.
 3. Apply rules 5.1 (the API already filters 2–3; they are re-checked locally, cheaply).
 4. Post notifications: one per event up to 3; if more, one group summary ("5 new earthquakes above M4.5").

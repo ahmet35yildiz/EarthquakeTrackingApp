@@ -51,7 +51,7 @@ com.ahmetyildiz.quakealert/
 │   │   └── di/
 │   ├── alerts/                      # Alert settings, city search (Geocoder), onboarding, worker, notifications
 │   │   ├── data/source (AndroidCityGeocoder) | repository
-│   │   ├── domain/model | repository | usecase
+│   │   ├── domain/model | repository | usecase   (+ AlertConfig, AlertMatcher at the domain root)
 │   │   ├── worker/                  # AlertCheckWorker, AlertWorkScheduler
 │   │   ├── notification/            # EarthquakeAlertNotifier
 │   │   ├── presentation/viewmodel | screen | component   (settings, onboarding, developer tools)
@@ -109,7 +109,7 @@ WorkManager (periodic 15 min, NetworkType.CONNECTED)
   └─ AlertCheckWorker (thin) ─▶ CheckForNewAlertsUseCase
         ├─ UserPreferencesRepository (settings, baseline, lastCheckedAt)
         ├─ EarthquakeRepository.fetchEarthquakes(query with updatedAfter)   ← earthquakes.domain
-        ├─ AlertMatcher (rules SPEC §5.1, pure Kotlin, unit-tested)
+        ├─ AlertMatcher (rules SPEC §5.1, pure Kotlin, unit-tested; input: AlertMatchCriteria, ADR-026)
         ├─ NotifiedEarthquakeRepository (dedupe, prune 30 days)
         ├─ AlertNotifier (interface) ─▶ EarthquakeAlertNotifier (Android)
         └─ AnalyticsTracker
@@ -211,7 +211,7 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
 - Functions short (< 20 statements), start with a verb; booleans `isX` / `hasX` / `canX`; no blank lines inside
   functions; early returns instead of nesting.
 - Constants `UPPER_CASE` in a per-feature `*Config` object (e.g. `AlertConfig.THRESHOLD_RANGE`,
-  `AlertConfig.RADIUS_OPTIONS_KM`, `AlertConfig.CHECK_INTERVAL_MINUTES`) — no magic numbers.
+  `AlertConfig.RADIUS_OPTIONS_KM`, `AlertConfig.CHECK_INTERVAL`) — no magic numbers.
 - Value classes for domain primitives where it helps (e.g. `Magnitude`, `EarthquakeId`).
 - Composables stateless where possible (state hoisting); `LazyColumn` items always keyed; previews use
   `@PreviewLightDark`.

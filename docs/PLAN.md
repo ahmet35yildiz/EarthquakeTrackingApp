@@ -212,11 +212,16 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   *Done when:* `adb shell am start -d "quakealert://earthquake/<id>"` opens the detail.
 
 ## Phase 2 — Alerts
-- [ ] **2.1 Alert domain.** `AlertConfig` (threshold range 2.5–8.0 step 0.5, default 4.5 = reuse
+- [x] **2.1 Alert domain.** `AlertConfig` (threshold range 2.5–8.0 step 0.5, default 4.5 = reuse
   `AlertSettings.DEFAULT_MAGNITUDE_THRESHOLD` from core, ADR-019; radius options
   50/100/250/500/1000, default 250; check interval 15 min; max event age 6 h; overlap 10 min; notified-id retention
   30 days; max individual notifications 3), `AlertMatcher` implementing SPEC §5.1.
   *Done when:* every rule in SPEC §5.1 has a unit test (incl. boundaries).
+  *Result:* `AlertConfig` and `AlertMatcher` in `alerts/domain`; the matcher is pure and takes one
+  `AlertMatchCriteria` (settings, baseline, notified ids, check time) so 2.6 and 2.8 share it (ADR-026). All limits
+  inclusive; a missing baseline (settings never saved) matches nothing. Intervals are `Duration`s
+  (`CHECK_INTERVAL`, `MAX_EVENT_AGE`, …). 23 unit tests: every rule with its boundary (±0.01 magnitude, ±1 m radius,
+  ±1 s baseline and max age), plus config consistency (default on a step, default radius among the options).
 - [ ] **2.2 City search (Geocoder).** `CitySearchRepository` (domain), `AndroidCityGeocoder` with the API 33 split
   (ARCHITECTURE §4.3), `SearchCitiesUseCase`, country list provider (`Locale.getISOCountries()`, localized, Collator
   sorted).
@@ -305,3 +310,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 21:42–22:30 | ~48m | 1.5.1 List sorting (newest / largest / nearest) + performance measurement; list computation off the main thread, in-memory paging removed (ADR-023); unit + Compose UI tests; verified on API 31 and 34 |
 | 2026-09-26 | 11:12–11:41 | ~29m | 1.6 Detail screen: details use case, assisted ViewModel, facts/distance/actions UI, detail route, not-found/error states, analytics; unit + Compose UI tests; verified on API 31 and 34 incl. real 404, offline and missing maps app (ADR-024) |
 | 2026-09-26 | 11:41–12:09 | ~28m | 1.7 Navigation: onboarding/main graphs, start destination, onboarding placeholder, deep link to detail handled in place (ADR-025); unit tests; verified cold/warm deep links on API 31 and 34 |
+| 2026-09-26 | 15:15–15:30 | ~15m | 2.1 Alert domain: AlertConfig, pure AlertMatcher with criteria object (ADR-026); 23 unit tests covering every SPEC §5.1 rule and its boundaries |

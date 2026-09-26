@@ -260,3 +260,18 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** One activity instance, correct back stack, analytics counted once, state survives rotation (the
   NavController remembers that the link was handled). A deep link replaces the current back stack (for example the
   Alerts tab), like the library's own new-task behaviour.
+
+## ADR-026 — Alert matching is one pure function over an explicit criteria object
+- **Context:** SPEC §5.1 defines six rules that decide whether an earthquake alerts. The background check (2.6) and
+  the developer "Simulate alert" (2.8) must apply exactly the same rules, and every rule needs boundary tests.
+- **Decision:** `AlertMatcher` (`alerts/domain`) is a stateless class with no dependencies. Everything a rule reads
+  comes in one `AlertMatchCriteria` (settings, baseline, notified ids, check time); the caller loads it from the
+  preferences, Room and the `Clock`. All limits are inclusive (`magnitude >= threshold`, `distance <= radius`,
+  `time >= baseline`, `time >= checkedAt - 6 h`). A missing baseline (alert settings never saved) matches nothing.
+  Tunable alert values live in `AlertConfig`; the default threshold reuses `AlertSettings.DEFAULT_MAGNITUDE_THRESHOLD`
+  (ADR-019).
+- **Alternatives:** Rules inside `CheckForNewAlertsUseCase` (needs fakes for USGS, Room and notifications to test a
+  single boundary; the simulate path would duplicate them); a matcher that reads the repositories itself (suspending,
+  harder to test); returning a rejection reason per rule (no consumer yet).
+- **Consequences:** The rules are read and changed in one short file and tested without coroutines or fakes. A user
+  who never saved alert settings gets no alerts for events from before the setup, instead of a burst of old ones.
