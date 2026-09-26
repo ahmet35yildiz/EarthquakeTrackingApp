@@ -47,6 +47,14 @@ class AnalyticsEventDaoTest {
         assertEquals(listOf("second", "first"), names)
     }
 
+    @Test
+    fun deleteAllRemovesEveryEvent() = runBlocking {
+        dao.insert(event(name = "first", params = emptyMap(), timestamp = 1_000))
+        dao.insert(event(name = "second", params = emptyMap(), timestamp = 2_000))
+        dao.deleteAll()
+        assertEquals(emptyList<AnalyticsEventEntity>(), dao.observeAll().first())
+    }
+
     private fun event(name: String, params: Map<String, String>, timestamp: Long) =
         AnalyticsEventEntity(name = name, params = params, timestampEpochMs = timestamp)
 }

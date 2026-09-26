@@ -65,7 +65,7 @@ A notification can open the app in three different ways, and each one takes a di
 | Restored | Leave the app with Home, end the process, tap the notification | The tapped event opens (not the previous screen); same events as cold |
 | Summary | Post more than 3 alerts at once | One "N new M… earthquakes" notification; tap opens the app; `event_id=summary` |
 
-**Posting a notification.** Debug builds: Settings → Developer tools. Enter a magnitude and (with a city area) the
+**Posting a notification.** Debug builds: Settings → Developer tools (opens its own screen). Enter a magnitude and (with a city area) the
 distance from the city; "Simulate now" delivers it at once, "Schedule" after the delay in minutes — also with the app
 closed (leave with Home or swipe it away; do not force-stop). Values that match the alert settings give a
 notification, others give none (`developer_simulated_alert outcome=not_matched` in Logcat `Analytics`). "Simulate the
@@ -79,7 +79,7 @@ same alert again" must post nothing. Scheduled runs usually arrive within a minu
   (`am kill` does not stop a recently used process; `am force-stop` also removes the notifications). Alternative:
   Developer options → "Don't keep activities", or Android Studio → Logcat → Terminate app.
 - Allow notifications on API 33+ without the dialog: `adb shell pm grant com.ahmetyildiz.quakealert android.permission.POST_NOTIFICATIONS`.
-- Check the events: Logcat tag `Analytics` (later also Developer → Event log).
+- Check the events: Logcat tag `Analytics` or Settings → Developer tools → Event log.
 - Clear the shade between runs: Android groups 4+ notifications of an app into a system group whose tap opens the
   app normally, which hides the scenario being tested.
 - Language check: `adb shell cmd locale set-app-locales com.ahmetyildiz.quakealert --locales tr` (API 33+), post

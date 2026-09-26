@@ -13,4 +13,7 @@ interface AnalyticsEventDao {
 
     @Query("SELECT * FROM analytics_events ORDER BY timestamp_epoch_ms DESC, id DESC")
     fun observeAll(): Flow<List<AnalyticsEventEntity>>
+
+    @Query("DELETE FROM analytics_events")
+    suspend fun deleteAll()
 }

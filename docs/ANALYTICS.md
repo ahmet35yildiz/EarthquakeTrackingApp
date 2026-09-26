@@ -1,7 +1,7 @@
 # QuakeAlert — Measurement Plan and Event Dictionary
 
 Events are recorded locally (Room `analytics_events` + Logcat tag `Analytics`) through the `AnalyticsTracker`
-interface and can be inspected in Settings → Developer → Event log. A remote backend (e.g. Firebase) can be plugged
+interface and can be inspected in Settings → Developer tools → Event log (debug builds). A remote backend (e.g. Firebase) can be plugged
 in later as another `AnalyticsTracker` implementation.
 
 ## 1. What "the product works" means

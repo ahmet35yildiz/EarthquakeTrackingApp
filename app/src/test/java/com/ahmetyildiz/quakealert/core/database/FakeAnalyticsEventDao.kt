@@ -20,4 +20,8 @@ class FakeAnalyticsEventDao : AnalyticsEventDao {
     }
 
     override fun observeAll(): Flow<List<AnalyticsEventEntity>> = events.map { it.reversed() }
+
+    override suspend fun deleteAll() {
+        events.value = emptyList()
+    }
 }

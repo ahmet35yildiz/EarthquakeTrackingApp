@@ -395,7 +395,24 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   System default (`from=tr, to=system`); API 34: per-app language changed in the system (`cmd locale`) shows on
   return, "Open settings" → system page → permission granted → row updates on return, USGS link opens the browser,
   dark mode.
-- [ ] **3.2 Event log screen.** List, filter by name, clear, share as text.
+  *Follow-up (requested):* the developer tools moved to their own screen so the Settings tab stays short: a
+  "Developer tools" entry below About (debug builds) opens `DeveloperToolsRoute` (pushed, no bottom bar, back arrow)
+  with the alert testing card (renamed "Alert testing", the screen carries the "Developer tools" title) and, since 3.2,
+  the event log entry. The Settings screen takes `onOpenDeveloperTools` instead of the card slot (ADR-039). Tests: +2
+  Settings and 2 developer screen Compose UI tests. Verified on API 34: entry → screen → back to Settings.
+- [x] **3.2 Event log screen.** List, filter by name, clear, share as text.
+  *Result:* new `eventlog` feature over the `analytics_events` table: `EventLogRepositoryImpl` (+ `deleteAll()` on the
+  DAO), `LoggedEvent`, `filterByName` (trimmed, case-insensitive "contains"), `EventLogText` (one line per event: local
+  ISO-8601 time with offset, name, `key=value` params), observe / clear use cases, `EventLogViewModel` (query in
+  `SavedStateHandle`). Screen from the developer tools screen: filter field with clear button, "N events" / "N of M
+  events", newest-first cards with local date-time (seconds) and monospace param chips, live updates; Share sends the
+  visible events through the share sheet; Clear asks for confirmation; empty and no-match states; share / clear
+  disabled when there is nothing to act on (ADR-039). `shareIntent` moved to `core/navigation/ExternalIntents`.
+  Tests: 12 unit tests (filter, text, repository, ViewModel), 8 Compose UI tests + 1 DAO test; full suites 361 unit,
+  71/71 instrumented on API 31 and 34. Verified on API 34: onboarding events listed live (9 → 11), "LIST" → "2 of 11
+  events", query kept across rotation, share sheet with the filtered lines, "zzz" → no-match state with share
+  disabled; API 31: clear → confirmation "9 recorded events will be deleted" → empty state, back → developer tools →
+  Settings, TR texts and date format ("26.09.2026 21:33:12").
 - [ ] **3.3 Polish.** Adaptive launcher icon, copy review (EN + TR), accessibility labels, dark mode, landscape (list:
   header + bottom bar leave room for ~1 card; consider scrolling the header away or a navigation rail),
   font scale, empty/error texts, consistent spacing.
@@ -460,3 +477,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 19:53–20:08 | ~15m | 2.8 Developer tools: simulate alert through the shared delivery step, repeat from the cache, run check now (ADR-036); 17 unit tests; verified simulate → tap → detail → no duplicate and run check now on API 31 and 34 |
 | 2026-09-26 | 20:16–20:38 | ~22m | 2.8 follow-up: simulation with magnitude / distance / delay, scheduled delivery with the app closed, `outcome` on the developer event (ADR-037); +13 unit tests; verified matching vs non-matching on API 31 and 34 |
 | 2026-09-26 | 20:52–21:09 | ~17m | 3.1 Settings screen: language picker, notification status, about (USGS, disclaimer, version), shared permission row and outgoing intents moved to core (ADR-038); 5 unit + 5 Compose UI tests; verified on API 31 and 34 incl. system per-app language, rotation, dark mode |
+| 2026-09-26 | 21:10–21:22 | ~12m | 3.1 follow-up: developer tools moved to their own screen behind a Settings entry, alert testing card renamed (ADR-039); +4 Compose UI tests; verified on API 34 |
+| 2026-09-26 | 21:22–21:34 | ~12m | 3.2 Event log: eventlog feature over the analytics table, filter / share / clear with confirmation, live list (ADR-039); 12 unit + 9 instrumented tests; verified on API 31 and 34 incl. rotation, share sheet, TR |

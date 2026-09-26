@@ -84,9 +84,25 @@ class SettingsScreenTest {
         assertEquals(1, openUsgsCount)
     }
 
-    private fun setContent(uiState: SettingsUiState) {
+    @Test
+    fun developerToolsEntryOpensTheDeveloperScreen() {
+        var openDeveloperToolsCount = 0
+        setContent(defaultState, onOpenDeveloperTools = { openDeveloperToolsCount++ })
+        composeRule.onNodeWithText(string(R.string.developer_tools_title)).performScrollTo().performClick()
+        assertEquals(1, openDeveloperToolsCount)
+    }
+
+    @Test
+    fun developerToolsEntryIsHiddenWithoutADestination() {
+        setContent(defaultState)
+        composeRule.onNodeWithText(string(R.string.developer_tools_title)).assertDoesNotExist()
+    }
+
+    private fun setContent(uiState: SettingsUiState, onOpenDeveloperTools: (() -> Unit)? = null) {
         composeRule.setContent {
-            QuakeAlertTheme { SettingsScreen(uiState = uiState, actions = actions) }
+            QuakeAlertTheme {
+                SettingsScreen(uiState = uiState, actions = actions, onOpenDeveloperTools = onOpenDeveloperTools)
+            }
         }
     }
 

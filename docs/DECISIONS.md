@@ -456,3 +456,18 @@ Add a new record (next number) whenever a significant decision is made; never re
   after two denials, so the system page is the path that always works).
 - **Consequences:** `notification_permission_requested` is only sent from onboarding (`context=onboarding`). Adding
   a setting that needs logic (e.g. a stored preference) is the point to add a `domain` layer to `settings`.
+
+## ADR-039 — Developer tools get their own screen; the event log reads the analytics table
+- **Context:** The debug-only developer card (simulation fields, schedule, repeat, run check) made the Settings tab
+  long, and the event log (SPEC §4.6) needed an entry point too.
+- **Decision:** Settings shows one "Developer tools" entry below About (only when `BuildConfig.DEBUG`). It opens
+  `DeveloperToolsRoute`, a pushed screen without the bottom bar: an "Event log" entry and the alert testing card
+  (the `alertTools` slot filled by `navigation`, so `settings` still does not depend on `alerts`). Both developer
+  routes are registered only in debug builds. The event log is its own feature (`eventlog`) over the existing
+  `analytics_events` table: newest first, live updates, filter by name ("contains", case-insensitive), share the
+  visible events as plain text lines, clear after a confirmation (`AnalyticsEventDao.deleteAll()`).
+- **Alternatives:** Keep the card inline and collapse it (still one long screen, more state); a separate debug source
+  set (more build wiring); filter by exact name from a dropdown (typing a part such as "alert" covers groups of events
+  at once); share as JSON/CSV (plain lines are readable in any chat or issue).
+- **Consequences:** One more tap to reach the developer tools. Clearing the log only affects the local table; Logcat
+  keeps its copy. Release builds have neither route nor entry.

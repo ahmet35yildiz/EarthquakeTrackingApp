@@ -17,6 +17,8 @@ import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSetti
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.OnboardingEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeDetailEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeListEntry
+import com.ahmetyildiz.quakealert.features.eventlog.presentation.screen.EventLogEntry
+import com.ahmetyildiz.quakealert.features.settings.presentation.screen.DeveloperToolsScreen
 import com.ahmetyildiz.quakealert.features.settings.presentation.screen.SettingsEntry
 
 @Composable
@@ -49,7 +51,18 @@ fun QuakeAlertNavHost(
             }
             composable<AlertsRoute> { AlertSettingsEntry() }
             composable<SettingsRoute> {
-                SettingsEntry(developerTools = if (BuildConfig.DEBUG) { { DeveloperToolsEntry() } } else null)
+                SettingsEntry(
+                    onOpenDeveloperTools = if (BuildConfig.DEBUG) { { navController.navigate(DeveloperToolsRoute) } } else null,
+                )
+            }
+            if (BuildConfig.DEBUG) {
+                composable<DeveloperToolsRoute> {
+                    DeveloperToolsScreen(
+                        onBack = navController::navigateUp,
+                        onOpenEventLog = { navController.navigate(EventLogRoute) },
+                    ) { DeveloperToolsEntry() }
+                }
+                composable<EventLogRoute> { EventLogEntry(onBack = navController::navigateUp) }
             }
         }
     }

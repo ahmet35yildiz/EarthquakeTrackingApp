@@ -112,13 +112,15 @@ publication delay + background check interval). The app says this explicitly in 
 ### 4.5 Settings (tab "Settings")
 - Language: `System default` + every language the app ships (generated automatically), applied instantly.
 - About: data source attribution (USGS), "not an early-warning system" note, app version.
-- Developer section (debug builds only): Event log, Simulate alert, Run check now.
+- Developer tools entry below About (debug builds only) → a separate Developer tools screen with Event log,
+  Simulate alert, Run check now, so the Settings tab stays short.
 
 ### 4.6 Event log (developer)
 - Chronological list of recorded analytics events (name, params, timestamp), filter by name, clear, share as text.
 
 ### 4.7 Navigation
-- Bottom bar with 3 tabs: Earthquakes, Alerts, Settings. Detail and Event log are pushed on top.
+- Bottom bar with 3 tabs: Earthquakes, Alerts, Settings. Detail, Developer tools and Event log are pushed on top
+  (no bottom bar, back arrow).
 - Start: onboarding graph if not completed, otherwise main graph.
 - Notification tap → app opens directly on the earthquake detail (back goes to the list).
 

@@ -46,6 +46,7 @@ import com.ahmetyildiz.quakealert.core.analytics.DetailSource
 import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
 import com.ahmetyildiz.quakealert.core.navigation.browserIntent
+import com.ahmetyildiz.quakealert.core.navigation.shareIntent
 import com.ahmetyildiz.quakealert.core.navigation.tryStartActivity
 import com.ahmetyildiz.quakealert.core.ui.component.EmptyState
 import com.ahmetyildiz.quakealert.core.ui.component.ErrorState

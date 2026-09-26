@@ -230,4 +230,30 @@
     <string name="settings_about_disclaimer_title">Not an early-warning system</string>
     <string name="settings_about_disclaimer_message">Alerts can arrive several minutes after an earthquake. Always follow the guidance of local authorities.</string>
     <string name="settings_about_version">Version %1$s (%2$d)</string>
+    <string name="settings_developer_tools_description">Simulate alerts, run a check now and view the event log.</string>
+    <string name="developer_alert_testing_title">Alert testing</string>
+    <string name="event_log_title">Event log</string>
+    <string name="event_log_description">Recorded analytics events. Filter, share or clear them.</string>
+    <string name="event_log_filter_label">Filter by event name</string>
+    <string name="action_clear_filter">Clear filter</string>
+    <plurals name="event_log_count">
+        <item quantity="one">%d event</item>
+        <item quantity="other">%d events</item>
+    </plurals>
+    <plurals name="event_log_filtered_count">
+        <item quantity="one">%1$d of %2$d event</item>
+        <item quantity="other">%1$d of %2$d events</item>
+    </plurals>
+    <string name="event_log_empty_title">No events recorded yet</string>
+    <string name="event_log_empty_message">Events appear here as you use the app.</string>
+    <string name="event_log_no_match_title">No matching events</string>
+    <string name="event_log_no_match_message">No event name contains \"%1$s\".</string>
+    <string name="action_clear_event_log">Clear event log</string>
+    <string name="event_log_clear_dialog_title">Clear event log?</string>
+    <plurals name="event_log_clear_dialog_message">
+        <item quantity="one">%d recorded event will be deleted. This can\'t be undone.</item>
+        <item quantity="other">%d recorded events will be deleted. This can\'t be undone.</item>
+    </plurals>
+    <string name="action_clear">Clear</string>
+    <string name="event_log_share_title">Share event log</string>
 </resources>

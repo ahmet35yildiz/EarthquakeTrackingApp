@@ -59,7 +59,7 @@ com.ahmetyildiz.quakealert/
 │   │   └── di/
 │   ├── settings/                    # Language, about, permission status, developer entry points
 │   │   └── presentation/viewmodel | screen | component   (+ SettingsConfig; no data/domain: reads core only)
-│   └── eventlog/                    # Developer event log (reads core/analytics)
+│   └── eventlog/                    # Developer event log: data (AnalyticsEventDao) | domain (LoggedEvent, filter, share text) | presentation
 ```
 
 ### Cross-feature rules
@@ -72,7 +72,8 @@ com.ahmetyildiz.quakealert/
 - `settings` depends on `core` only (ADR-038): `SettingsViewModel` reads `AppLanguageManager` and
   `NotificationPermissionChecker` directly. Pieces used by more than one feature moved to `core` — the permission
   status row (`core/ui/component/NotificationPermissionStatus`) and the outgoing intents
-  (`core/navigation/ExternalIntents`). The developer tools card still comes in as a slot from `navigation`.
+  (`core/navigation/ExternalIntents`). The Settings tab only shows a "Developer tools" entry (debug builds); `DeveloperToolsScreen` (settings) is a pushed
+  route whose alert testing card comes in as a slot from `navigation` and which links to the event log (ADR-039).
 
 ## 4. Key flows
 
@@ -137,8 +138,14 @@ WorkManager (periodic 15 min, NetworkType.CONNECTED)
   `DeliverAlertsUseCase`; "Simulate the same alert again" re-delivers the newest cached simulated event (nothing is
   posted — dedupe); "Run check now" enqueues a unique one-time `AlertCheckWorker` request (network constraint, not
   expedited). The simulation takes a magnitude, a distance from the city and a delay (`SimulationRequest`);
-  "Schedule" enqueues `SimulatedAlertWorker` through `SimulatedAlertScheduler` with an initial delay (ADR-037). The card is a slot of `SettingsScreen`, filled in `QuakeAlertNavHost` when `BuildConfig.DEBUG`.
+  "Schedule" enqueues `SimulatedAlertWorker` through `SimulatedAlertScheduler` with an initial delay (ADR-037). The card is the `alertTools` slot of `DeveloperToolsScreen`, a route registered in `QuakeAlertNavHost` only when
+  `BuildConfig.DEBUG` (ADR-039).
 - The worker uses Hilt via `HiltWorkerFactory`; the default WorkManager initializer is removed from the manifest.
+- Event log (debug builds only, ADR-039): `EventLogRepositoryImpl` maps `AnalyticsEventDao.observeAll()` (newest
+  first) to `LoggedEvent` and clears with `deleteAll()`. `EventLogViewModel` combines the events with the query from
+  `SavedStateHandle` (`filterByName`: trimmed, case-insensitive "contains"); the text field keeps its own saveable
+  text so typing never waits for the flow. Share = the visible events as text (`EventLogText`: one line per event,
+  ISO-8601 local time with offset, name, `key=value` params) through the system share sheet; Clear asks first.
 
 ### 4.3 City search (Geocoder wrapper)
 ```

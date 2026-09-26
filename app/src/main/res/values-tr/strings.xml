@@ -216,4 +216,30 @@
     <string name="settings_about_disclaimer_title">Erken uyarı sistemi değildir</string>
     <string name="settings_about_disclaimer_message">Bildirimler depremden birkaç dakika sonra gelebilir. Her zaman yerel yetkililerin yönlendirmelerine uy.</string>
     <string name="settings_about_version">Sürüm %1$s (%2$d)</string>
+    <string name="settings_developer_tools_description">Uyarı simüle et, hemen kontrol çalıştır ve olay kaydını gör.</string>
+    <string name="developer_alert_testing_title">Uyarı testi</string>
+    <string name="event_log_title">Olay kaydı</string>
+    <string name="event_log_description">Kaydedilen analitik olayları. Filtrele, paylaş ya da temizle.</string>
+    <string name="event_log_filter_label">Olay adına göre filtrele</string>
+    <string name="action_clear_filter">Filtreyi temizle</string>
+    <plurals name="event_log_count">
+        <item quantity="one">%d olay</item>
+        <item quantity="other">%d olay</item>
+    </plurals>
+    <plurals name="event_log_filtered_count">
+        <item quantity="one">%2$d olaydan %1$d tanesi</item>
+        <item quantity="other">%2$d olaydan %1$d tanesi</item>
+    </plurals>
+    <string name="event_log_empty_title">Henüz kaydedilen olay yok</string>
+    <string name="event_log_empty_message">Uygulamayı kullandıkça olaylar burada görünür.</string>
+    <string name="event_log_no_match_title">Eşleşen olay yok</string>
+    <string name="event_log_no_match_message">Hiçbir olay adı \"%1$s\" içermiyor.</string>
+    <string name="action_clear_event_log">Olay kaydını temizle</string>
+    <string name="event_log_clear_dialog_title">Olay kaydı temizlensin mi?</string>
+    <plurals name="event_log_clear_dialog_message">
+        <item quantity="one">Kaydedilen %d olay silinecek. Bu işlem geri alınamaz.</item>
+        <item quantity="other">Kaydedilen %d olay silinecek. Bu işlem geri alınamaz.</item>
+    </plurals>
+    <string name="action_clear">Temizle</string>
+    <string name="event_log_share_title">Olay kaydını paylaş</string>
 </resources>

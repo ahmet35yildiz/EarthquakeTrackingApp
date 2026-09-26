@@ -39,7 +39,7 @@ Tüm kararlar gerekçeleriyle: [docs/DECISIONS.md](docs/DECISIONS.md). Özet:
 - **Çok dilli altyapı:** İngilizce + Türkçe; yeni dil eklemek sadece bir `strings.xml` eklemekten ibaret.
 
 ## Ölçüm
-Ürünün işe yarayıp yaramadığı yerel event kaydıyla ölçülür (Ayarlar → Geliştirici → Event log). Ana metrik:
+Ürünün işe yarayıp yaramadığı yerel event kaydıyla ölçülür (Ayarlar → Geliştirici araçları → Olay kaydı). Ana metrik:
 bildirim açılma oranı. Diğerleri: aktivasyon, bildirim izni oranı, "fazla gürültü" sinyali (bildirimden sonra eşiği
 yükseltme / alarmı kapatma). Detay: [docs/ANALYTICS.md](docs/ANALYTICS.md).
 

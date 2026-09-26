@@ -27,6 +27,12 @@ data object AlertsRoute : TopLevelRoute
 data object SettingsRoute : TopLevelRoute
 
 @Serializable
+data object DeveloperToolsRoute
+
+@Serializable
+data object EventLogRoute
+
+@Serializable
 data class EarthquakeDetailRoute(
     val earthquakeId: String,
     val isFromNotification: Boolean = false,

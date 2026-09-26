@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -18,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +38,7 @@ import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.settings.SettingsConfig
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.AboutSection
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.LanguageSection
+import com.ahmetyildiz.quakealert.features.settings.presentation.component.SettingsNavigationCard
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.SettingsUiState
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -48,7 +52,7 @@ data class SettingsActions(
 @Composable
 fun SettingsEntry(
     modifier: Modifier = Modifier,
-    developerTools: (@Composable () -> Unit)? = null,
+    onOpenDeveloperTools: (() -> Unit)? = null,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState: SettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,7 +78,7 @@ fun SettingsEntry(
         actions = actions,
         modifier = modifier,
         snackbarHostState = snackbarHostState,
-        developerTools = developerTools,
+        onOpenDeveloperTools = onOpenDeveloperTools,
     )
 }
 
@@ -85,7 +89,7 @@ fun SettingsScreen(
     actions: SettingsActions,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    developerTools: (@Composable () -> Unit)? = null,
+    onOpenDeveloperTools: (() -> Unit)? = null,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -114,7 +118,14 @@ fun SettingsScreen(
                 )
             }
             AboutSection(appVersion = uiState.appVersion, onOpenUsgsWebsite = actions.onOpenUsgsWebsite)
-            developerTools?.invoke()
+            onOpenDeveloperTools?.let { onClick ->
+                SettingsNavigationCard(
+                    title = stringResource(R.string.developer_tools_title),
+                    description = stringResource(R.string.settings_developer_tools_description),
+                    icon = rememberVectorPainter(Icons.Rounded.Build),
+                    onClick = onClick,
+                )
+            }
         }
     }
 }
