@@ -50,7 +50,7 @@ com.ahmetyildiz.quakealert/
 │   │   ├── presentation/viewmodel | screen | component
 │   │   └── di/
 │   ├── alerts/                      # Alert settings, city search (Geocoder), onboarding, worker, notifications
-│   │   ├── data/source (AndroidCityGeocoder) | repository
+│   │   ├── data/model | source (CityGeocoder, AndroidCityGeocoder) | repository
 │   │   ├── domain/model | repository | usecase   (+ AlertConfig, AlertMatcher at the domain root)
 │   │   ├── worker/                  # AlertCheckWorker, AlertWorkScheduler
 │   │   ├── notification/            # EarthquakeAlertNotifier
@@ -123,18 +123,27 @@ WorkManager (periodic 15 min, NetworkType.CONNECTED)
 ### 4.3 City search (Geocoder wrapper)
 ```
 CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (domain interface)
-                                                  └─ AndroidCityGeocoder (data)
+                                                  └─ CitySearchRepositoryImpl (data, rules)
+                                                       └─ CityGeocoder ─▶ AndroidCityGeocoder (android.location)
 ```
-- `AndroidCityGeocoder.search(query, countryCode, locale)`:
+- `SearchCitiesUseCase(CitySearchQuery(name, country, locale))` trims the name; a blank name returns no cities
+  without a request. `isAvailable()` tells the UI whether to show city search at all.
+- `CitySearchRepositoryImpl.searchCities(query)` (ADR-027):
   - `Geocoder.isPresent() == false` → `AppError.GeocoderUnavailable`.
+  - Asks the geocoder for `"<name>, <localized country name>"` in the app locale (better hits for names that exist
+    in several countries, localized admin areas).
+  - `IOException` → `AppError.Network`, anything else → `Unknown` (`safeApiCall`); empty → no results.
+  - Drops country-level results (no locality or admin area) unless their name equals the typed name (city states),
+    maps to `City(name, adminArea, countryCode, location)` (`core/model`), keeps the selected country, de-duplicates
+    by name + admin area.
+- `AndroidCityGeocoder.findAddresses(locationName, locale)` is the only class using `android.location`:
   - **API ≥ 33:** `getFromLocationName(name, max, GeocodeListener)` wrapped in `suspendCancellableCoroutine`
-    (`onError` → failure).
+    (`onError` → `IOException`).
   - **API < 33:** deprecated blocking `getFromLocationName(name, max)` on the IO dispatcher (`@Suppress` scoped to
     that one function).
-  - `IOException` → network error; empty → no results.
-  - Results filtered by `Address.countryCode == countryCode`, mapped to `City(name, adminArea, countryCode, location)`
-    (`core/model`),
-    de-duplicated.
+  - Addresses without coordinates are skipped; the rest become plain `GeocodedAddress` values.
+- `GetCountriesUseCase(displayLocale)`: `Locale.getISOCountries()` with names in the display locale, sorted with that
+  locale's `Collator`.
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
 
 ### 4.4 Earthquake detail

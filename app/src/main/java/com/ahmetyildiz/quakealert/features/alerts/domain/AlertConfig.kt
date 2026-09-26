@@ -9,6 +9,7 @@ object AlertConfig {
     const val DEFAULT_THRESHOLD: Double = AlertSettings.DEFAULT_MAGNITUDE_THRESHOLD
     val RADIUS_OPTIONS_KM: List<Int> = listOf(50, 100, 250, 500, 1000)
     const val DEFAULT_RADIUS_KM: Int = 250
+    const val CITY_SEARCH_MAX_RESULTS: Int = 10
     val CHECK_INTERVAL: Duration = Duration.ofMinutes(15)
     val MAX_EVENT_AGE: Duration = Duration.ofHours(6)
     val UPDATED_AFTER_OVERLAP: Duration = Duration.ofMinutes(10)

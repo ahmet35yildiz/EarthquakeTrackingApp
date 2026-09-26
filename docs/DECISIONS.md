@@ -275,3 +275,19 @@ Add a new record (next number) whenever a significant decision is made; never re
   harder to test); returning a rejection reason per rule (no consumer yet).
 - **Consequences:** The rules are read and changed in one short file and tested without coroutines or fakes. A user
   who never saved alert settings gets no alerts for events from before the setup, instead of a burst of old ones.
+
+## ADR-027 — City search rules live in the repository, behind a thin geocoder interface
+- **Context:** City search depends on the platform `Geocoder`, which cannot run in unit tests and has two APIs
+  (async from API 33, blocking below). The search rules (country filter, de-duplication, error mapping, which
+  results count as a city) must be unit tested. ADR-021 avoids data source classes that only pass calls through.
+- **Decision:** `CityGeocoder` (data/source) is a small interface; `AndroidCityGeocoder` is the only class that uses
+  `android.location`, handles the API 33 split and returns plain `GeocodedAddress` values. `CitySearchRepositoryImpl`
+  holds every rule and is tested with a fake geocoder. The geocoder is asked for `"<name>, <country name>"` in the
+  app language. Results without locality or admin area are the country itself (returned for unknown names) and are
+  dropped unless their name equals the typed name, which keeps city states. Countries come from
+  `GetCountriesUseCase` (pure JVM `Locale` + `Collator`, no data layer).
+- **Alternatives:** Rules inside `AndroidCityGeocoder` (only testable on a device); searching the bare name and
+  filtering by country (tested: "Paris" in the US found nothing, the geocoder returns the best global match first);
+  dropping every country-level result (loses Singapore, Monaco, Hong Kong).
+- **Consequences:** The Android-specific part is ~50 lines and verified on both API sides; everything else is
+  covered by fast unit tests. A city state is found by its name in the app language only ("Singapur" in Turkish).

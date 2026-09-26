@@ -222,13 +222,30 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   inclusive; a missing baseline (settings never saved) matches nothing. Intervals are `Duration`s
   (`CHECK_INTERVAL`, `MAX_EVENT_AGE`, …). 23 unit tests: every rule with its boundary (±0.01 magnitude, ±1 m radius,
   ±1 s baseline and max age), plus config consistency (default on a step, default radius among the options).
-- [ ] **2.2 City search (Geocoder).** `CitySearchRepository` (domain), `AndroidCityGeocoder` with the API 33 split
+- [x] **2.2 City search (Geocoder).** `CitySearchRepository` (domain), `AndroidCityGeocoder` with the API 33 split
   (ARCHITECTURE §4.3), `SearchCitiesUseCase`, country list provider (`Locale.getISOCountries()`, localized, Collator
   sorted).
   *Done when:* unit tests with a fake geocoder pass **and** "Izmir"/"Tokyo" searches work on **API 31/32 and API 34**;
   `isPresent() == false` path hides city search.
+  *Result:* domain: `Country`, `CitySearchQuery(name, country, locale)`, `CitySearchRepository`,
+  `SearchCitiesUseCase` (trims, blank → no request, `isAvailable()`), `GetCountriesUseCase(displayLocale)` (ISO list,
+  localized names, `Collator` order). Data: `CityGeocoder` interface + `AndroidCityGeocoder` (the only class that
+  touches `android.location`, API 33 split), `CitySearchRepositoryImpl` owns the rules and is tested with a fake
+  geocoder (ADR-027). The geocoder is asked for "name, country name" in the app language, which fixed "Paris" in the
+  US and returns localized admin areas. Found on the emulator: a nonsense name or a city of another country then
+  returned the country itself as a "city" — country-level results (no locality or admin area) are now dropped
+  unless their name equals the typed name (keeps city states such as Singapore and Monaco, typed in the app
+  language). Max results in `AlertConfig.CITY_SEARCH_MAX_RESULTS` (10). Tests: 26 unit tests (mapper, repository with
+  fake geocoder: availability, country filter, de-duplication, country-level results, error mapping; use cases incl.
+  Turkish collation). Verified on API 34 (async path) and API 31 (blocking path) with temporary injection (reverted):
+  "Izmir"/"İzmir" → İzmir, "Tokyo" → Tokyo, Paris US → Texas/Illinois/Kentucky, nonsense → empty, airplane mode →
+  `Network`; 253/249 countries, TR names sorted with Turkish rules; first request ~1–2.5 s, then ~0.1–0.5 s. The
+  hidden-search path is exposed through `SearchCitiesUseCase.isAvailable()` (unit tested); the UI part is in 2.3.
 - [ ] **2.3 Area components.** Reusable composables: threshold slider, country picker (searchable), city search
   field + results ("type and search", no live suggestions), radius selector, "Whole world" warning card.
+  From 2.2: city search hidden when `SearchCitiesUseCase.isAvailable()` is false; default country = device region
+  (SPEC §4.4); rebuild the country list when the app language changes; log `city_search_performed` /
+  `city_search_failed` from the ViewModel.
   *Done when:* previews + usable in both onboarding and settings.
 - [ ] **2.4 Alert settings screen.** Toggle, threshold, area, warning when no area, permission status row with
   "Open settings", last checked time; saving resets baseline; schedules/cancels work; analytics.
@@ -311,3 +328,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 11:12–11:41 | ~29m | 1.6 Detail screen: details use case, assisted ViewModel, facts/distance/actions UI, detail route, not-found/error states, analytics; unit + Compose UI tests; verified on API 31 and 34 incl. real 404, offline and missing maps app (ADR-024) |
 | 2026-09-26 | 11:41–12:09 | ~28m | 1.7 Navigation: onboarding/main graphs, start destination, onboarding placeholder, deep link to detail handled in place (ADR-025); unit tests; verified cold/warm deep links on API 31 and 34 |
 | 2026-09-26 | 15:15–15:30 | ~15m | 2.1 Alert domain: AlertConfig, pure AlertMatcher with criteria object (ADR-026); 23 unit tests covering every SPEC §5.1 rule and its boundaries |
+| 2026-09-26 | 15:27–15:42 | ~15m | 2.2 City search: country list, Geocoder wrapper with API 33 split, repository rules tested with a fake geocoder (ADR-027); fixed country-level results found on the emulator; 26 unit tests; verified on API 31 and 34 incl. airplane mode |

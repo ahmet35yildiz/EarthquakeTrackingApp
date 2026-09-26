@@ -57,6 +57,7 @@ yükseltme / alarmı kapatma). Detay: [docs/ANALYTICS.md](docs/ANALYTICS.md).
 - Bildirimler 15 dakikaya kadar (Doze modunda daha uzun) gecikebilir.
 - USGS'in küçük depremlerdeki kapsamı bölgeye göre değişiyor (ör. Türkiye'de bir haftada USGS 2, AFAD 713 deprem).
 - Şehir arama cihazın geocoding servisine ihtiyaç duyar; servis yoksa bölge "Tüm dünya" olarak kalır.
+- Şehir-devletleri (Singapur, Monako) uygulama dilindeki adlarıyla aranmalı (TR'de "Singapur", EN'de "Singapore").
 - USGS'in yer açıklaması (`place`) sadece İngilizce; uygulamanın ürettiği tüm metinler yerelleştirilmiştir.
 
 ## Harcanan süre
