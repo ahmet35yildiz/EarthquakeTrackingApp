@@ -228,3 +228,35 @@ Add a new record (next number) whenever a significant decision is made; never re
   (more requests, breaks offline filtering and sorting of the whole period).
 - **Consequences:** Simple code, instant sort and filter changes, smooth main thread. Revisit if the cached period grows
   by an order of magnitude (e.g. 30 days or M1+, several thousand items): then Paging 3 with SQL-side filtering.
+
+## ADR-024 — Screen arguments through assisted ViewModel injection; navigation arguments stay primitive
+- **Context:** The detail screen needs the earthquake id and where it was opened from (for analytics). Reading them
+  from `SavedStateHandle.toRoute()` ties the ViewModel to the navigation library and needs Android classes in unit
+  tests. The first draft passed the analytics `DetailSource` enum as a route argument; lint warned that enum
+  navigation arguments can be broken by R8 in minified builds unless kept.
+- **Decision:** The entry composable reads the route and creates the ViewModel with Hilt assisted injection
+  (`@HiltViewModel(assistedFactory = ...)`, `hiltViewModel(creationCallback)`), passing plain values. Route
+  arguments are primitives (`earthquakeId: String`, `isFromNotification: Boolean`); the navigation layer maps them to
+  domain or analytics types.
+- **Alternatives:** `SavedStateHandle` key lookups (string keys duplicated from the route); `@Keep` on the enum
+  (couples analytics types to navigation and relies on a build rule).
+- **Consequences:** ViewModels are constructed in unit tests with ordinary arguments; routes and deep links use simple
+  query values (`?isFromNotification=true`); nothing depends on keep rules.
+
+## ADR-025 — Deep links are handled in place, never by restarting the task
+- **Context:** Notification taps and `adb am start` deliver `quakealert://earthquake/{id}` with
+  `FLAG_ACTIVITY_NEW_TASK`. Navigation 2.9's `NavController.handleDeepLink(intent)` treats `NEW_TASK` without
+  `CLEAR_TASK` as "unknown task state": it restarts the task with `TaskStackBuilder` and finishes the current
+  activity. The activity would be created twice (double `app_opened`, a visible flash, lost state).
+- **Decision:** `MainActivity` is `singleTop`. Before the intent reaches the NavController (in `onCreate` and
+  `onNewIntent`), our own deep-link intents get `FLAG_ACTIVITY_CLEAR_TASK` added (`withDeepLinkHandledInPlace`). The
+  flag is only read by the NavController at that point; it then clears its back stack and builds list → detail in
+  place. Cold starts are handled while the graph is set (before the first frame), warm starts through an
+  `OnNewIntentListener`.
+- **Alternatives:** Default behaviour (task restart, see context); taking the URI out of the intent and calling
+  `handleDeepLink(NavDeepLinkRequest)` after the first composition (tried: the list was shown for a frame and logged a
+  list view and started a refresh); parsing the URI and navigating manually (duplicates the route's deep-link
+  definition).
+- **Consequences:** One activity instance, correct back stack, analytics counted once, state survives rotation (the
+  NavController remembers that the link was handled). A deep link replaces the current back stack (for example the
+  Alerts tab), like the library's own new-task behaviour.

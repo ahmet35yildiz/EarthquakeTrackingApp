@@ -5,6 +5,10 @@
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
 
+    <string name="onboarding_welcome_title">Welcome to QuakeAlert</string>
+    <string name="onboarding_welcome_message">Calm alerts for the earthquakes that matter to you.</string>
+    <string name="action_get_started">Get started</string>
+
     <string name="action_retry">Retry</string>
     <string name="state_loading">Loading</string>
     <string name="action_refresh">Refresh</string>
@@ -73,4 +77,46 @@
     <string name="sort_largest_first">Largest first</string>
     <string name="sort_nearest_first">Nearest first</string>
     <string name="sort_button_description">Sort: %1$s</string>
+
+    <string name="detail_title">Earthquake details</string>
+    <string name="action_back">Back</string>
+    <string name="action_share">Share</string>
+    <string name="action_open_in_maps">Open in maps</string>
+    <string name="action_view_on_usgs">View on USGS</string>
+    <string name="detail_within_alert_area">Within your %1$d km alert area</string>
+    <string name="detail_outside_alert_area">Outside your %1$d km alert area</string>
+    <string name="detail_facts_title">Details</string>
+    <string name="detail_row_magnitude">Magnitude</string>
+    <string name="detail_magnitude_with_type" translatable="false">%1$s (%2$s)</string>
+    <string name="detail_row_local_time">Local time</string>
+    <string name="detail_local_time_value" translatable="false">%1$s (%2$s)</string>
+    <string name="detail_row_utc_time">UTC time</string>
+    <string name="detail_utc_time_value" translatable="false">%1$s UTC</string>
+    <string name="detail_row_depth">Depth</string>
+    <string name="detail_depth_value">%1$s km</string>
+    <string name="detail_row_coordinates">Coordinates</string>
+    <string name="coordinate_value" translatable="false">%1$s° %2$s</string>
+    <string name="coordinate_pair" translatable="false">%1$s, %2$s</string>
+    <string name="coordinate_north">N</string>
+    <string name="coordinate_south">S</string>
+    <string name="coordinate_east">E</string>
+    <string name="coordinate_west">W</string>
+    <string name="detail_row_review_status">Review status</string>
+    <string name="detail_status_reviewed">Reviewed by a seismologist</string>
+    <string name="detail_status_automatic">Automatic, not yet reviewed</string>
+    <string name="detail_row_tsunami">Tsunami flag</string>
+    <string name="detail_tsunami_flag_set">Set · follow official warnings</string>
+    <string name="detail_tsunami_flag_not_set">Not set</string>
+    <string name="detail_row_felt_reports">Felt reports</string>
+    <plurals name="detail_felt_reports_value">
+        <item quantity="one">%d person felt it</item>
+        <item quantity="other">%d people felt it</item>
+    </plurals>
+    <string name="detail_data_note">Data: U.S. Geological Survey (USGS). Magnitude and location can be revised after publication.</string>
+    <string name="detail_not_found_title">Earthquake not found</string>
+    <string name="detail_not_found_message">USGS may have removed it or merged it with another event.</string>
+    <string name="detail_error_title">Couldn\'t load this earthquake</string>
+    <string name="error_no_app_for_action">No app found to open this.</string>
+    <string name="share_chooser_title">Share earthquake</string>
+    <string name="share_text">M%1$s earthquake · %2$s\n%3$s · %4$s km deep\n%5$s</string>
 </resources>

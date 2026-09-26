@@ -137,8 +137,31 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
     de-duplicated.
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
 
-### 4.4 Notification tap → detail
-- `PendingIntent` to `MainActivity` with deep link `quakealert://earthquake/{id}?source=notification`.
+### 4.4 Earthquake detail
+- `EarthquakeDetailRoute(earthquakeId, isFromNotification)` (navigation) → `EarthquakeDetailEntry` →
+  `EarthquakeDetailViewModel`, which receives the id and the analytics source through Hilt assisted injection
+  (ADR-024) → `GetEarthquakeUseCase` (cache first, then USGS `eventid`) → `EarthquakeDetails` (earthquake +
+  `DistanceFromCity` with `isWithinAlertArea` from `AlertArea.contains`, the same rule as alerts).
+- States: `LOADING` | `LOADED` | `NOT_FOUND` (HTTP 404 or not an earthquake) | `ERROR` (retry).
+- Maps (`geo:` intent), USGS page (browser) and share (chooser) are launched by the entry composable; the ViewModel
+  only logs `detail_action_clicked`. A missing handler app shows a snackbar instead of crashing.
+- The bottom bar is shown only on top-level destinations; pushed screens (detail) use the full height.
+
+### 4.5 Navigation and deep links
+- Root `NavHost` with two graphs: `OnboardingGraphRoute` (onboarding) and `MainGraphRoute` (three tabs + detail). The
+  start graph comes from `StartDestinationViewModel`, which reads `isOnboardingCompleted` once per session (the
+  first frame stays empty for that read); finishing onboarding navigates to the main graph and pops onboarding.
+- Tabs pop up to `MainGraphRoute` with save/restore state; the bottom bar is shown only on the three tab
+  destinations.
+- `EarthquakeDetailRoute` declares `navDeepLink` `quakealert://earthquake/{earthquakeId}?isFromNotification={bool}`
+  (manifest: `VIEW` + scheme `quakealert`, `launchMode="singleTop"`). Cold start: the NavController handles the
+  activity intent while setting the graph; warm start: `onNewIntent` → `navController.handleDeepLink(intent)`.
+  Both run in place (ADR-025): the back stack becomes list → detail, the activity is not recreated.
+- A deep link before onboarding is completed opens the detail with onboarding underneath (only reachable from adb
+  or another app; notifications exist only after onboarding).
+
+### 4.6 Notification tap → detail
+- `PendingIntent` to `MainActivity` with deep link `quakealert://earthquake/{id}?isFromNotification=true`.
 - Detail route declares `navDeepLink`; analytics logs `alert_notification_opened` with delay since posting.
 
 ## 5. Persistence
@@ -182,6 +205,8 @@ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ CitySearchRepository (doma
 - Mapping from exceptions happens in the data layer only; UI maps `AppError` → string resources.
 
 ## 9. Conventions (from the project coding rules)
+- Naming per screen: `XRoute` = navigation key (`navigation/Routes.kt`), `XEntry` = composable that wires the
+  ViewModel and platform actions, `XScreen` = stateless composable (previews and UI tests use it).
 - Explicit types on public functions/properties; no `Any`; data classes immutable (`val`, `List`).
 - Functions short (< 20 statements), start with a verb; booleans `isX` / `hasX` / `canX`; no blank lines inside
   functions; early returns instead of nesting.

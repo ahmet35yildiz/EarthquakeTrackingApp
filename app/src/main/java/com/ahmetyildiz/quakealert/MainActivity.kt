@@ -1,5 +1,6 @@
 package com.ahmetyildiz.quakealert
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,6 +10,7 @@ import com.ahmetyildiz.quakealert.core.analytics.AnalyticsTracker
 import com.ahmetyildiz.quakealert.core.analytics.AppOpenSource
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.navigation.QuakeAlertApp
+import com.ahmetyildiz.quakealert.navigation.withDeepLinkHandledInPlace
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        intent.withDeepLinkHandledInPlace()
         if (savedInstanceState == null) {
             analyticsTracker.track(AnalyticsEvent.AppOpened(source = AppOpenSource.LAUNCHER))
         }
@@ -29,5 +32,9 @@ class MainActivity : AppCompatActivity() {
                 QuakeAlertApp()
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent.withDeepLinkHandledInPlace())
     }
 }

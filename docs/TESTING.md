@@ -43,6 +43,9 @@ Emulators must use a **Google APIs** image (Geocoder backend needs Google Play s
 - [ ] List: pull-to-refresh, filters, airplane mode → offline banner with cached data, dark mode, font scale 1.5×,
       rotation.
 - [ ] Detail: open in maps, open USGS, share; open from notification (cold start and warm start).
+- [ ] Deep link: `adb shell am start -a android.intent.action.VIEW -d "quakealert://earthquake/<id>"` with the app
+      closed and open (another tab): detail opens, back goes to the list, one `app_opened`, no `earthquake_list_viewed`
+      on cold start; an unknown id shows "not found".
 - [ ] Developer → Simulate alert → notification appears → tap → detail; second simulate of same event → no duplicate.
 - [ ] Developer → Run check now → `background_check_completed` in Event log.
 - [ ] Periodic work scheduled: `adb shell dumpsys jobscheduler | grep quakealert`.

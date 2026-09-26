@@ -34,11 +34,11 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `alert_area_cleared` | `context` | Switched to whole world |
 | `city_search_performed` | `country_code`, `result_count` | Search completed |
 | `city_search_failed` | `reason` = network \| unavailable \| unknown | Search failed |
-| `earthquake_list_viewed` | `region_filter` = world \| near_city, `magnitude_filter` = all \| above_threshold, `sort` = newest_first \| largest_first \| nearest_first | List screen shown (not again after rotation / language switch) |
+| `earthquake_list_viewed` | `region_filter` = world \| near_city, `magnitude_filter` = all \| above_threshold, `sort` = newest_first \| largest_first \| nearest_first | List screen shown, also when coming back from the detail (not after rotation / language switch) |
 | `earthquake_list_refreshed` | `trigger` = initial \| pull \| stale (pull = any user-started refresh: pull, refresh button, retry), `result` = success \| failure, `count` (cached earthquakes after the refresh) | Refresh finished |
 | `list_filter_changed` | `filter` = region \| magnitude, `value` (same values as above) | Chip tapped |
 | `list_sort_changed` | `sort` = newest_first \| largest_first \| nearest_first | Sort order picked |
-| `earthquake_detail_viewed` | `source` = list \| notification, `magnitude` | Detail shown |
+| `earthquake_detail_viewed` | `source` = list \| notification, `magnitude` (omitted when unknown) | Detail loaded; once per opened detail (not for not-found / error, not again after rotation) |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
 | `alert_notification_posted` | `event_id`, `magnitude`, `batch_size` | Notification posted |
 | `alert_notification_suppressed` | `reason` = permission_denied | Match found but cannot notify |

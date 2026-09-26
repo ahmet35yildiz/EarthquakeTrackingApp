@@ -67,7 +67,7 @@ data class EarthquakeListActions(
 )
 
 @Composable
-fun EarthquakeListRoute(
+fun EarthquakeListEntry(
     onEarthquakeClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EarthquakeListViewModel = hiltViewModel(),

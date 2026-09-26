@@ -176,11 +176,39 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   back to top on a new order, position kept on rotation, EN/TR labels. One run showed the area chip missing right
   after install; not reproducible in 14 runs (live preference updates confirmed), most likely read before the save
   finished on a busy first launch.
-- [ ] **1.6 Detail screen.** ViewModel, all fields of SPEC §4.3, maps/USGS/share actions, not-found state,
+- [x] **1.6 Detail screen.** ViewModel, all fields of SPEC §4.3, maps/USGS/share actions, not-found state,
   analytics (viewed with source, action clicked).
   *Done when:* SPEC §4.3 met; opening an unknown id shows not-found.
-- [ ] **1.7 Navigation.** Type-safe routes, detail route with `navDeepLink` `quakealert://earthquake/{id}`, back
-  behaviour to list, onboarding/main graph split (onboarding placeholder until 2.7).
+  *Result:* `GetEarthquakeUseCase` now returns `EarthquakeDetails` (distance card: km from the city + inside/outside
+  the alert area, using `AlertArea.contains`). `EarthquakeDetailViewModel` with assisted injection (ADR-024), states
+  loading / loaded / not found / error + retry, `earthquake_detail_viewed` once per opened detail and only on success.
+  Screen: header card, distance card (only with an area), facts (magnitude + type, local time with offset, UTC,
+  depth, coordinates with localized hemispheres, review status, tsunami flag, felt reports if any), open in maps,
+  view on USGS, share (chooser, localized plain text), data note. The design's map, MMI and copy button left out
+  (SPEC). Detail route added so the list opens it (`EarthquakeDetailRoute(id, isFromNotification)`; deep link stays
+  in 1.7); bottom bar hidden on pushed screens; screen composables renamed `XEntry` to stop clashing with `XRoute`
+  keys. Lint led to `toUri()` and to a Boolean route argument instead of an analytics enum (R8 keep issue). Tests:
+  6 use case, 5 ViewModel, 6 Compose UI (API 31 and 34). Verified on API 34 and 31: list → detail, share chooser,
+  Google Maps, USGS page in Chrome, back, rotation (no second view event), TR (decimal comma, K/D, TR dates), dark,
+  distance card, unknown id → real USGS 404 → not found, offline uncached → error → retry, offline cached → loads,
+  Maps disabled → "No app found" snackbar (Maps re-enabled afterwards). Emulators were restarted once: their DNS
+  had stopped working after the host slept.
+- [x] **1.7 Navigation.** Type-safe routes, detail route with `navDeepLink` `quakealert://earthquake/{id}`, back
+  behaviour to list, onboarding/main graph split (onboarding placeholder until 2.7). The detail route itself exists
+  since 1.6 (`EarthquakeDetailRoute(earthquakeId, isFromNotification)`); a deep link must also land on the list
+  when going back.
+  *Result:* onboarding / main graphs, start graph from `StartDestinationViewModel` (read once, so finishing
+  onboarding never resets the graph), onboarding placeholder in `alerts/presentation` (welcome + "Get started" →
+  saves the flag), tabs pop to the main graph, bottom bar only on tabs. Deep link `navDeepLink` + manifest filter +
+  `singleTop`. Found by reading Navigation 2.9.8's source: `handleDeepLink(intent)` restarts the whole task when the
+  intent has `NEW_TASK` without `CLEAR_TASK` (every `am start` and notification tap) — the activity would be created
+  twice and `app_opened` logged twice. A first version handled links after the first frame instead, which briefly
+  showed the list and logged `earthquake_list_viewed`; final version marks our deep-link intents `CLEAR_TASK` so the
+  library builds the stack in place before anything is drawn (ADR-025). Tests: 3 start destination unit tests.
+  Verified on API 34 and 31: first run → onboarding → list, back exits, relaunch → list; cold deep link (one
+  activity, source = notification, no list view event), rotation (not re-handled), back → list → exit; warm deep
+  link from the Alerts tab (same process, no second `app_opened`); unknown id → not found. Deep link before
+  onboarding: detail, then list, then onboarding (documented, not blocked).
   *Done when:* `adb shell am start -d "quakealert://earthquake/<id>"` opens the detail.
 
 ## Phase 2 — Alerts
@@ -203,7 +231,8 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 - [ ] **2.5 Notifications.** Channel creation at startup, `AlertNotifier` interface + `EarthquakeAlertNotifier`
   (single, up to 3 individual, summary for more; deep link PendingIntent; localized title with distance),
   `NotificationPermissionChecker`, suppressed path, `alert_notification_opened` with delay, `app_opened` with
-  source = notification.
+  source = notification. The notification `PendingIntent` uses the deep link
+  `quakealert://earthquake/{id}?isFromNotification=true` (already handled since 1.7).
   *Done when:* notification from a test trigger opens the right detail (cold + warm start) on API 31/32 and 34.
 - [ ] **2.6 Worker.** `NotifiedEarthquakeRepository` (Room, prune), `CheckForNewAlertsUseCase` (SPEC §5.2),
   thin `AlertCheckWorker` (`@HiltWorker`), `AlertWorkScheduler` (unique periodic, UPDATE policy, network
@@ -212,6 +241,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   `background_check_completed`; reboot keeps the schedule.
 - [ ] **2.7 Onboarding.** Welcome (with not-an-early-warning disclaimer) → alert setup (reuses 2.3) → notification
   permission (API 33+ request; < 33 confirm only) → finish; completion flag; start destination logic; analytics.
+  Graph, start destination and completion flag exist since 1.7; replace the placeholder `OnboardingScreen`.
   *Done when:* SPEC §4.1 met on API 31/32 and 34; denial path works.
 - [ ] **2.8 Developer tools.** Debug-only section: Simulate alert (fake matching event through matcher + notifier),
   Run check now (expedited one-time worker).
@@ -273,3 +303,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-25 | 21:12–21:15 | ~3m | 1.4 Earthquakes domain: config, filters, observe/refresh/freshness/get use cases with distance; unit tests; verified on API 34 |
 | 2026-09-25 | 21:18–21:42 | ~24m | 1.5 List screen: ViewModel, UI state, top bar, chips, cards, states, stale banner, analytics; fixed two layout bugs found on the emulator; unit + Compose UI tests; verified on API 31 and 34 |
 | 2026-09-25 | 21:42–22:30 | ~48m | 1.5.1 List sorting (newest / largest / nearest) + performance measurement; list computation off the main thread, in-memory paging removed (ADR-023); unit + Compose UI tests; verified on API 31 and 34 |
+| 2026-09-26 | 11:12–11:41 | ~29m | 1.6 Detail screen: details use case, assisted ViewModel, facts/distance/actions UI, detail route, not-found/error states, analytics; unit + Compose UI tests; verified on API 31 and 34 incl. real 404, offline and missing maps app (ADR-024) |
+| 2026-09-26 | 11:41–12:09 | ~28m | 1.7 Navigation: onboarding/main graphs, start destination, onboarding placeholder, deep link to detail handled in place (ADR-025); unit tests; verified cold/warm deep links on API 31 and 34 |

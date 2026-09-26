@@ -3,6 +3,10 @@
     <string name="tab_alerts">Alarmlar</string>
     <string name="tab_settings">Ayarlar</string>
 
+    <string name="onboarding_welcome_title">QuakeAlert\'e hoş geldin</string>
+    <string name="onboarding_welcome_message">Senin için önemli depremler için sakin uyarılar.</string>
+    <string name="action_get_started">Başla</string>
+
     <string name="action_retry">Tekrar dene</string>
     <string name="state_loading">Yükleniyor</string>
     <string name="action_refresh">Yenile</string>
@@ -69,4 +73,41 @@
     <string name="sort_largest_first">En büyük</string>
     <string name="sort_nearest_first">En yakın</string>
     <string name="sort_button_description">Sıralama: %1$s</string>
+
+    <string name="detail_title">Deprem ayrıntıları</string>
+    <string name="action_back">Geri</string>
+    <string name="action_share">Paylaş</string>
+    <string name="action_open_in_maps">Haritada aç</string>
+    <string name="action_view_on_usgs">USGS\'te görüntüle</string>
+    <string name="detail_within_alert_area">%1$d km\'lik alarm alanının içinde</string>
+    <string name="detail_outside_alert_area">%1$d km\'lik alarm alanının dışında</string>
+    <string name="detail_facts_title">Ayrıntılar</string>
+    <string name="detail_row_magnitude">Büyüklük</string>
+    <string name="detail_row_local_time">Yerel saat</string>
+    <string name="detail_row_utc_time">UTC saati</string>
+    <string name="detail_row_depth">Derinlik</string>
+    <string name="detail_depth_value">%1$s km</string>
+    <string name="detail_row_coordinates">Koordinatlar</string>
+    <string name="coordinate_north">K</string>
+    <string name="coordinate_south">G</string>
+    <string name="coordinate_east">D</string>
+    <string name="coordinate_west">B</string>
+    <string name="detail_row_review_status">İnceleme durumu</string>
+    <string name="detail_status_reviewed">Sismolog tarafından incelendi</string>
+    <string name="detail_status_automatic">Otomatik, henüz incelenmedi</string>
+    <string name="detail_row_tsunami">Tsunami işareti</string>
+    <string name="detail_tsunami_flag_set">Var · resmî uyarıları takip et</string>
+    <string name="detail_tsunami_flag_not_set">Yok</string>
+    <string name="detail_row_felt_reports">Hissedildi bildirimi</string>
+    <plurals name="detail_felt_reports_value">
+        <item quantity="one">%d kişi hissetti</item>
+        <item quantity="other">%d kişi hissetti</item>
+    </plurals>
+    <string name="detail_data_note">Veri: ABD Jeoloji Araştırmaları Kurumu (USGS). Büyüklük ve konum yayından sonra güncellenebilir.</string>
+    <string name="detail_not_found_title">Deprem bulunamadı</string>
+    <string name="detail_not_found_message">USGS bu kaydı kaldırmış ya da başka bir kayıtla birleştirmiş olabilir.</string>
+    <string name="detail_error_title">Bu deprem yüklenemedi</string>
+    <string name="error_no_app_for_action">Bunu açabilecek bir uygulama bulunamadı.</string>
+    <string name="share_chooser_title">Depremi paylaş</string>
+    <string name="share_text">M%1$s deprem · %2$s\n%3$s · %4$s km derinlikte\n%5$s</string>
 </resources>
