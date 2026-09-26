@@ -10,7 +10,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.ahmetyildiz.quakealert.core.analytics.DetailSource
-import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSettingsScreen
+import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSettingsEntry
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.OnboardingEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeDetailEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeListEntry
@@ -44,7 +44,7 @@ fun QuakeAlertNavHost(
                     onBack = navController::navigateUp,
                 )
             }
-            composable<AlertsRoute> { AlertSettingsScreen() }
+            composable<AlertsRoute> { AlertSettingsEntry() }
             composable<SettingsRoute> { SettingsScreen() }
         }
     }

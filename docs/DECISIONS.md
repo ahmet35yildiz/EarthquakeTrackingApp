@@ -308,3 +308,18 @@ Add a new record (next number) whenever a significant decision is made; never re
   host screen (every host would need the device region and country list).
 - **Consequences:** Screens stay small: they hold one `AreaSelection` and save it. The components have previews and
   Compose tests without Hilt. A city-search change is made in one ViewModel.
+
+## ADR-029 — Alert settings save on every change, with a new baseline each time
+- **Context:** The Alerts tab edits the switch, threshold and area. SPEC §5.1 needs a baseline so a change never
+  alerts for older events. Settings are also read by the earthquake list (threshold chip, "Near city", distances).
+- **Decision:** No Save button: each change is saved at once through `UpdateAlertSettingsUseCase`, which serializes
+  updates with a mutex, reads the stored settings, applies the change and saves it with `baselineAt = now` only when
+  something changed. The switch also resets the baseline, so turning alerts back on never notifies about events from
+  while they were off. The ViewModel derives analytics from the returned previous/updated pair and confirms with a
+  short snackbar. "Near a city" without a city is only an on-screen draft. Scheduling / cancelling the background
+  work will be triggered from the same use case (2.6).
+- **Alternatives:** Explicit Save button (easy to leave the screen with unsaved changes; the list would show old
+  settings); one repository call per field (baseline easy to forget, see ADR-019); analytics logged per UI callback
+  (would also log no-op taps).
+- **Consequences:** What the user sees is always what is stored, and the list reflects it immediately. Rapid changes
+  cannot overwrite each other. Each change restarts the "only newer events" window, which is the intended behaviour.

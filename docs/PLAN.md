@@ -261,21 +261,37 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   "turk" → Türkiye / Turkmenistan / Turks & Caicos, keyboard search, İzmir picked, radius, Change → Cancel, slider
   tap → 6.5, `city_search_performed` logged, TR + dark (decimal comma, TR texts), airplane mode → network message →
   Retry → Ankara, landscape scrolls; on API 31 the country is "Turkey" (older platform data).
-- [ ] **2.4 Alert settings screen.** Toggle, threshold, area, warning when no area, permission status row with
+- [x] **2.4 Alert settings screen.** Toggle, threshold, area, warning when no area, permission status row with
   "Open settings", last checked time; saving resets baseline; schedules/cancels work; analytics.
   From 2.3: use `MagnitudeThresholdSelector` + `AreaSelectorEntry`; keep the `AreaSelection` in the ViewModel (it
   must survive rotation and language changes); save only when `toAlertAreaOrNull()` is not null; log
   `alert_threshold_changed` / `alert_area_set` / `alert_area_cleared` from the ViewModel.
   *Done when:* SPEC §4.4 met; ViewModel tests pass.
+  *Result:* `AlertSettingsEntry` / `AlertSettingsScreen` on the Alerts tab: summary card with the alerts switch and a
+  plain-language summary of the saved settings, threshold, area (2.3 components), status card (notification
+  permission with "Open settings" → the app's system notification page, last background check, check interval).
+  Every change is saved at once through `UpdateAlertSettingsUseCase` (serialized, new baseline on every saved change,
+  no save when nothing changed) with an "Alert settings saved" snackbar; analytics come from the difference between
+  the previous and the saved settings (`toAnalyticsEvents(context)`, reusable by onboarding) — ADR-029. "Near a city"
+  without a city stays on screen only. `NotificationPermissionChecker` (core/notification,
+  `areNotificationsEnabled()`) is re-read on resume. Found on the emulator: `POST_NOTIFICATIONS` was not declared,
+  so on API 33+ the system settings could not allow notifications at all — declared now (planned for 2.5). The
+  "schedules/cancels work" part moves to 2.6 (the worker and scheduler do not exist yet). Tests: 18 unit tests (use
+  cases, analytics mapping, ViewModel) and 6 Compose UI tests (passed on API 31 and 34). Verified on API 34 and 31:
+  İzmir picked in Alerts → "Near İzmir" chip and distances in the Earthquakes tab, kept after the app is killed,
+  radius / switch saved with the right analytics, Open settings → system page → permission granted → row updates on
+  return, TR texts; API 31 shows notifications allowed by default.
 - [ ] **2.5 Notifications.** Channel creation at startup, `AlertNotifier` interface + `EarthquakeAlertNotifier`
   (single, up to 3 individual, summary for more; deep link PendingIntent; localized title with distance),
-  `NotificationPermissionChecker`, suppressed path, `alert_notification_opened` with delay, `app_opened` with
+  `NotificationPermissionChecker` (exists since 2.4, as does the `POST_NOTIFICATIONS` declaration), suppressed
+  path, `alert_notification_opened` with delay, `app_opened` with
   source = notification. The notification `PendingIntent` uses the deep link
   `quakealert://earthquake/{id}?isFromNotification=true` (already handled since 1.7).
   *Done when:* notification from a test trigger opens the right detail (cold + warm start) on API 31/32 and 34.
 - [ ] **2.6 Worker.** `NotifiedEarthquakeRepository` (Room, prune), `CheckForNewAlertsUseCase` (SPEC §5.2),
   thin `AlertCheckWorker` (`@HiltWorker`), `AlertWorkScheduler` (unique periodic, UPDATE policy, network
-  constraint, schedule on app start/settings change, cancel on disable).
+  constraint, schedule on app start/settings change, cancel on disable). From 2.4: settings changes go through
+  `UpdateAlertSettingsUseCase` — schedule / cancel from there after a saved change.
   *Done when:* use case unit tests pass; `dumpsys jobscheduler` shows the job; "Run check now" logs
   `background_check_completed`; reboot keeps the schedule.
 - [ ] **2.7 Onboarding.** Welcome (with not-an-early-warning disclaimer) → alert setup (reuses 2.3) → notification
@@ -348,3 +364,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 15:15–15:30 | ~15m | 2.1 Alert domain: AlertConfig, pure AlertMatcher with criteria object (ADR-026); 23 unit tests covering every SPEC §5.1 rule and its boundaries |
 | 2026-09-26 | 15:27–15:42 | ~15m | 2.2 City search: country list, Geocoder wrapper with API 33 split, repository rules tested with a fake geocoder (ADR-027); fixed country-level results found on the emulator; 26 unit tests; verified on API 31 and 34 incl. airplane mode |
 | 2026-09-26 | 15:44–16:08 | ~24m | 2.3 Area components: threshold slider, area selector (country picker, city search, selected city, radius, whole-world warning), shared CitySearchViewModel with device-region default (ADR-028); 39 unit + 9 Compose UI tests; verified on API 31 and 34 incl. TR, dark, offline, landscape |
+| 2026-09-26 | 16:19–16:34 | ~15m | 2.4 Alert settings screen: summary switch, threshold, area, status (permission + last check), auto-save with new baseline and snackbar, analytics from the settings difference (ADR-029); declared POST_NOTIFICATIONS after the emulator showed it missing; 18 unit + 6 Compose UI tests; verified end to end on API 31 and 34 |

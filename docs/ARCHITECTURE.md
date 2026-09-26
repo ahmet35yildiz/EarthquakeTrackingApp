@@ -153,6 +153,12 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   reported back as a new `AreaSelection`; `toAlertAreaOrNull()` is null while "Near a city" has no city yet.
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
 
+- Alert settings screen (ADR-029): `AlertSettingsViewModel` combines `ObserveAlertSettingsUseCase` (settings + last
+  check), the on-screen `AreaSelection` draft and the notification permission (re-read on resume). Every change goes
+  through `UpdateAlertSettingsUseCase` (mutex, reads the stored settings, saves with a new baseline only when
+  something changed, returns previous + updated); the ViewModel logs `toAnalyticsEvents(SETTINGS)` of that update and
+  shows a "saved" snackbar.
+
 ### 4.4 Earthquake detail
 - `EarthquakeDetailRoute(earthquakeId, isFromNotification)` (navigation) → `EarthquakeDetailEntry` →
   `EarthquakeDetailViewModel`, which receives the id and the analytics source through Hilt assisted injection

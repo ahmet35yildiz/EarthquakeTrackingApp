@@ -134,4 +134,21 @@
     <string name="action_change">Değiştir</string>
     <string name="action_cancel">Vazgeç</string>
     <string name="action_close">Kapat</string>
+
+    <string name="alerts_switch_title">Deprem bildirimleri</string>
+    <string name="alerts_summary_world">Dünyanın her yerindeki M%1$s+ depremler için bildirim alırsın.</string>
+    <string name="alerts_summary_city">%3$s çevresinde %2$d km içindeki M%1$s+ depremler için bildirim alırsın.</string>
+    <string name="alerts_summary_off">Bildirimler kapalı. Büyüklük ve bölge seçimin deprem listesini filtrelemeye devam eder.</string>
+    <string name="alert_status_title">Durum</string>
+    <string name="notifications_allowed">Bildirimlere izin verildi</string>
+    <string name="notifications_blocked">Bildirim izni kapalı</string>
+    <string name="notifications_blocked_message">Bildirimlere izin verene kadar QuakeAlert uyarı gösteremez.</string>
+    <string name="action_open_settings">Ayarları aç</string>
+    <string name="last_checked">Son kontrol: %1$s</string>
+    <string name="last_checked_never">Henüz arka plan kontrolü yapılmadı</string>
+    <plurals name="alert_check_interval_info">
+        <item quantity="one">QuakeAlert yeni depremleri yaklaşık %d dakikada bir kontrol eder. Bildirimler depremden birkaç dakika sonra gelebilir.</item>
+        <item quantity="other">QuakeAlert yeni depremleri yaklaşık %d dakikada bir kontrol eder. Bildirimler depremden birkaç dakika sonra gelebilir.</item>
+    </plurals>
+    <string name="alert_settings_saved">Alarm ayarları kaydedildi</string>
 </resources>

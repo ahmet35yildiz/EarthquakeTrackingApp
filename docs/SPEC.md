@@ -106,7 +106,8 @@ publication delay + background check interval). The app says this explicitly in 
   - Radius options: **50 / 100 / 250 / 500 / 1000 km**, default **250 km**.
 - Notification permission status row with "Open settings" when denied.
 - Last background check time ("Last checked 6 min ago") for transparency.
-- Changing threshold or area resets the alert baseline (see 5.2) so old events never trigger notifications.
+- Every saved change (switch, threshold, area) is stored immediately and resets the alert baseline (see 5.1) so
+  older events never trigger notifications.
 
 ### 4.5 Settings (tab "Settings")
 - Language: `System default` + every language the app ships (generated automatically), applied instantly.

@@ -146,4 +146,21 @@
     <string name="action_change">Change</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_close">Close</string>
+
+    <string name="alerts_switch_title">Earthquake alerts</string>
+    <string name="alerts_summary_world">You\'ll be notified about M%1$s+ earthquakes anywhere in the world.</string>
+    <string name="alerts_summary_city">You\'ll be notified about M%1$s+ earthquakes within %2$d km of %3$s.</string>
+    <string name="alerts_summary_off">Alerts are off. Your magnitude and area still filter the earthquake list.</string>
+    <string name="alert_status_title">Status</string>
+    <string name="notifications_allowed">Notifications allowed</string>
+    <string name="notifications_blocked">Notification permission is off</string>
+    <string name="notifications_blocked_message">QuakeAlert can\'t show alerts until you allow notifications.</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="last_checked">Last checked %1$s</string>
+    <string name="last_checked_never">No background check yet</string>
+    <plurals name="alert_check_interval_info">
+        <item quantity="one">QuakeAlert checks for new earthquakes about every minute. Alerts can arrive a few minutes after an earthquake.</item>
+        <item quantity="other">QuakeAlert checks for new earthquakes about every %d minutes. Alerts can arrive a few minutes after an earthquake.</item>
+    </plurals>
+    <string name="alert_settings_saved">Alert settings saved</string>
 </resources>
