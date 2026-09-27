@@ -428,8 +428,16 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   launcher, landscape list with the rail (2+ cards), Alerts in landscape, font scale 2.0 (list, Alerts, Settings,
   detail, tab label "Earthqua…"), dark mode (list, developer tools, event log); API 31: icon, landscape with the rail
   next to the 3-button navigation.
-- [ ] **3.4 Instrumented tests.** Compose UI tests for list states, onboarding happy path, alert settings;
+- [x] **3.4 Instrumented tests.** Compose UI tests for list states, onboarding happy path, alert settings;
   worker test with fakes.
+  *Result:* the list states, alert settings and onboarding pages already had Compose UI tests (1.5, 2.4, 2.7); added
+  what was missing: Hilt instrumented setup (`HiltTestRunner`, `@TestInstallIn` in-memory Room, per-test DataStore,
+  `FakeUsgsApi`) (ADR-041); `OnboardingFlowTest` end to end through `MainActivity` (first launch → welcome → setup →
+  notifications → Finish → list from the fake USGS, onboarding flag + baseline saved, periodic check enqueued; a
+  completed onboarding opens on the list); `AlertCheckWorkerTest` with `HiltWorkerFactory`, fake USGS and notifier
+  (skipped before settings, notified once over two runs, older than the baseline ignored, network → retry, parsing →
+  failure, analytics recorded). Template `ExampleInstrumentedTest` removed. Full suites: 361 unit, 77/77 instrumented
+  on API 31 and 34.
 - [ ] **3.5 Full QA matrix.** Every item of `docs/TESTING.md` §3 and the scenarios of §4 on API 31/32 and API 34/35; fix findings.
 
 ## Phase 4 — Documentation and delivery
@@ -492,3 +500,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 21:10–21:22 | ~12m | 3.1 follow-up: developer tools moved to their own screen behind a Settings entry, alert testing card renamed (ADR-039); +4 Compose UI tests; verified on API 34 |
 | 2026-09-26 | 21:22–21:34 | ~12m | 3.2 Event log: eventlog feature over the analytics table, filter / share / clear with confirmation, live list (ADR-039); 12 unit + 9 instrumented tests; verified on API 31 and 34 incl. rotation, share sheet, TR |
 | 2026-09-26 | 21:35–22:01 | ~26m | 3.3 Polish: adaptive launcher icon, scrolling list controls + navigation rail for landscape (ADR-040), copy review EN/TR, heading semantics, one-line labels at large font scale; verified on API 31 and 34 incl. font scale 2.0 and dark mode |
+| 2026-09-26 | 22:02–22:19 | ~17m | 3.4 Instrumented tests: Hilt test runner + isolated storage and fake USGS (ADR-041), onboarding end-to-end through MainActivity, AlertCheckWorker with fakes; 77/77 on API 31 and 34 |

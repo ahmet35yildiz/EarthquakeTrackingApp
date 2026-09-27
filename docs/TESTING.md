@@ -17,8 +17,20 @@
 Fakes are preferred over mocks for repositories and the clock (`FakeClock`), so tests read like specifications.
 
 ### Instrumented tests (`app/src/androidTest`)
-- Compose UI tests: list states render, filter chips, onboarding happy path, alert settings interactions.
-- Worker: `TestListenableWorkerBuilder` with fakes (Hilt test module) — returns success/retry correctly.
+- Runner: `HiltTestRunner` (starts `HiltTestApplication`). Every `@HiltAndroidTest` gets, through `@TestInstallIn`
+  modules in `testing/`: an in-memory Room database, a fresh DataStore file and `FakeUsgsApi` instead of Retrofit
+  (no network, no leftover state between tests). Tests that need them replace the notifier and the permission check
+  with `@UninstallModules` + `@BindValue`, and initialise a test WorkManager with `HiltWorkerFactory` (the test
+  application is not a `Configuration.Provider`).
+- Compose UI tests (screen composables with fixed UI states): list states, filter chips, sort, detail, alert
+  settings interactions, area selector, onboarding pages, settings, developer tools, event log.
+- End to end (`navigation/OnboardingFlowTest`, real `MainActivity` and ViewModels): first launch → welcome → setup →
+  notifications → Finish → earthquake list from the fake USGS, settings + baseline saved, periodic check enqueued;
+  a completed onboarding opens straight on the list.
+- Worker (`AlertCheckWorkerTest`, `TestListenableWorkerBuilder` + `HiltWorkerFactory`, fake USGS and notifier):
+  skipped before settings are saved, a new matching earthquake is notified once across two runs, an earthquake
+  older than the baseline is not, network error → retry, unreadable response → failure, analytics recorded.
+- Room DAOs and the WorkManager scheduler against the real libraries.
 
 ## 2. Emulator matrix (manual + instrumented)
 

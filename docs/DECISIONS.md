@@ -484,3 +484,17 @@ Add a new record (next number) whenever a significant decision is made; never re
   (lint `ConfigurationScreenWidthHeight`: rounded and inset-dependent).
 - **Consequences:** Landscape shows two to three cards instead of one. After changing a filter the list starts at the
   top again (the list state is keyed on the options), so the controls are visible right after a change.
+
+## ADR-041 — Instrumented tests run on Hilt with isolated storage and a fake USGS
+- **Context:** The onboarding happy path and the worker need the real object graph (ViewModels, use cases, DataStore,
+  Room, WorkManager) to be meaningful, but must not depend on the network or on state left by earlier runs.
+- **Decision:** A custom `HiltTestRunner` starts `HiltTestApplication`. `@TestInstallIn` modules replace, for every
+  Hilt test, the database (in-memory), the DataStore (new file per test component) and the USGS API (`FakeUsgsApi`,
+  injectable to set responses or failures). Per test class, `@UninstallModules` + `@BindValue` swap the notifier and
+  the notification permission check. Tests initialise a test WorkManager with the injected `HiltWorkerFactory`. The
+  end-to-end test launches `MainActivity` with `ActivityScenario` after this setup, so preferences are prepared first.
+- **Alternatives:** A mock web server (more setup, tests the HTTP layer already covered by unit tests); per-test
+  `@UninstallModules` for storage too (repeated in every class); constructing ViewModels by hand in UI tests (skips
+  Hilt wiring and navigation, which is what the end-to-end test is for).
+- **Consequences:** Existing plain Compose and DAO tests are unaffected. `QuakeAlertApplication.onCreate` (channel,
+  schedule sync) does not run in instrumented tests; the flows under test do not depend on it.
