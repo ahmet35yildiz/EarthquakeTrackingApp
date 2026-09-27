@@ -39,7 +39,7 @@ must be verified.
 
 | AVD | API | Why | Status |
 |---|---|---|---|
-| `Pixel_API_31` (to create) | 31 or 32, Google APIs, arm64 | **Pre-33 paths:** blocking Geocoder, no runtime notification permission, AppCompat-stored locale | installed manually by the user when needed |
+| `Pixel_6` | 31, Google APIs, arm64 | **Pre-33 paths:** blocking Geocoder, no runtime notification permission, AppCompat-stored locale | ready |
 | `Pixel_7_API_34` (exists) | 34 | **33+ paths:** async Geocoder, `POST_NOTIFICATIONS`, system per-app language | ready |
 | `Pixel_9_API_35` (exists) | 35 | Latest behaviour, edge-to-edge | ready |
 | API 26 (optional) | 26 | minSdk smoke test | optional |
@@ -47,6 +47,9 @@ must be verified.
 Emulators must use a **Google APIs** image (Geocoder backend needs Google Play services).
 
 ## 3. Manual QA checklist (run on API 31/32 and API 34/35)
+Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every item and the §4 scenarios passed
+(summary notification tap: covered by tests, not repeated by hand); findings and fixes in `docs/PLAN.md` task 3.5.
+
 - [ ] Fresh install → onboarding → permission dialog (34/35) / no dialog (31/32) → list.
 - [ ] Deny permission → app works, banner in Alerts + Settings, "Open settings" works.
 - [ ] City search: "Izmir" in Türkiye, "Tokyo" in Japan, nonsense text (empty state), airplane mode (error state).
@@ -61,7 +64,10 @@ Emulators must use a **Google APIs** image (Geocoder backend needs Google Play s
 - [ ] Developer → Simulate alert → notification appears → tap → detail; second simulate of same event → no duplicate.
 - [ ] Developer → Run check now → `background_check_completed` in Event log.
 - [ ] Periodic work scheduled: `adb shell dumpsys jobscheduler | grep quakealert`.
-- [ ] Doze: `adb shell dumpsys deviceidle force-idle` → work deferred; `adb shell dumpsys deviceidle unforce` → runs.
+- [ ] Doze: screen off (`input keyevent KEYCODE_SLEEP`), `adb shell dumpsys deviceidle force-idle` → the periodic
+      job (`Required constraints: TIMING_DELAY CONNECTIVITY`) shows `DEVICE_NOT_DOZING` / `CONNECTIVITY` unsatisfied;
+      `adb shell dumpsys deviceidle unforce` → both satisfied again, only the timing delay remains. A scheduled
+      developer simulation is not a Doze probe: it has no constraints and WorkManager may run it in-process.
 - [ ] Reboot emulator → periodic work still scheduled.
 - [ ] Event log shows expected events for the flows above; no coordinates or city names in params.
 
@@ -99,7 +105,9 @@ same alert again" must post nothing. Scheduled runs usually arrive within a minu
 
 ### Background check
 - Job present (and after a reboot): `adb shell dumpsys jobscheduler | grep -A 12 "com.ahmetyildiz.quakealert/androidx.work"`
-  (network constraint visible under `Network type`).
+  (network constraint visible under `Network type`). API 34+ prints the job as
+  `JOB androidx.work.systemjobscheduler:u0aNNN/N: … @androidx.work.systemjobscheduler@com.ahmetyildiz.quakealert/…`
+  (namespace, no `#`); right after a reboot give the system a few seconds before reading it.
 - Enabling alerts (or saving settings) runs a first check at once → `background_check_completed` in Logcat `Analytics`.
 - A forced run of the periodic job (`adb shell cmd jobscheduler run -f [-n androidx.work.systemjobscheduler]
   com.ahmetyildiz.quakealert <jobId>`, the namespace on API 34+) is postponed by WorkManager before its time; use

@@ -81,7 +81,8 @@ class OnboardingFlowTest {
 
     @Test
     fun firstLaunchWalksThroughOnboardingIntoTheEarthquakeList() {
-        ActivityScenario.launch(MainActivity::class.java).use {
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            val string: (Int) -> String = { resId -> scenario.string(resId) }
             awaitText(string(R.string.onboarding_welcome_title))
             composeRule.onNodeWithText(string(R.string.action_get_started)).performClick()
             awaitText(string(R.string.onboarding_setup_title))
@@ -100,9 +101,9 @@ class OnboardingFlowTest {
     @Test
     fun completedOnboardingOpensStraightOnTheEarthquakeList() {
         runBlocking { preferencesRepository.setOnboardingCompleted(true) }
-        ActivityScenario.launch(MainActivity::class.java).use {
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             awaitText(PLACE)
-            composeRule.onNodeWithText(string(R.string.onboarding_welcome_title)).assertDoesNotExist()
+            composeRule.onNodeWithText(scenario.string(R.string.onboarding_welcome_title)).assertDoesNotExist()
         }
     }
 
@@ -115,7 +116,11 @@ class OnboardingFlowTest {
     private fun periodicCheck(): List<WorkInfo> =
         WorkManager.getInstance(context).getWorkInfosForUniqueWork(AlertWorkScheduler.PERIODIC_CHECK_WORK_NAME).get()
 
-    private fun string(resId: Int): String = context.getString(resId)
+    private fun ActivityScenario<MainActivity>.string(resId: Int): String {
+        var text = ""
+        onActivity { activity -> text = activity.getString(resId) }
+        return text
+    }
 
     private companion object {
         const val EVENT_ID: String = "test0002"

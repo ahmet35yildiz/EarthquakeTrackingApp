@@ -195,6 +195,8 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
 - Maps (`geo:` intent), USGS page (browser) and share (chooser) are launched by the entry composable; the ViewModel
   only logs `detail_action_clicked`. A missing handler app shows a snackbar instead of crashing.
 - The bottom bar is shown only on top-level destinations; pushed screens (detail) use the full height.
+- The list's header (`EarthquakeListTopBar`) is a plain row with a 64 dp minimum height instead of a `TopAppBar`, so
+  its two-line title block grows with the font scale instead of overflowing into the status bar (found in 3.5).
 - The list's controls (stale-data banner, filter chips, count + sort) are the first item of the `LazyColumn`, so they
   scroll away with the list and landscape / large font scales keep room for the cards (ADR-040).
 

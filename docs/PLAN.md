@@ -438,7 +438,24 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   (skipped before settings, notified once over two runs, older than the baseline ignored, network → retry, parsing →
   failure, analytics recorded). Template `ExampleInstrumentedTest` removed. Full suites: 361 unit, 77/77 instrumented
   on API 31 and 34.
-- [ ] **3.5 Full QA matrix.** Every item of `docs/TESTING.md` §3 and the scenarios of §4 on API 31/32 and API 34/35; fix findings.
+- [x] **3.5 Full QA matrix.** Every item of `docs/TESTING.md` §3 and the scenarios of §4 on API 31/32 and API 34/35; fix findings.
+  *Result:* full run on `Pixel_6` (API 31) and `Pixel_7_API_34` from a fresh install, driven over adb with screenshots,
+  Logcat `Analytics`, `dumpsys` and a copy of the Room database. All §3 items pass on both: onboarding (dialog on 34,
+  none on 31), denied / blocked notifications (banner in Alerts + Settings, Open settings → system page; on 31 blocked
+  from the system app page), whole-world warning, city search (İzmir in Türkiye/Turkey, Tokyo in Japan, nonsense →
+  "No city named …", airplane mode → network error + `city_search_failed`), EN ↔ TR kept after a restart and listed on
+  the system language page (34), list (refresh, filters, nearest sort with distances, offline banner over 325 cached
+  earthquakes, dark, 1.5×, rotation), detail actions (maps, USGS, share + events), deep links (cold / warm / unknown
+  id), simulate → notification → detail + no duplicate, run check now → event log, periodic job present, Doze
+  (periodic job's `DEVICE_NOT_DOZING` / `CONNECTIVITY` unsatisfied while idle, satisfied after), reboot keeps the job,
+  no coordinates or city names in 70 / 69 stored events. §4: warm, cold and restored notification taps with the
+  expected events on both; worker in a killed process posts Turkish text on API 31. Finding fixed: at font scale 1.5
+  the list's fixed-height top bar overflowed into the status bar → growing header row (ADR-040 update). Test fixed:
+  `OnboardingFlowTest` read strings from the system locale and failed when the app language was Turkish → strings
+  from the launched activity. Notes (no change): a pull during a running refresh is ignored; an external deep link
+  logs `source=list`; a scheduled developer simulation can run during forced Doze (no constraints, WorkManager runs it
+  in-process); the summary notification tap was not reproduced by hand (tests + 2.5). TESTING.md updated (AVD table,
+  Doze reading, API 34 job format, last run). Full suites: 361 unit, 77/77 instrumented on API 31 and 34.
 
 ## Phase 4 — Documentation and delivery
 - [ ] **4.1 README (Turkish) complete.** All sections filled (see README template), screenshots in `docs/images/`.
@@ -501,3 +518,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 21:22–21:34 | ~12m | 3.2 Event log: eventlog feature over the analytics table, filter / share / clear with confirmation, live list (ADR-039); 12 unit + 9 instrumented tests; verified on API 31 and 34 incl. rotation, share sheet, TR |
 | 2026-09-26 | 21:35–22:01 | ~26m | 3.3 Polish: adaptive launcher icon, scrolling list controls + navigation rail for landscape (ADR-040), copy review EN/TR, heading semantics, one-line labels at large font scale; verified on API 31 and 34 incl. font scale 2.0 and dark mode |
 | 2026-09-26 | 22:02–22:19 | ~17m | 3.4 Instrumented tests: Hilt test runner + isolated storage and fake USGS (ADR-041), onboarding end-to-end through MainActivity, AlertCheckWorker with fakes; 77/77 on API 31 and 34 |
+| 2026-09-27 | 13:38–14:29 | ~51m | 3.5 Full QA matrix on API 31 and 34 (all §3 items + §4 scenarios); fixed list header overflow at large font (ADR-040 update) and a locale-dependent end-to-end test; TESTING.md updated |

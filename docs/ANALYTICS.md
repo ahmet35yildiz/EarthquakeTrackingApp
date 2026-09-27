@@ -38,7 +38,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `earthquake_list_refreshed` | `trigger` = initial \| pull \| stale (pull = any user-started refresh: pull, refresh button, retry), `result` = success \| failure, `count` (cached earthquakes after the refresh) | Refresh finished |
 | `list_filter_changed` | `filter` = region \| magnitude, `value` (same values as above) | Chip tapped |
 | `list_sort_changed` | `sort` = newest_first \| largest_first \| nearest_first | Sort order picked |
-| `earthquake_detail_viewed` | `source` = list \| notification, `magnitude` (omitted when unknown) | Detail loaded; once per opened detail (not for not-found / error, not again after rotation) |
+| `earthquake_detail_viewed` | `source` = list \| notification (an external `quakealert://` link counts as list; the app only publishes it in notifications), `magnitude` (omitted when unknown) | Detail loaded; once per opened detail (not for not-found / error, not again after rotation) |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
 | `alert_notification_posted` | `event_id` (`summary` for the summary), `magnitude` (largest for the summary), `batch_size` | Once per notification shown (up to 3 individual ones, or 1 summary) |
 | `alert_notification_suppressed` | `reason` = permission_denied | Match found but cannot notify |

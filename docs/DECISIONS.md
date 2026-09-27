@@ -484,6 +484,9 @@ Add a new record (next number) whenever a significant decision is made; never re
   (lint `ConfigurationScreenWidthHeight`: rounded and inset-dependent).
 - **Consequences:** Landscape shows two to three cards instead of one. After changing a filter the list starts at the
   top again (the list state is keyed on the options), so the controls are visible right after a change.
+- **Update (3.5):** the list header no longer uses the fixed-height `TopAppBar`: at font scale 1.5 on API 31 its
+  title and two-line subtitle overflowed upwards into the status bar. A row with a 64 dp minimum height keeps the
+  normal look and grows with the text.
 
 ## ADR-041 — Instrumented tests run on Hilt with isolated storage and a fake USGS
 - **Context:** The onboarding happy path and the worker need the real object graph (ViewModels, use cases, DataStore,
