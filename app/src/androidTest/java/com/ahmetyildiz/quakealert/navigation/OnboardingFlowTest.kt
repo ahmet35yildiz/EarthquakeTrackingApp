@@ -23,6 +23,7 @@ import com.ahmetyildiz.quakealert.core.di.NotificationModule
 import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferences
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferencesRepository
+import com.ahmetyildiz.quakealert.core.ui.format.formatPlace
 import com.ahmetyildiz.quakealert.features.alerts.worker.AlertWorkScheduler
 import com.ahmetyildiz.quakealert.testing.FakeUsgsApi
 import com.ahmetyildiz.quakealert.testing.UsgsTestData
@@ -89,7 +90,7 @@ class OnboardingFlowTest {
             composeRule.onNodeWithText(string(R.string.action_next)).performClick()
             awaitText(string(R.string.notifications_allowed))
             composeRule.onNodeWithText(string(R.string.action_finish)).performClick()
-            awaitText(PLACE)
+            awaitText(scenario.displayedPlace())
             composeRule.onNode(hasText(string(R.string.tab_earthquakes)) and isHeading()).assertIsDisplayed()
         }
         val preferences: UserPreferences = runBlocking { preferencesRepository.userPreferences.first() }
@@ -102,7 +103,7 @@ class OnboardingFlowTest {
     fun completedOnboardingOpensStraightOnTheEarthquakeList() {
         runBlocking { preferencesRepository.setOnboardingCompleted(true) }
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-            awaitText(PLACE)
+            awaitText(scenario.displayedPlace())
             composeRule.onNodeWithText(scenario.string(R.string.onboarding_welcome_title)).assertDoesNotExist()
         }
     }
@@ -115,6 +116,12 @@ class OnboardingFlowTest {
 
     private fun periodicCheck(): List<WorkInfo> =
         WorkManager.getInstance(context).getWorkInfosForUniqueWork(AlertWorkScheduler.PERIODIC_CHECK_WORK_NAME).get()
+
+    private fun ActivityScenario<MainActivity>.displayedPlace(): String {
+        var text = ""
+        onActivity { activity -> text = formatPlace(PLACE, activity.resources) }
+        return text
+    }
 
     private fun ActivityScenario<MainActivity>.string(resId: Int): String {
         var text = ""

@@ -12,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.ui.format.formatPlace
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.EarthquakesConfig
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
@@ -55,7 +56,7 @@ class EarthquakeListScreenTest {
         earthquake = Earthquake(
             id = "us1",
             magnitude = Magnitude(value = 4.6, type = "mb"),
-            place = "12 km SW of Seferihisar, Turkey",
+            place = PLACE,
             time = now.minus(Duration.ofHours(3)),
             location = GeoPoint(38.1, 26.8),
             depthKm = 9.0,
@@ -80,7 +81,7 @@ class EarthquakeListScreenTest {
         )
         val depth: String = string(R.string.earthquake_depth, "9")
         val timeAndDepth: String = "${plural(R.plurals.relative_time_hours_ago, 3)} · $depth"
-        composeRule.onNodeWithText("12 km SW of Seferihisar, Turkey").assertIsDisplayed()
+        composeRule.onNodeWithText(displayedPlace()).assertIsDisplayed()
         composeRule.onNodeWithText(timeAndDepth).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.earthquake_distance_from_city, "41", "Izmir")).assertIsDisplayed()
     }
@@ -109,7 +110,7 @@ class EarthquakeListScreenTest {
             itemsState(nearCityName = null)
                 .copy(options = EarthquakeListOptions(sortOrder = EarthquakeSortOrder.LARGEST_FIRST)),
         )
-        composeRule.onNodeWithText("12 km SW of Seferihisar, Turkey").assertIsDisplayed()
+        composeRule.onNodeWithText(displayedPlace()).assertIsDisplayed()
         composeRule.onNodeWithText(dayLabelOf(izmirEarthquake.earthquake.time)).assertDoesNotExist()
         composeRule.onAllNodesWithText(plural(R.plurals.earthquake_count, 1)).assertCountEquals(1)
     }
@@ -123,7 +124,7 @@ class EarthquakeListScreenTest {
                 cachedCount = 1,
             ),
         )
-        composeRule.onNodeWithText("12 km SW of Seferihisar, Turkey").performClick()
+        composeRule.onNodeWithText(displayedPlace()).performClick()
         assertEquals(listOf("us1"), clickedIds)
     }
 
@@ -218,6 +219,8 @@ class EarthquakeListScreenTest {
         return string(if (isToday) R.string.day_today else R.string.day_yesterday)
     }
 
+    private fun displayedPlace(): String = formatPlace(PLACE, composeRule.activity.resources)
+
     private fun string(id: Int, vararg args: Any): String = composeRule.activity.getString(id, *args)
 
     private fun plural(id: Int, count: Int): String = composeRule.activity.resources.getQuantityString(id, count, count)
@@ -232,5 +235,6 @@ class EarthquakeListScreenTest {
 
     private companion object {
         val DAYS: Int = EarthquakesConfig.RECENT_PERIOD.toDays().toInt()
+        const val PLACE: String = "12 km SW of Seferihisar, Turkey"
     }
 }

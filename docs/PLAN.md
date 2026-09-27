@@ -468,6 +468,29 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   updated, +2 UI tests (day sections, flat list), +29 unit tests (category mapping, day grouping). Verified on API 34
   (light, dark, Turkish) and API 31 (onboarding). Full suites: 390 unit, 79/79 instrumented on API 31 and 34, lint
   clean.
+- [x] **3.7 Follow-up polish.** "Biggest first" label; app icon on the welcome page; theme choice in Settings;
+  USGS place text in the app language.
+  *Result:* welcome page shows the launcher icon layers masked to a circle (ADR-042 update). Theme: System / Light /
+  Dark in the shared `ChoiceToggle`, AppCompat night mode + SharedPreferences, applied at start-up, `theme_changed`
+  event (ADR-043). Place text: parsed into distance / direction / place, rebuilt per language with a trailing country
+  translated through the platform country list (+ alias table for USGS spellings), stored text unchanged (ADR-044);
+  used in list, detail, share, map label and notifications. Found on the emulator: Turkish lines broke between
+  "124 km" and the direction → non-breaking spaces; API 34 spells Turkey "Türkiye" in English → UI tests read the
+  expected text from `formatPlace`. +23 unit tests (place parsing, country names, theme ViewModel, event), +4
+  instrumented (place formatting EN/TR, theme toggle). Verified on API 34 (theme switch and restart, Turkish list,
+  biggest first) and API 31 (theme kept after restart). Full suites: 413 unit, 83/83 instrumented on API 31 and 34,
+  lint clean.
+
+- [x] **3.8 Theme picker, capitalized directions, region names.** Theme picked like the language; Turkish
+  directions start with a capital; USGS region-style texts translated (patterns + dictionary).
+  *Result:* language and theme share `SelectedValueRow` + `SingleChoiceDialog`, and both default options read
+  "System default"; the pill toggle went back to the
+  alerts feature (ADR-042/043 updated). English now shows the USGS text unchanged. Region phrases ("south of X",
+  "northern X", "X region", "off the (east) coast of X", "X Islands / Island") and a 44-name dictionary chosen from
+  one year of USGS data (all magnitudes, 138,695 events): in Turkish 3,418 of 3,434 region-style events read
+  differently, checked on a device against all 148 distinct texts (ADR-044 rewritten). +RegionPhrase unit tests,
+  place formatting tests extended, theme dialog UI test. Full suites: 419 unit, 83/83 instrumented on API 31 and 34,
+  lint clean.
 
 ## Phase 4 — Documentation and delivery
 - [x] **4.1 README (Turkish) complete.** All sections filled, structured along the delivery requirements (how to run,
@@ -548,3 +571,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-27 | 16:45–17:08 | ~23m | 4.1 README (Turkish): all sections rewritten from the delivery requirements and the current docs; AI tools (Claude Code, Google Stitch) confirmed by the user |
 | 2026-09-27 | 17:08–17:17 | ~9m | 4.2 AI usage report: ccusage per session, scoped to this repository's sessions, duplicate check against raw logs, AI_USAGE.md completed, README AI summary |
 | 2026-09-27 | 17:45–18:24 | ~39m | 3.6 Design alignment with the UI design: severity palette + words, chip icons, day sections, detail icons, area toggle, welcome illustration, event log categories (ADR-042); 390 unit, 79/79 instrumented on API 31 and 34 |
+| 2026-09-27 | 18:24–19:15 | ~51m | 3.7 Follow-up polish: "Biggest first", app icon on the welcome page, theme choice (ADR-043), USGS place text localized on display (ADR-044); 413 unit, 83/83 instrumented on API 31 and 34 |
+| 2026-09-27 | 19:15–20:07 | ~52m | 3.8 Theme picker like the language picker, capitalized Turkish directions, USGS region names translated (patterns + 44-name dictionary from one year of data, ADR-044); 419 unit, 83/83 instrumented on API 31 and 34 |

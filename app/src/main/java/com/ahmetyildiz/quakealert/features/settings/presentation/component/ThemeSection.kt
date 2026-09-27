@@ -1,6 +1,8 @@
 package com.ahmetyildiz.quakealert.features.settings.presentation.component
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -8,66 +10,63 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.ahmetyildiz.quakealert.R
-import com.ahmetyildiz.quakealert.core.locale.AppLanguage
+import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.ui.component.SectionCard
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
 @Composable
-fun LanguageSection(
-    languages: List<AppLanguage>,
-    selectedLanguage: AppLanguage?,
-    onLanguageSelected: (AppLanguage?) -> Unit,
+fun ThemeSection(
+    selectedMode: ThemeMode,
+    onModeSelected: (ThemeMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isPickerOpen: Boolean by rememberSaveable { mutableStateOf(false) }
     SectionCard(
-        title = stringResource(R.string.settings_language_title),
-        icon = painterResource(R.drawable.ic_language),
+        title = stringResource(R.string.settings_theme_title),
+        icon = rememberVectorPainter(Icons.Rounded.Edit),
         modifier = modifier,
     ) {
         SelectedValueRow(
-            value = languageLabel(selectedLanguage),
-            onClickLabel = stringResource(R.string.settings_language_change),
+            value = stringResource(selectedMode.labelRes),
+            onClickLabel = stringResource(R.string.settings_theme_change),
             onClick = { isPickerOpen = true },
         )
     }
     if (isPickerOpen) {
         SingleChoiceDialog(
             content = SingleChoiceDialogContent(
-                title = stringResource(R.string.settings_language_dialog_title),
-                options = listOf(null) + languages,
-                selected = selectedLanguage,
-                optionLabel = { languageLabel(it) },
+                title = stringResource(R.string.settings_theme_dialog_title),
+                options = ThemeMode.entries,
+                selected = selectedMode,
+                optionLabel = { stringResource(it.labelRes) },
             ),
-            onSelected = { language ->
+            onSelected = { mode ->
                 isPickerOpen = false
-                onLanguageSelected(language)
+                onModeSelected(mode)
             },
             onDismiss = { isPickerOpen = false },
         )
     }
 }
 
-@Composable
-fun languageLabel(language: AppLanguage?): String =
-    language?.nativeName ?: stringResource(R.string.settings_language_system_default)
+private val ThemeMode.labelRes: Int
+    get() = when (this) {
+        ThemeMode.SYSTEM -> R.string.settings_theme_system
+        ThemeMode.LIGHT -> R.string.settings_theme_light
+        ThemeMode.DARK -> R.string.settings_theme_dark
+    }
 
 @PreviewLightDark
 @Composable
-private fun LanguageSectionPreview() {
+private fun ThemeSectionPreview() {
     QuakeAlertTheme {
         Surface {
-            LanguageSection(
-                languages = listOf(AppLanguage("en"), AppLanguage("tr")),
-                selectedLanguage = AppLanguage("tr"),
-                onLanguageSelected = {},
-                modifier = Modifier.padding(Spacing.large),
-            )
+            ThemeSection(selectedMode = ThemeMode.SYSTEM, onModeSelected = {}, modifier = Modifier.padding(Spacing.large))
         }
     }
 }

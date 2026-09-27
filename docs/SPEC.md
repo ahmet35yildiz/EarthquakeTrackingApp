@@ -78,11 +78,13 @@ publication delay + background check interval). The app says this explicitly in 
 - Data: last **7 days**, **M2.5+**, worldwide, fetched once per refresh and cached in Room. All filtering is local.
 - Filters (chips): Region `World | Near <city>` (second chip only when an area is set) and Magnitude
   `All (2.5+) | ≥ my threshold`.
-- Item: magnitude badge (colour and word by severity), place, relative time ("12 min ago"), depth, distance to the
+- Item: magnitude badge (colour and word by severity), place (shown in the app language: distance, direction,
+  country, region phrases and well-known oceans / ridges / island groups are translated, town names are kept —
+  ADR-044), relative time ("12 min ago"), depth, distance to the
   user's city when an area is set.
 - With `Newest first` the list is split into day sections (Today, Yesterday, then the date) with a count per day;
   other sort orders show one flat list.
-- Sort order (menu next to the count, always visible): `Newest first` (default) | `Largest first` (unknown
+- Sort order (menu next to the count, always visible): `Newest first` (default) | `Biggest first` (unknown
   magnitudes last) | `Nearest first` (only when an area is set). Ties are broken by time, newest first. Changing the
   sort or a filter scrolls back to the top; rotation keeps the position. `LazyColumn` with stable keys (event id).
 - The whole cached period is one list (no paging); see ADR-023.
@@ -113,6 +115,8 @@ publication delay + background check interval). The app says this explicitly in 
 
 ### 4.5 Settings (tab "Settings")
 - Language: `System default` + every language the app ships (generated automatically), applied instantly.
+- Theme: `System default` | `Light` | `Dark`, picked like the language (row + dialog), applied instantly and kept
+  after a restart (ADR-043).
 - About: data source attribution (USGS), "not an early-warning system" note, app version.
 - Developer tools entry below About (debug builds only) → a separate Developer tools screen with Event log,
   Simulate alert, Run check now, so the Settings tab stays short.

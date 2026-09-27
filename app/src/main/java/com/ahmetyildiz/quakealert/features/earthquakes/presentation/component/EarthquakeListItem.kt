@@ -26,6 +26,7 @@ import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
 import com.ahmetyildiz.quakealert.core.ui.component.MagnitudeBadge
 import com.ahmetyildiz.quakealert.core.ui.format.formatWholeNumber
+import com.ahmetyildiz.quakealert.core.ui.format.localizedPlace
 import com.ahmetyildiz.quakealert.core.ui.format.relativeTimeText
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
@@ -57,7 +58,7 @@ fun EarthquakeListItem(
             MagnitudeBadge(magnitude = earthquake.magnitude?.value)
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.extraSmall)) {
                 Text(
-                    text = earthquake.place ?: stringResource(R.string.earthquake_unknown_place),
+                    text = localizedPlace(earthquake.place),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,

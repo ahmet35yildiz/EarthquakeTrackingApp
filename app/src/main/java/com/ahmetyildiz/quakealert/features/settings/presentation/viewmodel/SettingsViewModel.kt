@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import com.ahmetyildiz.quakealert.BuildConfig
 import com.ahmetyildiz.quakealert.core.analytics.AnalyticsEvent
 import com.ahmetyildiz.quakealert.core.analytics.AnalyticsTracker
+import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
+import com.ahmetyildiz.quakealert.core.appearance.ThemeModeManager
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.locale.AppLanguageManager
 import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val appLanguageManager: AppLanguageManager,
+    private val themeModeManager: ThemeModeManager,
     private val notificationPermissionChecker: NotificationPermissionChecker,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
@@ -36,10 +39,19 @@ class SettingsViewModel @Inject constructor(
         mutableUiState.value = readState()
     }
 
+    fun onThemeModeSelected(mode: ThemeMode) {
+        val previousMode: ThemeMode = themeModeManager.getSelectedMode()
+        if (mode == previousMode) return
+        analyticsTracker.track(AnalyticsEvent.ThemeChanged(from = previousMode, to = mode))
+        themeModeManager.setSelectedMode(mode)
+        mutableUiState.value = readState()
+    }
+
     private fun readState(): SettingsUiState =
         SettingsUiState(
             languages = appLanguageManager.getSupportedLanguages(),
             selectedLanguage = appLanguageManager.getSelectedLanguage(),
+            selectedThemeMode = themeModeManager.getSelectedMode(),
             areNotificationsAllowed = notificationPermissionChecker.areNotificationsAllowed(),
             appVersion = AppVersion(name = BuildConfig.VERSION_NAME, code = BuildConfig.VERSION_CODE),
         )

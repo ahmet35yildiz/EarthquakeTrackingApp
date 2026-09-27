@@ -3,6 +3,8 @@ package com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel
 import com.ahmetyildiz.quakealert.BuildConfig
 import com.ahmetyildiz.quakealert.core.analytics.AnalyticsEvent
 import com.ahmetyildiz.quakealert.core.analytics.FakeAnalyticsTracker
+import com.ahmetyildiz.quakealert.core.appearance.FakeThemeModeManager
+import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.locale.FakeAppLanguageManager
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,11 +18,13 @@ class SettingsViewModelTest {
     private val english = AppLanguage("en")
     private val turkish = AppLanguage("tr")
     private val languageManager = FakeAppLanguageManager()
+    private val themeModeManager = FakeThemeModeManager()
     private val analyticsTracker = FakeAnalyticsTracker()
     private var areNotificationsAllowed: Boolean = true
     private val viewModel: SettingsViewModel by lazy {
         SettingsViewModel(
             appLanguageManager = languageManager,
+            themeModeManager = themeModeManager,
             notificationPermissionChecker = { areNotificationsAllowed },
             analyticsTracker = analyticsTracker,
         )
@@ -59,6 +63,28 @@ class SettingsViewModelTest {
         languageManager.currentLanguage = turkish
         viewModel.onLanguageSelected(turkish)
         assertEquals(0, languageManager.setCount)
+        assertTrue(analyticsTracker.events.isEmpty())
+    }
+
+    @Test
+    fun `system theme is selected by default`() {
+        assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.selectedThemeMode)
+    }
+
+    @Test
+    fun `picking a theme applies it and tracks the change`() {
+        viewModel.onThemeModeSelected(ThemeMode.DARK)
+        assertEquals(ThemeMode.DARK, themeModeManager.currentMode)
+        assertEquals(ThemeMode.DARK, viewModel.uiState.value.selectedThemeMode)
+        val expected = AnalyticsEvent.ThemeChanged(from = ThemeMode.SYSTEM, to = ThemeMode.DARK)
+        assertEquals(listOf(expected), analyticsTracker.events)
+    }
+
+    @Test
+    fun `picking the current theme changes and tracks nothing`() {
+        themeModeManager.currentMode = ThemeMode.LIGHT
+        viewModel.onThemeModeSelected(ThemeMode.LIGHT)
+        assertEquals(0, themeModeManager.setCount)
         assertTrue(analyticsTracker.events.isEmpty())
     }
 

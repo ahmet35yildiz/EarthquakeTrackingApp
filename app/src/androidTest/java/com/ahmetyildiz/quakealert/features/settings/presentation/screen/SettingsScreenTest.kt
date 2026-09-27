@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.AppVersion
@@ -30,13 +31,16 @@ class SettingsScreenTest {
     private val turkish = AppLanguage("tr")
     private val defaultState = SettingsUiState(
         languages = listOf(AppLanguage("en"), turkish),
+        selectedThemeMode = ThemeMode.DARK,
         appVersion = AppVersion(name = "1.0", code = 1),
     )
     private val selectedLanguages: MutableList<AppLanguage?> = mutableListOf()
+    private val selectedThemeModes: MutableList<ThemeMode> = mutableListOf()
     private var openNotificationSettingsCount: Int = 0
     private var openUsgsCount: Int = 0
     private val actions = SettingsActions(
         onLanguageSelected = { selectedLanguages += it },
+        onThemeModeSelected = { selectedThemeModes += it },
         onOpenNotificationSettings = { openNotificationSettingsCount++ },
         onOpenUsgsWebsite = { openUsgsCount++ },
     )
@@ -65,6 +69,18 @@ class SettingsScreenTest {
         composeRule.onNode(hasText("Türkçe") and isSelectable()).assertIsSelected()
         composeRule.onNode(hasText(string(R.string.settings_language_system_default)) and isSelectable())
             .assertIsNotSelected()
+    }
+
+    @Test
+    fun themePickerMarksTheSelectedModeAndReportsTheChoice() {
+        setContent(defaultState.copy(selectedThemeMode = ThemeMode.LIGHT))
+        composeRule.onNodeWithText(string(R.string.settings_theme_light)).performClick()
+        composeRule.onNodeWithText(string(R.string.settings_theme_dialog_title)).assertIsDisplayed()
+        composeRule.onNode(hasText(string(R.string.settings_theme_light)) and isSelectable()).assertIsSelected()
+        composeRule.onNode(hasText(string(R.string.settings_theme_system)) and isSelectable()).assertIsNotSelected()
+        composeRule.onNodeWithText(string(R.string.settings_theme_dark)).performClick()
+        assertEquals(listOf(ThemeMode.DARK), selectedThemeModes)
+        composeRule.onNodeWithText(string(R.string.settings_theme_dialog_title)).assertDoesNotExist()
     }
 
     @Test

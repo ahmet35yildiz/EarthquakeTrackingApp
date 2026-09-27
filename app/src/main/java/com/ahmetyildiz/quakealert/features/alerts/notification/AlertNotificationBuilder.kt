@@ -10,6 +10,7 @@ import com.ahmetyildiz.quakealert.core.navigation.DeepLinkConfig
 import com.ahmetyildiz.quakealert.core.notification.AlertNotificationTap
 import com.ahmetyildiz.quakealert.core.notification.NotificationChannels
 import com.ahmetyildiz.quakealert.core.notification.putAlertNotificationTap
+import com.ahmetyildiz.quakealert.core.ui.format.formatPlace
 import com.ahmetyildiz.quakealert.features.alerts.domain.AlertConfig
 import com.ahmetyildiz.quakealert.features.alerts.domain.AlertNotifier
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.EarthquakeAlert
@@ -88,7 +89,8 @@ class AlertNotificationBuilder(
             ?: context.getString(R.string.magnitude_unknown_value)
 
     private fun placeText(earthquake: Earthquake): String =
-        earthquake.place ?: context.getString(R.string.earthquake_unknown_place)
+        earthquake.place?.let { formatPlace(it, context.resources) }
+            ?: context.getString(R.string.earthquake_unknown_place)
 
     private fun timeText(earthquake: Earthquake): String =
         DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)

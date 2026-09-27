@@ -41,6 +41,7 @@ import com.ahmetyildiz.quakealert.core.ui.format.formatCoordinates
 import com.ahmetyildiz.quakealert.core.ui.format.formatLocalDateTime
 import com.ahmetyildiz.quakealert.core.ui.format.formatUtcDateTime
 import com.ahmetyildiz.quakealert.core.ui.format.formatWholeNumber
+import com.ahmetyildiz.quakealert.core.ui.format.localizedPlace
 import com.ahmetyildiz.quakealert.core.ui.format.relativeTimeText
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.DistanceFromCity
@@ -62,7 +63,7 @@ fun DetailHeaderCard(earthquake: Earthquake, now: Instant, modifier: Modifier = 
             MagnitudeBadge(magnitude = earthquake.magnitude?.value, size = MagnitudeBadgeSize.LARGE)
             Column(verticalArrangement = Arrangement.spacedBy(Spacing.extraSmall)) {
                 Text(
-                    text = earthquake.place ?: stringResource(R.string.earthquake_unknown_place),
+                    text = localizedPlace(earthquake.place),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.semantics { heading() },
                 )

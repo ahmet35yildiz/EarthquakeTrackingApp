@@ -26,9 +26,10 @@ yeni bir deprem olduğunda bildirim gönderen Android uygulaması. Veri kaynağ�
   ülke → şehir arama → yarıçap (50–1000 km, varsayılan 250 km). Her değişiklik anında kaydedilir.
 - **Arka plan kontrolü ve bildirimler:** 15 dakikada bir kontrol; en fazla 3 ayrı bildirim, daha fazlası için tek
   özet. Bildirime dokununca ilgili deprem detayı açılır.
-- **Ayarlar:** uygulama dili (sistem, English, Türkçe), bildirim izni durumu, hakkında.
+- **Ayarlar:** uygulama dili (sistem, English, Türkçe), tema (sistem, açık, koyu), bildirim izni durumu, hakkında.
 - **Geliştirici araçları (sadece debug build):** alarm simülasyonu, hemen kontrol, event log.
-- Açık ve koyu tema, yatay ekran ve büyük yazı desteği.
+- Açık ve koyu tema, yatay ekran ve büyük yazı desteği. USGS'in İngilizce yer metinleri seçili dilde gösterilir
+  (mesafe, yön, ülke, bölge ifadeleri ve bilinen okyanus/sırt/ada adları çevrilir; şehir adları olduğu gibi kalır).
 
 ## Çalıştırma
 **Gereksinimler:** Android Studio Quail 4 (2026.1.4) veya üstü (AGP 9.4 bunu gerektiriyor), JDK 17+, Android SDK 36.

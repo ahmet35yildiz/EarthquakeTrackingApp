@@ -28,6 +28,7 @@ class EventCategoryTest {
         "city_search_performed, SETTINGS",
         "city_search_failed, SETTINGS",
         "language_changed, SETTINGS",
+        "theme_changed, SETTINGS",
         "app_opened, USAGE",
         "earthquake_list_viewed, USAGE",
         "list_filter_changed, USAGE",

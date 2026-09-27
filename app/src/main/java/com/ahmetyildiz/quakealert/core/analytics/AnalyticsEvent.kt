@@ -1,5 +1,6 @@
 package com.ahmetyildiz.quakealert.core.analytics
 
+import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 
 sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = emptyMap()) {
@@ -169,6 +170,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
 
     data class LanguageChanged(val from: AppLanguage?, val to: AppLanguage?) : AnalyticsEvent(
         name = "language_changed",
+        params = mapOf("from" to from.paramValue, "to" to to.paramValue),
+    )
+
+    data class ThemeChanged(val from: ThemeMode, val to: ThemeMode) : AnalyticsEvent(
+        name = "theme_changed",
         params = mapOf("from" to from.paramValue, "to" to to.paramValue),
     )
 

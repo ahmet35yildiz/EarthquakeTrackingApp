@@ -39,7 +39,8 @@ com.ahmetyildiz.quakealert/
 │   ├── network/                     # Retrofit/OkHttp/Json setup
 │   ├── notification/                # NotificationChannels, NotificationPermissionChecker, AlertNotificationTap extras
 │   ├── navigation/                  # DeepLinkConfig (detail deep link builder), ExternalIntents (browser, notification settings)
-│   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), DeviceRegionProvider
+│   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), DeviceRegionProvider, CountryNames
+│   ├── appearance/                  # ThemeMode, ThemeModeManager (system / light / dark through AppCompat night mode)
 │   ├── error/                       # AppResult, AppError
 │   ├── time/                        # Clock abstraction (testable "now"), formatters
 │   ├── di/                          # App-wide Hilt modules (network, database, datastore, dispatchers, app scope, clock)
@@ -69,7 +70,7 @@ com.ahmetyildiz.quakealert/
   `core/preferences` because both the list (filters, distance) and alerts need them.
 - Features never import each other's screens; the `navigation` package wires all routes.
 - Onboarding lives in `alerts` because it is the alert setup flow (reuses the same threshold/area components).
-- `settings` depends on `core` only (ADR-038): `SettingsViewModel` reads `AppLanguageManager` and
+- `settings` depends on `core` only (ADR-038): `SettingsViewModel` reads `AppLanguageManager`, `ThemeModeManager` and
   `NotificationPermissionChecker` directly. Pieces used by more than one feature moved to `core` — the permission
   status row (`core/ui/component/NotificationPermissionStatus`) and the outgoing intents
   (`core/navigation/ExternalIntents`). The Settings tab only shows a "Developer tools" entry (debug builds); `DeveloperToolsScreen` (settings) is a pushed
@@ -243,6 +244,7 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
 | DataStore `user_preferences` | onboardingCompleted, alertsEnabled, threshold, area (lat, lon, city, admin, countryCode, radiusKm), alertBaselineAt, lastCheckedAt, lastRefreshedAt |
 | AppCompat locale storage | Selected app language (system-managed on API 33+, `autoStoreLocales` below) |
 | SharedPreferences `app_language` | Copy of the selected language tag, read below API 33 when no activity has loaded AppCompat's locales (worker process, ADR-034) |
+| SharedPreferences `app_theme` | Selected theme mode (system / light / dark), applied at start-up (ADR-043) |
 
 ## 6. Localization
 - Default `values/strings.xml` = English, `values-tr/strings.xml` = Turkish. Plurals for counts/relative times.
@@ -262,8 +264,10 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   from `AppLanguageManager.getSelectedLanguage()` (AppCompat's locales; below API 33 in a process without an activity,
   the stored tag — ADR-034). App bundles keep every language in the base APK (`bundle.language.enableSplit =
   false`, ADR-032) so switching the in-app language never misses resources.
-- USGS `place` text is English-only and shown as is (documented limitation); everything we render ourselves
-  (distance, dates, numbers, labels) is localized.
+- USGS `place` text is English-only; it is stored as is and localized on display when the app language is not
+  English (`formatPlace`: distance and direction, country names, region phrases and a 44-name dictionary; town
+  names kept — ADR-044). Everything else we render (distance, dates,
+  numbers, labels) is localized.
 
 ## 7. Design system
 - Custom light and dark `ColorScheme` (dynamic color **off** for a consistent brand look), typography scale, shapes,

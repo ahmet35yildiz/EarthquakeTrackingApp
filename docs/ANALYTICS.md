@@ -46,6 +46,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `background_check_completed` | `fetched`, `matched`, `notified`, `duration_ms` | Worker success |
 | `background_check_failed` | `reason` = network \| server \| parsing \| unknown | Worker failure/retry |
 | `language_changed` | `from`, `to` = language tag \| system | Language picked |
+| `theme_changed` | `from`, `to` = system \| light \| dark | Theme picked |
 | `developer_simulated_alert` | `outcome` = posted \| already_notified \| not_matched \| notifications_off \| alerts_off \| nothing_to_repeat, `scheduled` | Simulated alert delivered or rejected (debug; immediately or when the scheduled one runs) |
 | `developer_check_triggered` | – | Run check now (debug) |
 

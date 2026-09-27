@@ -1,5 +1,6 @@
 package com.ahmetyildiz.quakealert.core.analytics
 
+import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
@@ -154,6 +155,11 @@ class AnalyticsEventTest {
                 AnalyticsEvent.LanguageChanged(from = null, to = AppLanguage("tr")),
                 "language_changed",
                 "from" to "system", "to" to "tr",
+            ),
+            entry(
+                AnalyticsEvent.ThemeChanged(from = ThemeMode.SYSTEM, to = ThemeMode.DARK),
+                "theme_changed",
+                "from" to "system", "to" to "dark",
             ),
             entry(
                 AnalyticsEvent.DeveloperSimulatedAlert(SimulationOutcomeValue.NOT_MATCHED, isScheduled = true),

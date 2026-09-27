@@ -54,6 +54,7 @@ import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
 import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
 import com.ahmetyildiz.quakealert.core.ui.format.formatLocalDateTime
 import com.ahmetyildiz.quakealert.core.ui.format.formatWholeNumber
+import com.ahmetyildiz.quakealert.core.ui.format.localizedPlace
 import com.ahmetyildiz.quakealert.core.ui.format.rememberCurrentTime
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
@@ -125,7 +126,7 @@ private data class DetailIntents(
 @Composable
 private fun rememberDetailIntents(details: EarthquakeDetails): DetailIntents {
     val earthquake: Earthquake = details.earthquake
-    val place: String = earthquake.place ?: stringResource(R.string.earthquake_unknown_place)
+    val place: String = localizedPlace(earthquake.place)
     val shareText: String = shareText(earthquake, place)
     val chooserTitle: String = stringResource(R.string.share_chooser_title)
     return remember(details, shareText) {

@@ -23,29 +23,34 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ahmetyildiz.quakealert.R
-import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
 private val OPTION_MIN_HEIGHT: Dp = 48.dp
 
+data class SingleChoiceDialogContent<T>(
+    val title: String,
+    val options: List<T>,
+    val selected: T,
+    val optionLabel: @Composable (T) -> String,
+)
+
 @Composable
-fun LanguagePickerDialog(
-    languages: List<AppLanguage>,
-    selectedLanguage: AppLanguage?,
-    onLanguageSelected: (AppLanguage?) -> Unit,
+fun <T> SingleChoiceDialog(
+    content: SingleChoiceDialogContent<T>,
+    onSelected: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.settings_language_dialog_title)) },
+        title = { Text(text = content.title) },
         text = {
             Column(modifier = Modifier.selectableGroup().verticalScroll(rememberScrollState())) {
-                (listOf(null) + languages).forEach { language ->
-                    LanguageOption(
-                        label = languageLabel(language),
-                        isSelected = language == selectedLanguage,
-                        onClick = { onLanguageSelected(language) },
+                content.options.forEach { option ->
+                    ChoiceOption(
+                        label = content.optionLabel(option),
+                        isSelected = option == content.selected,
+                        onClick = { onSelected(option) },
                     )
                 }
             }
@@ -57,7 +62,7 @@ fun LanguagePickerDialog(
 }
 
 @Composable
-private fun LanguageOption(label: String, isSelected: Boolean, onClick: () -> Unit) {
+private fun ChoiceOption(label: String, isSelected: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,12 +78,16 @@ private fun LanguageOption(label: String, isSelected: Boolean, onClick: () -> Un
 
 @PreviewLightDark
 @Composable
-private fun LanguagePickerDialogPreview() {
+private fun SingleChoiceDialogPreview() {
     QuakeAlertTheme {
-        LanguagePickerDialog(
-            languages = listOf(AppLanguage("en"), AppLanguage("tr")),
-            selectedLanguage = null,
-            onLanguageSelected = {},
+        SingleChoiceDialog(
+            content = SingleChoiceDialogContent(
+                title = "Choose language",
+                options = listOf("System default", "English", "Türkçe"),
+                selected = "English",
+                optionLabel = { it },
+            ),
+            onSelected = {},
             onDismiss = {},
         )
     }

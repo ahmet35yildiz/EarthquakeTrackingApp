@@ -3,6 +3,7 @@ package com.ahmetyildiz.quakealert
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import com.ahmetyildiz.quakealert.core.appearance.ThemeModeManager
 import com.ahmetyildiz.quakealert.core.di.ApplicationScope
 import com.ahmetyildiz.quakealert.core.notification.NotificationChannels
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.SyncAlertScheduleUseCase
@@ -21,6 +22,9 @@ class QuakeAlertApplication : Application(), Configuration.Provider {
     lateinit var notificationChannels: NotificationChannels
 
     @Inject
+    lateinit var themeModeManager: ThemeModeManager
+
+    @Inject
     lateinit var syncAlertSchedule: SyncAlertScheduleUseCase
 
     @Inject
@@ -29,6 +33,7 @@ class QuakeAlertApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        themeModeManager.applySelectedMode()
         notificationChannels.register()
         applicationScope.launch { syncAlertSchedule() }
     }

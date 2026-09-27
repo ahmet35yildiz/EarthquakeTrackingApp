@@ -512,13 +512,16 @@ Add a new record (next number) whenever a significant decision is made; never re
     both themes because white text on orange was preferred; `#BF5700` is the brightest orange that keeps 4.5:1 with
     white. The compact list badge shows the severity word too (`Mod` / `Orta` as the short form of moderate).
   - List: grouped into sticky day sections ("Today", "Yesterday", then a localized weekday + date) with a count, but
-    only for `Newest first`; for `Largest` / `Nearest` sections would break the chosen order, so the list stays flat.
+    only for `Newest first`; for `Biggest` / `Nearest` sections would break the chosen order, so the list stays flat.
     Days are the device's local days. Grouping is a pure function over the already sorted list
     (`groupByDay`), done in the UI because "today" moves with the clock, not with the data.
   - Filter chips and radius chips share one colour set (`quakeAlertFilterChipColors`): filled primary when selected,
     no outline; every list chip has a fixed icon (globe, pin, waves, bell).
-  - Area mode: a pill-shaped two-option toggle (selected option raised, icon + label) with radio-button semantics.
-  - Welcome page: a drawn illustration (rings, seismogram line, icon in a raised circle) with Compose `Canvas`.
+  - Area mode: a pill-shaped toggle (selected option raised, icon + label) with radio-button semantics
+    (`ChoiceToggle` in the alerts presentation layer).
+  - Welcome page: the app icon itself (its adaptive background + foreground layers, masked to a circle like the
+    launcher shows it); a first drawn `Canvas` version was replaced at the user's request, so the welcome page and
+    the launcher show the same mark.
   - Event log: each event gets a category from its name (`EventCategory`: alert, background, settings, usage) that
     picks the icon and accent colour; parameter values use the accent colour; the time sits in a pill under the name
     so long snake_case names are not broken mid-word.
@@ -526,7 +529,47 @@ Add a new record (next number) whenever a significant decision is made; never re
     `ic_schedule` (clock), which the core set lacks.
 - **Alternatives:** Keep the palette of ADR-018 (two neighbouring bands hard to tell apart); orange with dark text
   (passes contrast more easily, but white text was preferred); day sections for every sort order (splits
-  "Largest first" into days, so the largest earthquake would not be on top); adding a Material Symbols drawable for
+  "Biggest first" into days, so the biggest earthquake would not be on top); adding a Material Symbols drawable for
   every icon in the design (more resource files for small visual gains).
 - **Consequences:** Badges are distinguishable at a glance in both themes, all pairs meet WCAG AA (≥ 4.5:1). The
   event category mapping must be extended when a new event family is added; unknown names fall back to "usage".
+
+## ADR-043 — Theme choice (system / light / dark) through AppCompat night mode
+- **Context:** Users asked to pick the theme in the app, applied at once and kept after a restart.
+- **Decision:** `ThemeModeManager` (`core/appearance`) with `AppCompatThemeModeManager`: the choice is stored in
+  SharedPreferences (`app_theme`) and applied with `AppCompatDelegate.setDefaultNightMode`, in
+  `QuakeAlertApplication.onCreate` and on every change. AppCompat recreates the activity, so Compose
+  (`isSystemInDarkTheme`), the window background and the system bar icons all follow; the Settings tab stays selected.
+  Settings shows it exactly like the language: the current value in a row that opens a radio dialog
+  (`SelectedValueRow` + `SingleChoiceDialog`, shared by both sections); a change logs `theme_changed`.
+- **Alternatives:** Keep the mode in DataStore and pass it to `QuakeAlertTheme` (no recreation, but an asynchronous
+  first read shows the wrong theme for a frame, and the window background and system bars would need separate
+  handling); `UiModeManager.setApplicationNightMode` (API 31+ only, minSdk is 26).
+- **Consequences:** Same pattern as the language (ADR-034): a small synchronous read at start-up, identical on every
+  API level (verified on API 31 and 34, including after the app is killed). Default is "System default", labelled
+  like the language's default.
+
+## ADR-044 — USGS place text is localized on display
+- **Context:** USGS returns `place` as English text with no language option. Over one year of events (all
+  magnitudes, 138,695 events) 97.5% had the form "`<distance>` km `<direction>` of `<place>`"; the other 2.5% (3,434
+  events, 148 distinct texts) are region names from a fixed list ("south of the Fiji Islands", "Iceland region",
+  "Kermadec Islands, New Zealand", "northern Mid-Atlantic Ridge").
+- **Decision:** The stored text stays unchanged; it is localized only when shown (list, detail, share and map label,
+  notifications), and not at all when the app language is English (the source text is already English).
+  - `PlaceDescription.parse` (`core/model`, pure) splits the common form into distance, one of 16 compass directions
+    and the place name; `place_near_format` rebuilds it per language (Turkish "Preston, Nevada · 28 km
+    Kuzey-Kuzeybatı", capitalized directions, non-breaking spaces so distance and direction stay on one line).
+  - Each comma-separated part of a place or region name is translated in this order: a country name through the
+    platform country list (`CountryNames`, `Locale.getISOCountries` plus a small alias table for USGS spellings);
+    a well-known name from a dictionary of 44 oceans, seas, ridges and island groups (`PlaceNameDictionary`, chosen
+    from the one-year data); a region phrase (`RegionPhrase`, `core/model`, pure): "`<side>` of X", "northern X",
+    "X region", "off the (east) coast of X", "X Islands", "X Island", whose inner name goes through the same steps.
+    Anything else (towns, states, one-off event names) is kept.
+- **Alternatives:** Reverse-geocoding every earthquake with the platform `Geocoder` (hundreds of lookups per refresh,
+  needs the network, results vary by device); an on-device translation model (tens of MB for mostly proper names);
+  translating the full USGS region list of about 750 names (complete, but a large per-language translation effort);
+  keeping the English text (the list mixed two languages).
+- **Consequences:** In Turkish, 3,418 of the 3,434 region-style events of the year read differently (checked on a
+  device against all 148 texts); the 16 unchanged ones are US state names and named events. A new language needs
+  `place_near_format`, 16 direction strings, the region phrase templates, 9 side words and the 44 dictionary names;
+  missing ones fall back to English and lint reports them.

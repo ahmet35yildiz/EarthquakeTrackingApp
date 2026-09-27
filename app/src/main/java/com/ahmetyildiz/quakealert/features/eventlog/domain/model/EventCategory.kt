@@ -18,6 +18,7 @@ enum class EventCategory {
             "alert_area_",
             "city_search_",
             "language_changed",
+            "theme_changed",
         )
 
         fun fromEventName(name: String): EventCategory = when {

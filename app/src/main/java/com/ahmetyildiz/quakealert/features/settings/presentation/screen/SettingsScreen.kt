@@ -27,6 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.navigation.browserIntent
 import com.ahmetyildiz.quakealert.core.navigation.notificationSettingsIntent
@@ -39,12 +40,14 @@ import com.ahmetyildiz.quakealert.features.settings.SettingsConfig
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.AboutSection
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.LanguageSection
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.SettingsNavigationCard
+import com.ahmetyildiz.quakealert.features.settings.presentation.component.ThemeSection
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.SettingsUiState
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 
 data class SettingsActions(
     val onLanguageSelected: (AppLanguage?) -> Unit,
+    val onThemeModeSelected: (ThemeMode) -> Unit,
     val onOpenNotificationSettings: () -> Unit,
     val onOpenUsgsWebsite: () -> Unit,
 )
@@ -66,6 +69,7 @@ fun SettingsEntry(
     }
     val actions = SettingsActions(
         onLanguageSelected = viewModel::onLanguageSelected,
+        onThemeModeSelected = viewModel::onThemeModeSelected,
         onOpenNotificationSettings = { context.startActivity(notificationSettingsIntent(context)) },
         onOpenUsgsWebsite = {
             if (!context.tryStartActivity(browserIntent(SettingsConfig.USGS_WEBSITE_URL))) {
@@ -108,6 +112,7 @@ fun SettingsScreen(
                 selectedLanguage = uiState.selectedLanguage,
                 onLanguageSelected = actions.onLanguageSelected,
             )
+            ThemeSection(selectedMode = uiState.selectedThemeMode, onModeSelected = actions.onThemeModeSelected)
             SectionCard(
                 title = stringResource(R.string.settings_notifications_title),
                 icon = painterResource(R.drawable.ic_notifications),

@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.ui.format.formatPlace
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.DistanceFromCity
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
@@ -44,7 +45,7 @@ class EarthquakeDetailScreenTest {
     private val earthquake = Earthquake(
         id = "us1",
         magnitude = Magnitude(value = 4.6, type = "mww"),
-        place = "12 km SW of Seferihisar, Turkey",
+        place = PLACE,
         time = now.minus(Duration.ofHours(3)),
         location = GeoPoint(38.21, -26.74),
         depthKm = 9.0,
@@ -63,7 +64,7 @@ class EarthquakeDetailScreenTest {
     @Test
     fun loadedStateShowsTheKeyFacts() {
         setContent(loaded(distance))
-        composeRule.onNodeWithText("12 km SW of Seferihisar, Turkey").assertIsDisplayed()
+        composeRule.onNodeWithText(displayedPlace()).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.earthquake_distance_from_city, "41", "Izmir")).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.detail_within_alert_area, 250)).assertIsDisplayed()
         val magnitude: String = string(R.string.magnitude_value, 4.6)
@@ -127,6 +128,8 @@ class EarthquakeDetailScreenTest {
             maximumFractionDigits = 2
         }.format(value)
 
+    private fun displayedPlace(): String = formatPlace(PLACE, composeRule.activity.resources)
+
     private fun string(id: Int, vararg args: Any): String = composeRule.activity.getString(id, *args)
 
     private fun setContent(uiState: EarthquakeDetailUiState) {
@@ -139,5 +142,6 @@ class EarthquakeDetailScreenTest {
 
     private companion object {
         const val FELT_REPORTS: Int = 23
+        const val PLACE: String = "12 km SW of Seferihisar, Turkey"
     }
 }
