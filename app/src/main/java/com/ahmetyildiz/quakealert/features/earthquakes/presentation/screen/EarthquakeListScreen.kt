@@ -1,6 +1,7 @@
 package com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Arrangement
@@ -18,11 +20,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -36,6 +41,7 @@ import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
 import com.ahmetyildiz.quakealert.core.ui.component.StaleDataBanner
 import com.ahmetyildiz.quakealert.core.ui.component.StateAction
 import com.ahmetyildiz.quakealert.core.ui.format.formatDataTime
+import com.ahmetyildiz.quakealert.core.ui.format.formatDayLabel
 import com.ahmetyildiz.quakealert.core.ui.format.rememberCurrentTime
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
@@ -51,11 +57,15 @@ import com.ahmetyildiz.quakealert.features.earthquakes.presentation.component.Ea
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.component.EarthquakeListItem
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.component.EarthquakeListTopBar
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.component.EarthquakeSortMenu
+import com.ahmetyildiz.quakealert.features.earthquakes.presentation.viewmodel.EarthquakeDayGroup
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.viewmodel.EarthquakeListContent
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.viewmodel.EarthquakeListUiState
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.viewmodel.EarthquakeListViewModel
+import com.ahmetyildiz.quakealert.features.earthquakes.presentation.viewmodel.groupByDay
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 data class EarthquakeListActions(
     val onRefresh: () -> Unit,
@@ -166,6 +176,9 @@ private fun ListControls(uiState: EarthquakeListUiState, actions: EarthquakeList
 @Composable
 private fun EarthquakeItems(uiState: EarthquakeListUiState, actions: EarthquakeListActions, now: Instant) {
     val listState: LazyListState = rememberSaveable(uiState.options, saver = LazyListState.Saver) { LazyListState() }
+    val dayGroups: List<EarthquakeDayGroup> = remember(uiState.earthquakes) {
+        uiState.earthquakes.groupByDay(ZoneId.systemDefault())
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = listState,
@@ -182,15 +195,66 @@ private fun EarthquakeItems(uiState: EarthquakeListUiState, actions: EarthquakeL
                 )
             }
         }
-        items(items = uiState.earthquakes, key = { it.earthquake.id }) { item ->
-            EarthquakeListItem(
-                item = item,
-                cityName = uiState.nearCityName,
-                now = now,
-                onClick = { actions.onEarthquakeClick(item.earthquake.id) },
-                modifier = Modifier.padding(horizontal = Spacing.screenMargin),
-            )
+        if (uiState.options.sortOrder == EarthquakeSortOrder.NEWEST_FIRST) {
+            dayGroupedItems(dayGroups = dayGroups, uiState = uiState, actions = actions, now = now)
+        } else {
+            earthquakeItems(earthquakes = uiState.earthquakes, uiState = uiState, actions = actions, now = now)
         }
+    }
+}
+
+private fun LazyListScope.dayGroupedItems(
+    dayGroups: List<EarthquakeDayGroup>,
+    uiState: EarthquakeListUiState,
+    actions: EarthquakeListActions,
+    now: Instant,
+) {
+    val today: LocalDate = now.atZone(ZoneId.systemDefault()).toLocalDate()
+    dayGroups.forEach { group ->
+        stickyHeader(key = DAY_HEADER_KEY_PREFIX + group.date) {
+            DayHeader(date = group.date, today = today, count = group.earthquakes.size)
+        }
+        earthquakeItems(earthquakes = group.earthquakes, uiState = uiState, actions = actions, now = now)
+    }
+}
+
+private fun LazyListScope.earthquakeItems(
+    earthquakes: List<EarthquakeWithDistance>,
+    uiState: EarthquakeListUiState,
+    actions: EarthquakeListActions,
+    now: Instant,
+) {
+    items(items = earthquakes, key = { it.earthquake.id }) { item ->
+        EarthquakeListItem(
+            item = item,
+            cityName = uiState.nearCityName,
+            now = now,
+            onClick = { actions.onEarthquakeClick(item.earthquake.id) },
+            modifier = Modifier.padding(horizontal = Spacing.screenMargin),
+        )
+    }
+}
+
+@Composable
+private fun DayHeader(date: LocalDate, today: LocalDate, count: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = Spacing.screenMargin, vertical = Spacing.small),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = formatDayLabel(date, today),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.weight(1f).semantics { heading() },
+        )
+        Text(
+            text = pluralStringResource(R.plurals.earthquake_count, count, count),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -266,6 +330,8 @@ private fun errorMessage(error: AppError?): String =
 
 private const val CONTROLS_KEY: String = "controls"
 
+private const val DAY_HEADER_KEY_PREFIX: String = "day-"
+
 private val PreviewNow: Instant = Instant.parse("2026-09-25T12:00:00Z")
 
 private val PreviewActions = EarthquakeListActions({}, {}, {}, {}, {}, {})
@@ -304,7 +370,6 @@ private fun EarthquakeListScreenItemsPreview() {
                     cachedCount = earthquakes.size,
                     options = EarthquakeListOptions(
                         region = RegionFilter.NEAR_CITY,
-                        sortOrder = EarthquakeSortOrder.NEAREST_FIRST,
                     ),
                     nearCityName = "Izmir",
                     lastRefreshedAt = PreviewNow.minus(Duration.ofMinutes(2)),

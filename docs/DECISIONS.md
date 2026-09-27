@@ -162,7 +162,7 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Alternatives:** Hand-picked dark colours (drift from the light palette); downloadable Roboto Flex via Google
   Fonts (needs Play services, async loading and a fallback).
 - **Consequences:** Both themes derive from one palette definition; every badge colour pair meets WCAG AA
-  (≥ 5.7:1). Changing the brand colour means regenerating `Color.kt` from the same palettes.
+  (≥ 4.5:1). The severity palette was later revised to follow the design more closely (ADR-042). Changing the brand colour means regenerating `Color.kt` from the same palettes.
 
 ## ADR-019 — User preferences: one DataStore repository, baseline saved with the alert settings
 - **Context:** ADR-006 puts shared preferences in `core`. The alert rules (SPEC §5.1) require that a change of alert
@@ -501,3 +501,32 @@ Add a new record (next number) whenever a significant decision is made; never re
   Hilt wiring and navigation, which is what the end-to-end test is for).
 - **Consequences:** Existing plain Compose and DAO tests are unaffected. `QuakeAlertApplication.onCreate` (channel,
   schedule sync) does not run in instrumented tests; the flows under test do not depend on it.
+
+## ADR-042 — Screens aligned with the UI design: severity palette, day groups, event categories
+- **Context:** A side-by-side review against the UI design showed drift: the "light" and "moderate" badges were two
+  similar browns, list badges had no severity word, the list had no day sections, the filter chips had no icons, the
+  area mode used plain segmented buttons, the welcome page had a single icon and the event log was monochrome.
+- **Decision:**
+  - Severity badges: minor teal, light amber (dark text), moderate burnt orange `#BF5700` (white text), strong red,
+    major purple (instead of a second dark red, so M6 and M7+ never look alike). The same moderate colour is used in
+    both themes because white text on orange was preferred; `#BF5700` is the brightest orange that keeps 4.5:1 with
+    white. The compact list badge shows the severity word too (`Mod` / `Orta` as the short form of moderate).
+  - List: grouped into sticky day sections ("Today", "Yesterday", then a localized weekday + date) with a count, but
+    only for `Newest first`; for `Largest` / `Nearest` sections would break the chosen order, so the list stays flat.
+    Days are the device's local days. Grouping is a pure function over the already sorted list
+    (`groupByDay`), done in the UI because "today" moves with the clock, not with the data.
+  - Filter chips and radius chips share one colour set (`quakeAlertFilterChipColors`): filled primary when selected,
+    no outline; every list chip has a fixed icon (globe, pin, waves, bell).
+  - Area mode: a pill-shaped two-option toggle (selected option raised, icon + label) with radio-button semantics.
+  - Welcome page: a drawn illustration (rings, seismogram line, icon in a raised circle) with Compose `Canvas`.
+  - Event log: each event gets a category from its name (`EventCategory`: alert, background, settings, usage) that
+    picks the icon and accent colour; parameter values use the accent colour; the time sits in a pill under the name
+    so long snake_case names are not broken mid-word.
+  - Icons come only from `material-icons-core` and the drawables already in the project; the one addition is
+    `ic_schedule` (clock), which the core set lacks.
+- **Alternatives:** Keep the palette of ADR-018 (two neighbouring bands hard to tell apart); orange with dark text
+  (passes contrast more easily, but white text was preferred); day sections for every sort order (splits
+  "Largest first" into days, so the largest earthquake would not be on top); adding a Material Symbols drawable for
+  every icon in the design (more resource files for small visual gains).
+- **Consequences:** Badges are distinguishable at a glance in both themes, all pairs meet WCAG AA (≥ 4.5:1). The
+  event category mapping must be extended when a new event family is added; unknown names fall back to "usage".

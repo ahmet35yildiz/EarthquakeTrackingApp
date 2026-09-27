@@ -456,14 +456,40 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   logs `source=list`; a scheduled developer simulation can run during forced Doze (no constraints, WorkManager runs it
   in-process); the summary notification tap was not reproduced by hand (tests + 2.5). TESTING.md updated (AVD table,
   Doze reading, API 34 job format, last run). Full suites: 361 unit, 77/77 instrumented on API 31 and 34.
+- [x] **3.6 Design alignment.** Compare the screens with the UI design and fix the drift the user picked: badge
+  colours and severity words, list chips with icons, day sections, detail icons, area toggle, welcome illustration,
+  colourful event log. Icons only from the existing set.
+  *Result:* ADR-042. Severity palette minor teal / light amber / moderate orange `#BF5700` with white text (user
+  request) / strong red / major purple, all ≥ 4.5:1; compact badge shows the severity word (`Mod` / `Orta`). Sticky
+  day sections (Today, Yesterday, date + count) only for `Newest first`. List and radius chips share one colour set;
+  area mode is a pill toggle with radio semantics; welcome illustration drawn with `Canvas`; event log coloured by
+  `EventCategory` (alert / background / settings / usage). Icons from `material-icons-core` and existing drawables;
+  only `ic_schedule` added (user approved). A list UI test failed because the day header repeats the count → test
+  updated, +2 UI tests (day sections, flat list), +29 unit tests (category mapping, day grouping). Verified on API 34
+  (light, dark, Turkish) and API 31 (onboarding). Full suites: 390 unit, 79/79 instrumented on API 31 and 34, lint
+  clean.
 
 ## Phase 4 — Documentation and delivery
-- [ ] **4.1 README (Turkish) complete.** All sections filled (see README template), screenshots in `docs/images/`.
-- [ ] **4.2 AI usage report.** Fill `docs/AI_USAGE.md` with real `npx ccusage@latest` output for this project's
+- [x] **4.1 README (Turkish) complete.** All sections filled, structured along the delivery requirements (how to run,
+  key decisions, out of scope, time spent, next steps, AI usage: tools, delegated work, verification, link to the
+  usage report). No screenshots (user decision, 2026-09-27).
+  *Result:* tools = Claude Code (VS Code extension) + Google Stitch (design, read through the Stitch MCP server); time
+  spent = work-log total only (user: nothing to add outside the log). `docs/AI_USAGE.md` tools table updated too.
+- [x] **4.2 AI usage report.** Fill `docs/AI_USAGE.md` with real `npx ccusage@latest` output for this project's
   sessions (`--since 20260925`, per-model breakdown).
+  *Result:* ccusage 20.0.24 has no `--breakdown` or project filter on `daily`, so the report uses
+  `session --since 20260925 --json` and keeps the sessions whose logs live in this repository's Claude Code project
+  folder (7 of 8; the excluded one ran in the home folder before the project started). One session is a resumed copy
+  of another (150 shared messages); ccusage counts each message once — confirmed against the raw logs. Result:
+  100% Claude Opus 5.5, 337.7 M tokens (98.4% cache reads, 1.49 M output), $127.21 at API list prices (subscription
+  used). `docs/AI_USAGE.md` completed (tools, delegated work, what stayed with the user, verification, per-session /
+  per-phase table); README AI section got the model summary, and a bug reference that pointed to an ADR which does
+  not record it was corrected in both files.
 - [ ] **4.3 Translate README to English** (keep it short).
 - [ ] **4.4 Final checks.** Clean clone builds; all tests pass; lint clean; wording review of every file and commit
-  message; `docs/PLAN.md` keep/remove decision with the user.
+  message; `docs/PLAN.md` keep/remove decision with the user; update the README time total with the phase 4 rows
+  of the work log; regenerate the usage report in `docs/AI_USAGE.md` (the documentation session is still running,
+  so its numbers grow); if `docs/PLAN.md` is removed, fix the links to it in `docs/AI_USAGE.md`.
 
 ## Phase 5 — Stretch (only when Phases 0–4 are done, in this order)
 - [ ] **5.1 OneTimeWork chain** (~5 min while device active) on top of periodic work (ADR-003).
@@ -519,3 +545,6 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-26 | 21:35–22:01 | ~26m | 3.3 Polish: adaptive launcher icon, scrolling list controls + navigation rail for landscape (ADR-040), copy review EN/TR, heading semantics, one-line labels at large font scale; verified on API 31 and 34 incl. font scale 2.0 and dark mode |
 | 2026-09-26 | 22:02–22:19 | ~17m | 3.4 Instrumented tests: Hilt test runner + isolated storage and fake USGS (ADR-041), onboarding end-to-end through MainActivity, AlertCheckWorker with fakes; 77/77 on API 31 and 34 |
 | 2026-09-27 | 13:38–14:29 | ~51m | 3.5 Full QA matrix on API 31 and 34 (all §3 items + §4 scenarios); fixed list header overflow at large font (ADR-040 update) and a locale-dependent end-to-end test; TESTING.md updated |
+| 2026-09-27 | 16:45–17:08 | ~23m | 4.1 README (Turkish): all sections rewritten from the delivery requirements and the current docs; AI tools (Claude Code, Google Stitch) confirmed by the user |
+| 2026-09-27 | 17:08–17:17 | ~9m | 4.2 AI usage report: ccusage per session, scoped to this repository's sessions, duplicate check against raw logs, AI_USAGE.md completed, README AI summary |
+| 2026-09-27 | 17:45–18:24 | ~39m | 3.6 Design alignment with the UI design: severity palette + words, chip icons, day sections, detail icons, area toggle, welcome illustration, event log categories (ADR-042); 390 unit, 79/79 instrumented on API 31 and 34 |

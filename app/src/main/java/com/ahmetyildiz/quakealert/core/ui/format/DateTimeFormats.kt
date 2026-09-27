@@ -1,9 +1,11 @@
 package com.ahmetyildiz.quakealert.core.ui.format
 
+import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.ahmetyildiz.quakealert.R
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -11,6 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 private const val ZONE_OFFSET_PATTERN: String = "O"
+private const val DAY_LABEL_SKELETON: String = "EEEEdMMMM"
 
 @Composable
 fun formatLocalDateTime(time: Instant): String {
@@ -28,3 +31,13 @@ private fun formatDateTime(dateTime: ZonedDateTime): String =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
         .withLocale(currentLocale())
         .format(dateTime)
+
+@Composable
+fun formatDayLabel(date: LocalDate, today: LocalDate): String =
+    when (date) {
+        today -> stringResource(R.string.day_today)
+        today.minusDays(1) -> stringResource(R.string.day_yesterday)
+        else -> DateTimeFormatter
+            .ofPattern(DateFormat.getBestDateTimePattern(currentLocale(), DAY_LABEL_SKELETON), currentLocale())
+            .format(date)
+    }

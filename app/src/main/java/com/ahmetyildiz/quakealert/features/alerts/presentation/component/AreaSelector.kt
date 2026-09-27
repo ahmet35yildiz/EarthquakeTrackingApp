@@ -1,12 +1,19 @@
 package com.ahmetyildiz.quakealert.features.alerts.presentation.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Place
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,11 +21,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
@@ -63,18 +79,68 @@ fun AreaSelector(
 
 @Composable
 private fun AreaModeSelector(mode: AreaMode, onModeSelected: (AreaMode) -> Unit) {
-    val modes: List<AreaMode> = AreaMode.entries
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-        modes.forEachIndexed { index, option ->
-            SegmentedButton(
-                selected = option == mode,
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .padding(Spacing.extraSmall)
+            .selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.extraSmall),
+    ) {
+        AreaMode.entries.forEach { option ->
+            AreaModeOption(
+                mode = option,
+                isSelected = option == mode,
                 onClick = { onModeSelected(option) },
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
-                label = { Text(text = stringResource(option.labelRes), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                modifier = Modifier.weight(1f),
             )
         }
     }
 }
+
+@Composable
+private fun AreaModeOption(mode: AreaMode, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val contentColor: Color =
+        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+    Row(
+        modifier = modifier
+            .shadow(elevation = if (isSelected) SELECTED_OPTION_ELEVATION else 0.dp, shape = CircleShape)
+            .clip(CircleShape)
+            .background(if (isSelected) MaterialTheme.colorScheme.surfaceBright else Color.Transparent)
+            .selectable(selected = isSelected, onClick = onClick, role = Role.RadioButton)
+            .heightIn(min = OPTION_MIN_HEIGHT)
+            .padding(horizontal = Spacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = mode.iconPainter(),
+            contentDescription = null,
+            tint = contentColor,
+            modifier = Modifier.size(OPTION_ICON_SIZE),
+        )
+        Text(
+            text = stringResource(mode.labelRes),
+            style = MaterialTheme.typography.labelLarge,
+            color = contentColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun AreaMode.iconPainter(): Painter = when (this) {
+    AreaMode.WHOLE_WORLD -> painterResource(R.drawable.ic_language)
+    AreaMode.NEAR_CITY -> rememberVectorPainter(Icons.Rounded.Place)
+}
+
+private val OPTION_MIN_HEIGHT: Dp = 40.dp
+
+private val OPTION_ICON_SIZE: Dp = 18.dp
+
+private val SELECTED_OPTION_ELEVATION: Dp = 1.dp
 
 @Composable
 private fun NearCityContent(selection: AreaSelection, citySearch: CitySearchUiState, actions: AreaSelectorActions) {

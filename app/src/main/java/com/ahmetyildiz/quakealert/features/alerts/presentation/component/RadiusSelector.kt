@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.ui.component.quakeAlertFilterChipColors
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.alerts.domain.AlertConfig
@@ -54,6 +55,8 @@ private fun RadiusChip(radiusKm: Int, isSelected: Boolean, onClick: () -> Unit) 
         } else {
             null
         },
+        colors = quakeAlertFilterChipColors(),
+        border = null,
     )
 }
 

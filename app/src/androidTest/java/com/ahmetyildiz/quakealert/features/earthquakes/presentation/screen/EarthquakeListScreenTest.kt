@@ -1,8 +1,10 @@
 package com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -28,6 +30,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Duration
 import java.time.Instant
+import java.time.ZoneId
 
 @RunWith(AndroidJUnit4::class)
 class EarthquakeListScreenTest {
@@ -80,7 +83,35 @@ class EarthquakeListScreenTest {
         composeRule.onNodeWithText("12 km SW of Seferihisar, Turkey").assertIsDisplayed()
         composeRule.onNodeWithText(timeAndDepth).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.earthquake_distance_from_city, "41", "Izmir")).assertIsDisplayed()
-        composeRule.onNodeWithText(plural(R.plurals.earthquake_count, 1)).assertIsDisplayed()
+    }
+
+    @Test
+    fun newestFirstGroupsItemsUnderDayHeadersWithCounts() {
+        val olderEarthquake: EarthquakeWithDistance = izmirEarthquake.copy(
+            earthquake = izmirEarthquake.earthquake.copy(id = "us2", time = now.minus(Duration.ofDays(2))),
+        )
+        setContent(
+            EarthquakeListUiState(
+                content = EarthquakeListContent.ITEMS,
+                earthquakes = listOf(izmirEarthquake, olderEarthquake),
+                cachedCount = 2,
+                lastRefreshedAt = now,
+            ),
+        )
+        composeRule.onNodeWithText(plural(R.plurals.earthquake_count, 2)).assertIsDisplayed()
+        composeRule.onNodeWithText(dayLabelOf(izmirEarthquake.earthquake.time)).assertIsDisplayed()
+        composeRule.onAllNodesWithText(plural(R.plurals.earthquake_count, 1)).assertCountEquals(2)
+    }
+
+    @Test
+    fun otherSortOrdersShowOneFlatList() {
+        setContent(
+            itemsState(nearCityName = null)
+                .copy(options = EarthquakeListOptions(sortOrder = EarthquakeSortOrder.LARGEST_FIRST)),
+        )
+        composeRule.onNodeWithText("12 km SW of Seferihisar, Turkey").assertIsDisplayed()
+        composeRule.onNodeWithText(dayLabelOf(izmirEarthquake.earthquake.time)).assertDoesNotExist()
+        composeRule.onAllNodesWithText(plural(R.plurals.earthquake_count, 1)).assertCountEquals(1)
     }
 
     @Test
@@ -180,6 +211,12 @@ class EarthquakeListScreenTest {
             nearCityName = nearCityName,
             lastRefreshedAt = now,
         )
+
+    private fun dayLabelOf(time: Instant): String {
+        val zone: ZoneId = ZoneId.systemDefault()
+        val isToday: Boolean = time.atZone(zone).toLocalDate() == now.atZone(zone).toLocalDate()
+        return string(if (isToday) R.string.day_today else R.string.day_yesterday)
+    }
 
     private fun string(id: Int, vararg args: Any): String = composeRule.activity.getString(id, *args)
 

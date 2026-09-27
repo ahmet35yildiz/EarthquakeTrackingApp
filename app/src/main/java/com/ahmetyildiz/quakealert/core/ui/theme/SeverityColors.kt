@@ -30,18 +30,18 @@ data class SeverityColors(
 
 internal val LightSeverityColors: SeverityColors = SeverityColors(
     minor = SeverityColor(container = Color(0xFF006874), onContainer = Color(0xFFFFFFFF)),
-    light = SeverityColor(container = Color(0xFF765A00), onContainer = Color(0xFFFFFFFF)),
-    moderate = SeverityColor(container = Color(0xFF944B00), onContainer = Color(0xFFFFFFFF)),
+    light = SeverityColor(container = Color(0xFFFBBF24), onContainer = Color(0xFF261A00)),
+    moderate = SeverityColor(container = Color(0xFFBF5700), onContainer = Color(0xFFFFFFFF)),
     strong = SeverityColor(container = Color(0xFFBA1A1A), onContainer = Color(0xFFFFFFFF)),
-    major = SeverityColor(container = Color(0xFF680016), onContainer = Color(0xFFFFFFFF)),
+    major = SeverityColor(container = Color(0xFF6A1B9A), onContainer = Color(0xFFFFFFFF)),
 )
 
 internal val DarkSeverityColors: SeverityColors = SeverityColors(
     minor = SeverityColor(container = Color(0xFF4FD8EB), onContainer = Color(0xFF00363D)),
-    light = SeverityColor(container = Color(0xFFE9C349), onContainer = Color(0xFF3C2F00)),
-    moderate = SeverityColor(container = Color(0xFFFFB688), onContainer = Color(0xFF4F2500)),
-    strong = SeverityColor(container = Color(0xFFFFB4AB), onContainer = Color(0xFF690005)),
-    major = SeverityColor(container = Color(0xFFA8353F), onContainer = Color(0xFFFFEDEC)),
+    light = SeverityColor(container = Color(0xFFFFD24D), onContainer = Color(0xFF261A00)),
+    moderate = SeverityColor(container = Color(0xFFBF5700), onContainer = Color(0xFFFFFFFF)),
+    strong = SeverityColor(container = Color(0xFFFF6E61), onContainer = Color(0xFF410002)),
+    major = SeverityColor(container = Color(0xFFD7A6FF), onContainer = Color(0xFF2E004E)),
 )
 
 val LocalSeverityColors = staticCompositionLocalOf { LightSeverityColors }

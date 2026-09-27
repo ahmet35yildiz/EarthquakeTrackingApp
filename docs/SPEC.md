@@ -78,8 +78,10 @@ publication delay + background check interval). The app says this explicitly in 
 - Data: last **7 days**, **M2.5+**, worldwide, fetched once per refresh and cached in Room. All filtering is local.
 - Filters (chips): Region `World | Near <city>` (second chip only when an area is set) and Magnitude
   `All (2.5+) | ≥ my threshold`.
-- Item: magnitude badge (colour by severity), place, relative time ("12 min ago"), depth, distance to the user's
-  city when an area is set.
+- Item: magnitude badge (colour and word by severity), place, relative time ("12 min ago"), depth, distance to the
+  user's city when an area is set.
+- With `Newest first` the list is split into day sections (Today, Yesterday, then the date) with a count per day;
+  other sort orders show one flat list.
 - Sort order (menu next to the count, always visible): `Newest first` (default) | `Largest first` (unknown
   magnitudes last) | `Nearest first` (only when an area is set). Ties are broken by time, newest first. Changing the
   sort or a filter scrolls back to the top; rotation keeps the position. `LazyColumn` with stable keys (event id).
@@ -117,6 +119,7 @@ publication delay + background check interval). The app says this explicitly in 
 
 ### 4.6 Event log (developer)
 - Chronological list of recorded analytics events (name, params, timestamp), filter by name, clear, share as text.
+  Each event is coloured by category (alert, background, settings, usage).
 
 ### 4.7 Navigation
 - Bottom bar with 3 tabs: Earthquakes, Alerts, Settings (a navigation rail on wide windows: landscape, tablets). Detail, Developer tools and Event log are pushed on top

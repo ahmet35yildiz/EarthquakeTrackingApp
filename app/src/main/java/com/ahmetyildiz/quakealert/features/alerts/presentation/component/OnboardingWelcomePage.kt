@@ -33,7 +33,7 @@ fun OnboardingWelcomePage(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(Spacing.large),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        OnboardingHeroIcon(icon = painterResource(R.drawable.ic_waves))
+        OnboardingHeroIllustration(icon = painterResource(R.drawable.ic_waves))
         Text(
             text = stringResource(R.string.onboarding_welcome_title),
             style = MaterialTheme.typography.headlineMedium,

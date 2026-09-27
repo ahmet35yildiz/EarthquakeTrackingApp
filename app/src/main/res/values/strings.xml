@@ -18,6 +18,8 @@
     <string name="error_message_generic">Something went wrong. Please try again in a moment.</string>
 
     <string name="relative_time_just_now">just now</string>
+    <string name="day_today">Today</string>
+    <string name="day_yesterday">Yesterday</string>
     <plurals name="relative_time_minutes_ago">
         <item quantity="one">%d min ago</item>
         <item quantity="other">%d min ago</item>
@@ -38,6 +40,7 @@
     <string name="severity_minor">Minor</string>
     <string name="severity_light">Light</string>
     <string name="severity_moderate">Moderate</string>
+    <string name="severity_moderate_short">Mod</string>
     <string name="severity_strong">Strong</string>
     <string name="severity_major">Major</string>
 

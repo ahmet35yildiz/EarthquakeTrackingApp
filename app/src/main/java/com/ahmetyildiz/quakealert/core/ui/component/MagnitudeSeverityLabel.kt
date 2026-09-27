@@ -13,3 +13,10 @@ val MagnitudeSeverity.labelRes: Int
         MagnitudeSeverity.STRONG -> R.string.severity_strong
         MagnitudeSeverity.MAJOR -> R.string.severity_major
     }
+
+@get:StringRes
+val MagnitudeSeverity.shortLabelRes: Int
+    get() = when (this) {
+        MagnitudeSeverity.MODERATE -> R.string.severity_moderate_short
+        else -> labelRes
+    }

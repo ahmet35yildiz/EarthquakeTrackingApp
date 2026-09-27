@@ -37,5 +37,7 @@ internal val QuakeAlertTypography: Typography = Typography(
 val MagnitudeTextStyle: TextStyle = textStyle(18.sp, 22.sp, FontWeight.Bold, (-0.2).sp)
     .copy(fontFeatureSettings = "tnum")
 
+val SeverityLabelTextStyle: TextStyle = textStyle(10.sp, 12.sp, FontWeight.Bold, 0.2.sp)
+
 val MagnitudeLargeTextStyle: TextStyle = textStyle(28.sp, 36.sp, FontWeight.Bold, 0.sp)
     .copy(fontFeatureSettings = "tnum")

@@ -22,16 +22,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.MagnitudeSeverity
+import com.ahmetyildiz.quakealert.core.ui.format.currentLocale
 import com.ahmetyildiz.quakealert.core.ui.theme.MagnitudeLargeTextStyle
 import com.ahmetyildiz.quakealert.core.ui.theme.MagnitudeTextStyle
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.SeverityColor
+import com.ahmetyildiz.quakealert.core.ui.theme.SeverityLabelTextStyle
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
-enum class MagnitudeBadgeSize(val minSize: Dp, val textStyle: TextStyle, val showsSeverityLabel: Boolean) {
-    COMPACT(minSize = 48.dp, textStyle = MagnitudeTextStyle, showsSeverityLabel = false),
+enum class MagnitudeBadgeSize(val minSize: Dp, val textStyle: TextStyle, val usesShortSeverityLabel: Boolean) {
+    COMPACT(minSize = 52.dp, textStyle = MagnitudeTextStyle, usesShortSeverityLabel = true),
 
-    LARGE(minSize = 72.dp, textStyle = MagnitudeLargeTextStyle, showsSeverityLabel = true),
+    LARGE(minSize = 72.dp, textStyle = MagnitudeLargeTextStyle, usesShortSeverityLabel = false),
 }
 
 @Composable
@@ -48,22 +50,25 @@ fun MagnitudeBadge(
         ?.let { stringResource(R.string.magnitude_value, it) }
         ?: stringResource(R.string.magnitude_unknown_value)
     val severityText: String? = severity?.let { stringResource(it.labelRes) }
+    val badgeLabel: String? = severity
+        ?.let { stringResource(if (size.usesShortSeverityLabel) it.shortLabelRes else it.labelRes) }
+        ?.uppercase(currentLocale())
     val description: String = severityText
         ?.let { stringResource(R.string.magnitude_badge_description, valueText, it) }
         ?: stringResource(R.string.magnitude_unknown_description)
     Column(
         modifier = modifier
             .defaultMinSize(minWidth = size.minSize, minHeight = size.minSize)
-            .clip(MaterialTheme.shapes.small)
+            .clip(MaterialTheme.shapes.medium)
             .background(colors.container)
-            .padding(horizontal = Spacing.small, vertical = Spacing.extraSmall)
+            .padding(horizontal = Spacing.extraSmall, vertical = Spacing.extraSmall)
             .clearAndSetSemantics { contentDescription = description },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = valueText, style = size.textStyle, color = colors.onContainer)
-        if (size.showsSeverityLabel && severityText != null) {
-            Text(text = severityText, style = MaterialTheme.typography.labelSmall, color = colors.onContainer)
+        if (badgeLabel != null) {
+            Text(text = badgeLabel, style = SeverityLabelTextStyle, color = colors.onContainer, maxLines = 1)
         }
     }
 }
@@ -78,7 +83,7 @@ private fun MagnitudeBadgePreview() {
                     listOf(2.7, 4.6, 5.4, 6.2, 7.8, null).forEach { MagnitudeBadge(magnitude = it) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(Spacing.small)) {
-                    listOf(3.2, 4.6, 7.8).forEach { MagnitudeBadge(magnitude = it, size = MagnitudeBadgeSize.LARGE) }
+                    listOf(3.2, 5.4, 7.8).forEach { MagnitudeBadge(magnitude = it, size = MagnitudeBadgeSize.LARGE) }
                 }
             }
         }
