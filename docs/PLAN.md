@@ -491,6 +491,16 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   differently, checked on a device against all 148 distinct texts (ADR-044 rewritten). +RegionPhrase unit tests,
   place formatting tests extended, theme dialog UI test. Full suites: 419 unit, 83/83 instrumented on API 31 and 34,
   lint clean.
+- [x] **3.9 Alerts tab: alert switch vs. notification permission** (added on request). With the permission off the
+  top card said the alerts were on while the status card below said notifications were off.
+  *Result:* while alerts are on and the permission is off, the summary card replaces "You'll be notified…" with
+  "Alerts can't reach you" + "Allow notifications" (opens the app's notification settings); with alerts off nothing
+  is flagged. Turkish switch renamed "Deprem alarmları" (it said "Deprem bildirimleri", the same word as the
+  permission), and the alerts-off texts follow (ADR-046). Follow-up on request: the status card (last background
+  check, check interval) removed with its strings; `ObserveAlertSettingsUseCase` now returns only the settings
+  (`AlertSettingsStatus` and `lastCheckedAt` in the UI state removed; the worker still stores the check time for
+  `updatedafter`). 440 unit, 88/88 instrumented on API 31 and 34, lint clean; checked on API 34 in TR and EN, and the
+  notice goes away after allowing notifications.
 
 ## Phase 4 — Documentation and delivery
 - [x] **4.1 README (Turkish) complete.** All sections filled, structured along the delivery requirements (how to run,
@@ -514,12 +524,20 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   of the work log; regenerate the usage report in `docs/AI_USAGE.md` (the documentation session is still running,
   so its numbers grow); if `docs/PLAN.md` is removed, fix the links to it in `docs/AI_USAGE.md`.
 
-## Phase 5 — Stretch (only when Phases 0–4 are done, in this order)
-- [ ] **5.1 OneTimeWork chain** (~5 min while device active) on top of periodic work (ADR-003).
-- [ ] **5.2 In-app auto refresh** every 60 s while the list is visible.
-- [ ] **5.3 GPS-based area** ("Use my location" → center; reverse geocode for the name).
-- [ ] **5.4 Alert preview** "In the last 7 days you would have received N alerts" (from cached data).
-- [ ] **5.5 GitHub Actions CI** (build + unit tests + lint).
+## Phase 5 — Stretch (only when Phases 0–4 are done)
+- [x] **5.1 GPS-based area** ("Use my location" → center; reverse geocode for the name).
+  *Result:* "Use my location" button above the country picker (onboarding and Alerts tab share it), approximate
+  location permission only, requested on first tap (ADR-045). `AndroidDeviceLocationSource` (platform
+  `LocationManager`, no new dependency) asks fused / network / gps at once, first fix wins, 15 s limit, then the last
+  known location; `CitySearchRepositoryImpl.findCityAt` names the point with the existing Geocoder wrapper (API 33
+  split) and keeps the device point as the circle center. The found city is picked like a tapped search result;
+  errors: permission denied → app settings, location off → location settings, not found / network → retry. New
+  event `current_location_used` (`result`, no coordinates). Found on the emulator: with approximate permission the
+  fused provider stays in low-power mode and never answers there, so all providers are asked in parallel; a
+  located city equal to the current one left the search open, so the result now goes through UI state instead of
+  a one-off channel. 440 unit (+21), 89/89 instrumented (+6) on API 31 and 34; manual on API 31 (Konak, İzmir) and
+  API 34 (EN + TR, deny, location off, rotation while locating; the API 34 AVD ignored `geo fix`, test providers
+  used, see TESTING.md).
 
 ---
 
@@ -573,3 +591,6 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-27 | 17:45–18:24 | ~39m | 3.6 Design alignment with the UI design: severity palette + words, chip icons, day sections, detail icons, area toggle, welcome illustration, event log categories (ADR-042); 390 unit, 79/79 instrumented on API 31 and 34 |
 | 2026-09-27 | 18:24–19:15 | ~51m | 3.7 Follow-up polish: "Biggest first", app icon on the welcome page, theme choice (ADR-043), USGS place text localized on display (ADR-044); 413 unit, 83/83 instrumented on API 31 and 34 |
 | 2026-09-27 | 19:15–20:07 | ~52m | 3.8 Theme picker like the language picker, capitalized Turkish directions, USGS region names translated (patterns + 44-name dictionary from one year of data, ADR-044); 419 unit, 83/83 instrumented on API 31 and 34 |
+| 2026-09-28 | 14:45–15:30 | ~45m | Phase 5 trimmed to one item; 5.1 "Use my location": approximate permission, platform LocationManager (all providers in parallel), reverse geocoding, error paths, `current_location_used` (ADR-045); 440 unit, 89/89 instrumented on API 31 and 34 |
+| 2026-09-28 | 16:10–16:30 | ~20m | 3.9 Alerts tab: blocked notifications shown once, in the summary card with "Allow notifications"; status card shows only the background check; Turkish switch renamed "Deprem alarmları" (ADR-046); 440 unit, 90/90 instrumented on API 31 and 34 |
+| 2026-09-28 | 16:35–16:45 | ~10m | 3.9 follow-up: Alerts tab status card removed (last check + interval), use case returns only the settings (ADR-046 updated); 440 unit, 88/88 instrumented on API 31 and 34 |

@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import java.time.Instant
 
 class AlertSettingsViewModelTest {
 
@@ -56,14 +55,11 @@ class AlertSettingsViewModelTest {
         get() = preferencesRepository.userPreferences.value
 
     @Test
-    fun `state shows the saved settings and last check`() = runTest {
-        val lastCheckedAt: Instant = clock.now()
-        preferencesRepository.setLastCheckedAt(lastCheckedAt)
+    fun `state shows the saved settings`() = runTest {
         val state: AlertSettingsUiState = collectState()
         assertFalse(state.isLoading)
         assertEquals(AlertSettings.DEFAULT, state.settings)
         assertEquals(AreaSelection.from(AlertArea.WholeWorld), state.areaSelection)
-        assertEquals(lastCheckedAt, state.lastCheckedAt)
     }
 
     @Test

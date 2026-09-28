@@ -23,7 +23,8 @@ yeni bir deprem olduğunda bildirim gönderen Android uygulaması. Veri kaynağ�
 - **Deprem detayı:** büyüklük, yer, yerel saat + UTC, derinlik, koordinat, şehre uzaklık, inceleme durumu, tsunami
   işareti. Haritada aç, USGS'te görüntüle, paylaş.
 - **Alarm ayarları:** aç/kapa, eşik (M2.5–8.0, 0.5 adım, varsayılan M4.5), bölge: tüm dünya (uyarıyla birlikte) veya
-  ülke → şehir arama → yarıçap (50–1000 km, varsayılan 250 km). Her değişiklik anında kaydedilir.
+  ülke → şehir arama → yarıçap (50–1000 km, varsayılan 250 km). Şehir, "Konumumu kullan" ile tek dokunuşla da
+  seçilebilir (yalnızca yaklaşık konum izni). Her değişiklik anında kaydedilir.
 - **Arka plan kontrolü ve bildirimler:** 15 dakikada bir kontrol; en fazla 3 ayrı bildirim, daha fazlası için tek
   özet. Bildirime dokununca ilgili deprem detayı açılır.
 - **Ayarlar:** uygulama dili (sistem, English, Türkçe), tema (sistem, açık, koyu), bildirim izni durumu, hakkında.
@@ -49,13 +50,13 @@ emülatörde **Google APIs** imajı gerekir.
 
 **Testler:**
 ```bash
-./gradlew testDebugUnitTest            # 361 unit test
-./gradlew connectedDebugAndroidTest    # 77 instrumented test (emülatör açık olmalı)
+./gradlew testDebugUnitTest            # 440 unit test
+./gradlew connectedDebugAndroidTest    # 88 instrumented test (emülatör açık olmalı)
 ./gradlew lintDebug
 ```
 
 ## Önemli kararlar
-Tüm kararlar alternatifleriyle birlikte [docs/DECISIONS.md](docs/DECISIONS.md) dosyasında (41 kayıt). En önemlileri:
+Tüm kararlar alternatifleriyle birlikte [docs/DECISIONS.md](docs/DECISIONS.md) dosyasında (46 kayıt). En önemlileri:
 
 1. **Veri kaynağı: USGS.** Uygulama global. USGS anahtarsız, dünyayı tek entegrasyonla kapsıyor ve bu ürün için
    gereken iki özelliği doğrudan destekliyor: daire filtresi (`latitude`/`longitude`/`maxradiuskm`) ve geç yayınlanan
@@ -66,6 +67,9 @@ Tüm kararlar alternatifleriyle birlikte [docs/DECISIONS.md](docs/DECISIONS.md) 
 3. **Ek bağımlılık ve gömülü veri yok.** Ülke listesi Android'in kendi listesinden (`Locale.getISOCountries()`),
    şehir koordinatı Android `Geocoder` ile alınıyor. Geocoder, Android 13 ve sonrasında asenkron, öncesinde arka plan
    thread'inde çalışan tek bir sarmalayıcının arkasında. Her iki yol da API 31 ve API 34'te test edildi.
+   "Konumumu kullan" da Android'in kendi konum servisini kullanıyor (Play Services yok) ve sadece yaklaşık konum
+   izni istiyor: en küçük yarıçap 50 km olduğu için ~2 km hassasiyet yeterli. Konum dairenin merkezi olur, Geocoder
+   sadece adını bulur.
 4. **Arka plan kontrolü: WorkManager, 15 dakikada bir.** Sunucu olmadan en güvenilir ve pil dostu yöntem.
    - Exact alarm, kullanıcının ayrıca vermesi gereken bir izin istiyor.
    - Foreground service ise sürekli görünen bir bildirim demek.
@@ -130,9 +134,7 @@ Toplam **~11 saat 5 dakika** (2026-09-25 – 2026-09-27, iş kaydından).
 1. **Backend + FCM push:** Sunucu USGS'i sürekli izler ve eşleşen kullanıcılara anında push gönderir (Doze'da bile).
 2. **Uzak analytics:** Yerel event kaydını Firebase Analytics gibi bir servise bağlamak. `AnalyticsTracker`
    arayüzüne yeni bir implementasyon eklemek yeterli.
-3. **Daha sık kontrol:** Cihaz aktifken ~5 dakikada bir kontrol eden, kendini yeniden kuran bir OneTimeWork zinciri.
-4. **Konuma göre bölge:** "Konumumu kullan" seçeneği; aynı daire modeli, merkez GPS'ten gelir.
-5. **Bölgesel veri kaynakları:** Küçük depremlerde daha iyi yerel kapsam için (ör. Türkiye için AFAD).
+3. **Bölgesel veri kaynakları:** Küçük depremlerde daha iyi yerel kapsam için (ör. Türkiye için AFAD).
 
 ## AI kullanımı
 **Araçlar:**

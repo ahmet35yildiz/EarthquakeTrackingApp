@@ -75,6 +75,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("reason" to reason.paramValue),
     )
 
+    data class CurrentLocationUsed(val result: CurrentLocationResult) : AnalyticsEvent(
+        name = "current_location_used",
+        params = mapOf("result" to result.paramValue),
+    )
+
     data class EarthquakeListViewed(
         val regionFilter: RegionFilterValue,
         val magnitudeFilter: MagnitudeFilterValue,

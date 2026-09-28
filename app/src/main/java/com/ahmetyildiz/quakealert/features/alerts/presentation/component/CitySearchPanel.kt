@@ -51,6 +51,7 @@ data class CitySearchActions(
     val onSearch: (String) -> Unit,
     val onCitySelected: (City) -> Unit,
     val onCancel: (() -> Unit)?,
+    val location: CurrentLocationActions,
 )
 
 @Composable
@@ -67,6 +68,7 @@ fun CitySearchPanel(
         actions.onSearch(cityName)
     }
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.medium)) {
+        CurrentLocationSection(lookup = state.location, actions = actions.location)
         CountryPickerField(
             selectedCountry = state.selectedCountry,
             countries = state.countries,
@@ -111,7 +113,7 @@ private fun CitySearchResultContent(
 ) {
     when (result) {
         CitySearchResult.Idle -> Unit
-        CitySearchResult.Loading -> SearchingIndicator()
+        CitySearchResult.Loading -> ProgressMessage(text = stringResource(R.string.city_search_loading))
         is CitySearchResult.Found -> CityResults(cities = result.cities, onCitySelected = onCitySelected)
         is CitySearchResult.NoResults -> ResultMessage(
             text = stringResource(R.string.city_search_no_results, result.searchedName, countryName),
@@ -121,10 +123,10 @@ private fun CitySearchResultContent(
 }
 
 @Composable
-private fun SearchingIndicator() {
+internal fun ProgressMessage(text: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(Spacing.medium), verticalAlignment = Alignment.CenterVertically) {
         CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-        ResultMessage(text = stringResource(R.string.city_search_loading))
+        ResultMessage(text = text)
     }
 }
 
@@ -156,7 +158,7 @@ private fun SearchFailure(error: AppError, onRetry: () -> Unit) {
 }
 
 @Composable
-private fun ResultMessage(text: String, modifier: Modifier = Modifier) {
+internal fun ResultMessage(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
@@ -187,7 +189,13 @@ private fun CitySearchPanelPreview() {
                         ),
                     ),
                 ),
-                actions = CitySearchActions(onCountrySelected = {}, onSearch = {}, onCitySelected = {}, onCancel = {}),
+                actions = CitySearchActions(
+                    onCountrySelected = {},
+                    onSearch = {},
+                    onCitySelected = {},
+                    onCancel = {},
+                    location = CurrentLocationActions(onUseMyLocation = {}, onOpenAppSettings = {}, onOpenLocationSettings = {}),
+                ),
                 modifier = Modifier.padding(Spacing.large),
             )
         }

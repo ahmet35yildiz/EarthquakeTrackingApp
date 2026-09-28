@@ -4,9 +4,12 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -16,6 +19,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
@@ -24,6 +28,7 @@ import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaMod
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaSelection
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.CitySearchResult
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.CitySearchUiState
+import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.LocationLookup
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -48,6 +53,9 @@ class AreaSelectorTest {
     private val selectedCountries: MutableList<String> = mutableListOf()
     private val searchedNames: MutableList<String> = mutableListOf()
     private var dismissCount: Int = 0
+    private var useMyLocationCount: Int = 0
+    private var appSettingsCount: Int = 0
+    private var locationSettingsCount: Int = 0
     private val actions = AreaSelectorActions(
         onModeSelected = { selectedModes += it },
         onRadiusSelected = { selectedRadii += it },
@@ -55,6 +63,11 @@ class AreaSelectorTest {
         onCountrySelected = { selectedCountries += it },
         onSearch = { searchedNames += it },
         onSearchDismissed = { dismissCount++ },
+        location = CurrentLocationActions(
+            onUseMyLocation = { useMyLocationCount++ },
+            onOpenAppSettings = { appSettingsCount++ },
+            onOpenLocationSettings = { locationSettingsCount++ },
+        ),
     )
 
     @Test
@@ -123,6 +136,58 @@ class AreaSelectorTest {
         composeRule.onAllNodesWithText("Türkiye").assertCountEquals(1)
         composeRule.onNodeWithText("Japan").performClick()
         assertEquals(listOf("JP"), selectedCountries)
+    }
+
+    @Test
+    fun useMyLocationAsksForTheLocation() {
+        setContent(nearNoCity, searchState)
+        composeRule.onNodeWithText(string(R.string.location_use_mine)).performClick()
+        assertEquals(1, useMyLocationCount)
+    }
+
+    @Test
+    fun locatingShowsProgressAndDisablesTheButton() {
+        setContent(nearNoCity, searchState.copy(location = LocationLookup.Locating))
+        composeRule.onNodeWithText(string(R.string.location_finding)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.location_use_mine)).assertIsNotEnabled()
+    }
+
+    @Test
+    fun deniedPermissionOffersTheAppSettings() {
+        setContent(nearNoCity, searchState.copy(location = LocationLookup.Failed(AppError.LocationPermissionDenied)))
+        composeRule.onNodeWithText(string(R.string.location_error_permission)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
+        assertEquals(1, appSettingsCount)
+    }
+
+    @Test
+    fun locationTurnedOffOffersTheLocationSettings() {
+        setContent(nearNoCity, searchState.copy(location = LocationLookup.Failed(AppError.LocationDisabled)))
+        composeRule.onNodeWithText(string(R.string.location_error_disabled)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
+        assertEquals(1, locationSettingsCount)
+    }
+
+    @Test
+    fun locationNotFoundCanBeRetried() {
+        setContent(nearNoCity, searchState.copy(location = LocationLookup.Failed(AppError.LocationUnavailable)))
+        composeRule.onNodeWithText(string(R.string.action_retry)).performClick()
+        assertEquals(1, useMyLocationCount)
+    }
+
+    @Test
+    fun locatedCityIsPickedAndClosesTheSearch() {
+        val citySearch: MutableState<CitySearchUiState> = mutableStateOf(searchState)
+        val bornova = City(name = "Bornova", adminArea = "İzmir", countryCode = "TR", location = GeoPoint(38.46, 27.21))
+        composeRule.setContent {
+            QuakeAlertTheme {
+                AreaSelector(selection = nearIzmir, citySearch = citySearch.value, actions = actions)
+            }
+        }
+        composeRule.onNodeWithText(string(R.string.action_change)).performClick()
+        citySearch.value = searchState.copy(location = LocationLookup.Found(bornova))
+        composeRule.onNodeWithText(string(R.string.action_change)).assertIsDisplayed()
+        assertEquals(listOf(bornova), selectedCities)
     }
 
     private fun string(id: Int, vararg args: Any): String = composeRule.activity.getString(id, *args)

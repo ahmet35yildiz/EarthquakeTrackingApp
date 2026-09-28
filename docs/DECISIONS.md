@@ -28,8 +28,6 @@ Add a new record (next number) whenever a significant decision is made; never re
   - Exact alarms (`setExactAndAllowWhileIdle`) — at most once per 9 min in Doze and requires the user to grant
     "Alarms & reminders" (not granted by default on Android 14+).
   - Foreground service polling — ~1 min, but a permanent notification, battery cost and Android 15 limits.
-  - Self-rescheduling OneTimeWork chain (~5 min while the device is active) — kept as a stretch item on top of the
-    periodic work.
 - **Consequences:** Battery-friendly and reliable, survives reboot. Alerts may arrive up to ~15 min late (longer in
   Doze). Stated in onboarding and README.
 
@@ -573,3 +571,48 @@ Add a new record (next number) whenever a significant decision is made; never re
   device against all 148 texts); the 16 unchanged ones are US state names and named events. A new language needs
   `place_near_format`, 16 direction strings, the region phrase templates, 9 side words and the 44 dictionary names;
   missing ones fall back to English and lint reports them.
+
+## ADR-045 — "Use my location" with approximate location and the platform location API
+- **Context:** Typing a city is slow for users who simply want alerts around where they are. The area model is a
+  circle of 50–1000 km (ADR-007), so the center does not need to be precise.
+- **Decision:** A "Use my location" button in the area selector (onboarding and Alerts tab share it) sets the city in
+  one tap.
+  - Permission: `ACCESS_COARSE_LOCATION` only, requested at the moment of use (never at start-up). Approximate
+    location (~2 km) is far below the smallest radius, and it is the least intrusive request.
+  - Location: platform `LocationManager` through `LocationManagerCompat.getCurrentLocation` (androidx.core, already a
+    dependency). All enabled providers (fused on API 31+, network, gps) are asked at the same time and the first fix
+    wins: with approximate permission the fused provider runs in low-power mode (Wi-Fi / cell only), which never
+    answers on an emulator and can be slow indoors, while gps still answers (coarsened by the system). 15 s limit
+    (`AlertConfig.CURRENT_LOCATION_TIMEOUT`), then the newest last known location.
+  - Name: reverse geocoding with the same `Geocoder` wrapper as the search (API 33 split, same error mapping). The
+    circle center is the device point; the geocoder only names it (city, admin area, country in the app language).
+  - The located city is applied directly (no second pick) and saved like a searched city; nothing else changes
+    (alerts, list filter "Near <city>", distances all read the same `City`).
+  - Failures keep the search usable: permission denied → app settings, location off → location settings, no fix or
+    no place name → retry, offline → network message.
+  - The located city is UI state (`LocationLookup.Found`) that the area selector picks like a tapped search result,
+    so one code path sets the city and a result that arrives during a rotation is not lost.
+- **Alternatives:** Fused Location Provider from Google Play services (one more dependency and a Play services
+  requirement for a single lookup); `ACCESS_FINE_LOCATION` (a stronger permission prompt for no benefit at this
+  radius); using the geocoded town's coordinates as the center (the circle would move away from the user for no
+  reason); showing the located city as a search result to confirm (an extra tap for the common case).
+- **Consequences:** The location is read once per tap and never in the background; coordinates are only stored as
+  the alert area (as with a searched city) and never logged (`current_location_used` has only a `result`). Devices
+  without a geocoder do not see the button (the whole "Near a city" mode is hidden there, ADR-008).
+
+## ADR-046 — Alerts tab: the alert switch and the notification permission are shown as one state
+- **Context:** With the notification permission off, the Alerts tab showed "Earthquake alerts" switched on with
+  "You'll be notified about…" at the top, and "Notification permission is off" in the status card at the bottom. In
+  Turkish both used the same word ("Deprem bildirimleri" / "Bildirim izni kapalı"), so the screen seemed to say
+  "on" and "off" about the same thing.
+- **Decision:** The switch is the user's choice, the permission is the system's; the screen shows their combined
+  effect in one place. Alerts on + permission off → the summary card replaces the (untrue) summary sentence with
+  "Alerts can't reach you" and an "Allow notifications" button that opens the app's notification settings (same
+  target as before, ADR-038). Alerts off → the "alerts are off" text only. The status card at the bottom of the tab
+  (permission, last background check, check interval) is removed: the permission now lives in the summary card, and
+  the check time and interval are technical details (the delay is explained in onboarding and the README). Turkish uses "alarm" for the app's alerts and "bildirim" only for the system
+  notifications ("Deprem alarmları", "Alarmlar kapalı").
+- **Alternatives:** Keep both rows and reword them (still two places to read); turn the switch off while the
+  permission is off (it would overwrite the user's choice and the saved baseline).
+- **Consequences:** One answer to "will I get alerts?" at the top of the tab. The Settings tab still shows the full
+  permission row, since it is about the device, not the alert choice.

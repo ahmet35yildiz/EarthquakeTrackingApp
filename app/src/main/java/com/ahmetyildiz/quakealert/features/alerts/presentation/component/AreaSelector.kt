@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Place
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,6 +26,7 @@ import com.ahmetyildiz.quakealert.features.alerts.domain.model.Country
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaMode
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaSelection
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.CitySearchUiState
+import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.LocationLookup
 
 data class AreaSelectorActions(
     val onModeSelected: (AreaMode) -> Unit,
@@ -33,6 +35,7 @@ data class AreaSelectorActions(
     val onCountrySelected: (String) -> Unit,
     val onSearch: (String) -> Unit,
     val onSearchDismissed: () -> Unit,
+    val location: CurrentLocationActions,
 )
 
 @Composable
@@ -78,6 +81,12 @@ private fun AreaMode.iconPainter(): Painter = when (this) {
 private fun NearCityContent(selection: AreaSelection, citySearch: CitySearchUiState, actions: AreaSelectorActions) {
     var isChangingCity: Boolean by rememberSaveable { mutableStateOf(false) }
     val city: City? = selection.city
+    val locatedCity: City? = (citySearch.location as? LocationLookup.Found)?.city
+    LaunchedEffect(locatedCity) {
+        if (locatedCity == null) return@LaunchedEffect
+        isChangingCity = false
+        actions.onCitySelected(locatedCity)
+    }
     if (city != null && !isChangingCity) {
         SelectedCityCard(
             city = city,
@@ -109,6 +118,7 @@ private fun NearCityContent(selection: AreaSelection, citySearch: CitySearchUiSt
                 } else {
                     null
                 },
+                location = actions.location,
             ),
         )
     }
@@ -128,6 +138,7 @@ private val previewActions: AreaSelectorActions = AreaSelectorActions(
     onCountrySelected = {},
     onSearch = {},
     onSearchDismissed = {},
+    location = CurrentLocationActions(onUseMyLocation = {}, onOpenAppSettings = {}, onOpenLocationSettings = {}),
 )
 
 @PreviewLightDark

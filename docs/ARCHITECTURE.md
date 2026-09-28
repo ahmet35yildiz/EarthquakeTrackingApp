@@ -35,7 +35,7 @@ com.ahmetyildiz.quakealert/
 │   ├── datastore/                   # DataStoreUserPreferencesRepository (DataStore keys + mapping)
 │   ├── preferences/                 # UserPreferences, AlertSettings + UserPreferencesRepository (shared by features)
 │   ├── model/                       # GeoPoint, City, AlertArea, MagnitudeSeverity … pure Kotlin shared models
-│   ├── location/                    # Distance (haversine) utilities
+│   ├── location/                    # Distance (haversine) utilities, location permission check
 │   ├── network/                     # Retrofit/OkHttp/Json setup
 │   ├── notification/                # NotificationChannels, NotificationPermissionChecker, AlertNotificationTap extras
 │   ├── navigation/                  # DeepLinkConfig (detail deep link builder), ExternalIntents (browser, notification settings)
@@ -52,7 +52,7 @@ com.ahmetyildiz.quakealert/
 │   │   ├── presentation/viewmodel | screen | component
 │   │   └── di/
 │   ├── alerts/                      # Alert settings, city search (Geocoder), onboarding, worker, notifications
-│   │   ├── data/model | source (CityGeocoder, AndroidCityGeocoder) | repository
+│   │   ├── data/model | source (CityGeocoder, DeviceLocationSource + Android implementations) | repository
 │   │   ├── domain/model | repository | usecase   (+ AlertConfig, AlertMatcher at the domain root)
 │   │   ├── worker/                  # AlertCheckWorker, AlertWorkScheduler
 │   │   ├── notification/            # EarthquakeAlertNotifier
@@ -72,7 +72,8 @@ com.ahmetyildiz.quakealert/
 - Onboarding lives in `alerts` because it is the alert setup flow (reuses the same threshold/area components).
 - `settings` depends on `core` only (ADR-038): `SettingsViewModel` reads `AppLanguageManager`, `ThemeModeManager` and
   `NotificationPermissionChecker` directly. Pieces used by more than one feature moved to `core` — the permission
-  status row (`core/ui/component/NotificationPermissionStatus`) and the outgoing intents
+  status row (`core/ui/component/NotificationPermissionStatus`, now shown only in Settings; the Alerts tab flags a
+  blocked permission in its summary card, ADR-046) and the outgoing intents
   (`core/navigation/ExternalIntents`). The Settings tab only shows a "Developer tools" entry (debug builds); `DeveloperToolsScreen` (settings) is a pushed
   route whose alert testing card comes in as a slot from `navigation` and which links to the event log (ADR-039).
 
@@ -181,8 +182,31 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   reported back as a new `AreaSelection`; `toAlertAreaOrNull()` is null while "Near a city" has no city yet.
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
 
-- Alert settings screen (ADR-029): `AlertSettingsViewModel` combines `ObserveAlertSettingsUseCase` (settings + last
-  check), the on-screen `AreaSelection` draft and the notification permission (re-read on resume). Every change goes
+### 4.3.1 "Use my location" (ADR-045)
+```
+CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ CitySearchViewModel.onUseMyLocation
+  └─ FindCityAtCurrentLocationUseCase ─▶ DeviceLocationRepository ─▶ DeviceLocationSource ─▶ AndroidDeviceLocationSource
+                                     └─▶ CitySearchRepository.findCityAt ─▶ CityGeocoder.findAddressesAt
+```
+- `AreaSelectorEntry` checks `hasLocationPermission()` (`core/location`) and requests `ACCESS_COARSE_LOCATION`
+  through `rememberLauncherForActivityResult`; granted → `onUseMyLocation()`, denied → `onLocationPermissionDenied()`.
+- `DeviceLocationRepositoryImpl`: no permission → `LocationPermissionDenied`, location off → `LocationDisabled`,
+  otherwise the current location within `AlertConfig.CURRENT_LOCATION_TIMEOUT` (15 s), else the newest last known
+  location, else `LocationUnavailable`.
+- `AndroidDeviceLocationSource` is the only class using `LocationManager`: `LocationManagerCompat.getCurrentLocation`
+  on every enabled provider of fused (API 31+), network and gps at the same time (`channelFlow`); the first fix wins
+  and the other requests are cancelled, as they are when the coroutine is cancelled.
+- `CitySearchRepositoryImpl.findCityAt(point, locale)`: reverse geocoding (`getFromLocation`, same API 33 split and
+  error mapping as the search), first address that is not country level → `City` whose `location` is the device
+  point (the circle is centred on the user, not on the town centre); no such address → `LocationUnavailable`.
+- `CitySearchViewModel` keeps `LocationLookup` (Idle / Locating / Found / Failed) in `CitySearchUiState`. `Found`
+  is picked by `AreaSelector` exactly like a tapped search result (`onCitySelected`: the search closes, the lookup
+  goes back to Idle, the `AreaSelection` gets the city), so a result that arrives during a rotation is not lost.
+  Search and location share one job, so the newer request cancels the older. Every result is tracked as
+  `current_location_used`.
+
+- Alert settings screen (ADR-029): `AlertSettingsViewModel` combines `ObserveAlertSettingsUseCase` (saved alert
+  settings), the on-screen `AreaSelection` draft and the notification permission (re-read on resume). Every change goes
   through `UpdateAlertSettingsUseCase` (mutex, reads the stored settings, saves with a new baseline only when
   something changed, returns previous + updated); the ViewModel logs `toAnalyticsEvents(SETTINGS)` of that update and
   shows a "saved" snackbar.

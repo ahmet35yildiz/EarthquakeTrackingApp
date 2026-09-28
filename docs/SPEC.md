@@ -25,18 +25,13 @@ publication delay + background check interval). The app says this explicitly in 
 1. First-run onboarding: value proposition + disclaimer → alert setup (threshold, area) → notification permission.
 2. Earthquake list: recent events, filters, pull-to-refresh, offline cache, loading/empty/error states.
 3. Earthquake detail: all key facts, distance to the user's city, open in maps, open on USGS, share.
-4. Alert settings: enable/disable, magnitude threshold, area (country → city search → radius) or whole world.
+4. Alert settings: enable/disable, magnitude threshold, area (country → city search → radius, or "Use my
+   location") or whole world.
 5. Background check with WorkManager (every 15 min) + local notifications for new matching earthquakes.
 6. Local analytics event log + developer screen to inspect it.
 7. Developer tools: "Simulate alert" and "Run check now" to demonstrate the notification flow on demand.
 8. Multilingual UI: English (default) + Turkish, in-app language switch.
 9. Light and dark theme, consistent custom Material 3 design.
-
-### Stretch (only after everything above is done, in this order)
-1. Self-rescheduling OneTimeWork chain (~5 min checks while the device is active) on top of the periodic work.
-2. In-app auto refresh every 60 s while the list is visible.
-3. "Use my location" as area center (GPS + reverse geocoding), same circle model.
-4. "Last 7 days you would have received N alerts" preview in alert settings.
 
 ### Out of scope (documented in README with reasons)
 | Item | Reason |
@@ -107,9 +102,16 @@ publication delay + background check interval). The app says this explicitly in 
     with a locale-aware `Collator`, local search box. Default: device locale country.
   - City search: text field + "Search" action (no live suggestions) → Android `Geocoder` → results filtered to the
     selected country → user picks one. Loading/empty/error states. Hidden if `Geocoder.isPresent()` is false.
+  - "Use my location" (above the country picker, same place as the search): asks for approximate location
+    (`ACCESS_COARSE_LOCATION` only) on first use → the device location becomes the circle center and reverse
+    geocoding gives the name (city + admin area + country, in the app language); the city is set directly, no
+    extra pick. Errors: permission denied → "Open settings" (app details); location off → "Open settings"
+    (location settings); no location within 15 s and no recent one, or no place name → retry; offline → network
+    message + retry. Searching by name stays available in every case.
   - Radius options: **50 / 100 / 250 / 500 / 1000 km**, default **250 km**.
-- Notification permission status row with "Open settings" when denied.
-- Last background check time ("Last checked 6 min ago") for transparency.
+- Notification permission: while alerts are on and the permission is off, the summary card shows "Alerts can't
+  reach you" with "Allow notifications" (opens the app's notification settings) instead of the summary sentence;
+  nothing is flagged while alerts are off. The Settings tab keeps the full permission status row.
 - Every saved change (switch, threshold, area) is stored immediately and resets the alert baseline (see 5.1) so
   older events never trigger notifications.
 

@@ -7,7 +7,6 @@ import com.ahmetyildiz.quakealert.core.analytics.SetupContext
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
-import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertSettingsStatus
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertSettingsUpdate
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.ObserveAlertSettingsUseCase
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.UpdateAlertSettingsUseCase
@@ -72,15 +71,14 @@ class AlertSettingsViewModel @Inject constructor(
     }
 
     private fun toUiState(
-        status: AlertSettingsStatus,
+        settings: AlertSettings,
         draft: AreaSelection?,
         areNotificationsAllowed: Boolean,
     ): AlertSettingsUiState =
         AlertSettingsUiState(
             isLoading = false,
-            settings = status.settings,
-            areaSelection = draft ?: AreaSelection.from(status.settings.area),
-            lastCheckedAt = status.lastCheckedAt,
+            settings = settings,
+            areaSelection = draft ?: AreaSelection.from(settings.area),
             areNotificationsAllowed = areNotificationsAllowed,
         )
 

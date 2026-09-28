@@ -40,7 +40,7 @@ class DeveloperToolsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            observeAlertSettings().collect { status -> state.update { it.withSettings(status.settings) } }
+            observeAlertSettings().collect { settings -> state.update { it.withSettings(settings) } }
         }
     }
 

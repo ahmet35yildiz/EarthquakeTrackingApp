@@ -3,6 +3,7 @@ package com.ahmetyildiz.quakealert.features.alerts.data.repository
 import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.error.AppResult
 import com.ahmetyildiz.quakealert.core.model.City
+import com.ahmetyildiz.quakealert.core.model.GeoPoint
 import com.ahmetyildiz.quakealert.features.alerts.data.model.GeocodedAddress
 import com.ahmetyildiz.quakealert.features.alerts.data.model.GeocodedAddressFixtures.address
 import com.ahmetyildiz.quakealert.features.alerts.data.source.FakeCityGeocoder
@@ -20,6 +21,7 @@ class CitySearchRepositoryImplTest {
 
     private val geocoder = FakeCityGeocoder()
     private val repository = CitySearchRepositoryImpl(geocoder)
+    private val devicePoint = GeoPoint(38.46, 27.21)
     private val query = CitySearchQuery(name = "Izmir", country = Country("TR", "Türkiye"), locale = TURKISH)
 
     @Test
@@ -91,6 +93,43 @@ class CitySearchRepositoryImplTest {
     fun `unexpected failure maps to an unknown error`() = runTest {
         geocoder.failure = IllegalStateException("service error")
         assertEquals(AppResult.Failure(AppError.Unknown), repository.searchCities(query))
+    }
+
+    @Test
+    fun `location lookup without a geocoder fails without a request`() = runTest {
+        geocoder.isGeocoderPresent = false
+        assertEquals(AppResult.Failure(AppError.GeocoderUnavailable), repository.findCityAt(devicePoint, TURKISH))
+        assertTrue(geocoder.pointRequests.isEmpty())
+    }
+
+    @Test
+    fun `location lookup names the point and keeps the device coordinates`() = runTest {
+        geocoder.addresses = listOf(address(locality = "Bornova", adminArea = "Izmir", latitude = 38.47, longitude = 27.22))
+        val expected = City(name = "Bornova", adminArea = "Izmir", countryCode = "TR", location = devicePoint)
+        assertEquals(AppResult.Success(expected), repository.findCityAt(devicePoint, TURKISH))
+        assertEquals(listOf(devicePoint to TURKISH), geocoder.pointRequests)
+    }
+
+    @Test
+    fun `location lookup skips country level addresses`() = runTest {
+        geocoder.addresses = listOf(
+            countryLevelAddress(featureName = "Türkiye", countryCode = "TR"),
+            address(locality = "Bornova"),
+        )
+        val city: City = (repository.findCityAt(devicePoint, TURKISH) as AppResult.Success).data
+        assertEquals("Bornova", city.name)
+    }
+
+    @Test
+    fun `location lookup without a named place is unavailable`() = runTest {
+        geocoder.addresses = listOf(countryLevelAddress(featureName = "Türkiye", countryCode = "TR"))
+        assertEquals(AppResult.Failure(AppError.LocationUnavailable), repository.findCityAt(devicePoint, TURKISH))
+    }
+
+    @Test
+    fun `location lookup io failure maps to a network error`() = runTest {
+        geocoder.failure = IOException("grpc failed")
+        assertEquals(AppResult.Failure(AppError.Network), repository.findCityAt(devicePoint, TURKISH))
     }
 
     private fun countryLevelAddress(featureName: String, countryCode: String): GeocodedAddress =

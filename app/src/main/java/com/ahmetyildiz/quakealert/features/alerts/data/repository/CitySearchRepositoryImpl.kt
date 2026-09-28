@@ -4,12 +4,14 @@ import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.error.AppResult
 import com.ahmetyildiz.quakealert.core.error.map
 import com.ahmetyildiz.quakealert.core.model.City
+import com.ahmetyildiz.quakealert.core.model.GeoPoint
 import com.ahmetyildiz.quakealert.core.network.safeApiCall
 import com.ahmetyildiz.quakealert.features.alerts.data.model.GeocodedAddress
 import com.ahmetyildiz.quakealert.features.alerts.data.model.toCityOrNull
 import com.ahmetyildiz.quakealert.features.alerts.data.source.CityGeocoder
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.CitySearchQuery
 import com.ahmetyildiz.quakealert.features.alerts.domain.repository.CitySearchRepository
+import java.util.Locale
 import javax.inject.Inject
 
 class CitySearchRepositoryImpl @Inject constructor(
@@ -25,10 +27,27 @@ class CitySearchRepositoryImpl @Inject constructor(
             .map { addresses -> toCitiesInCountry(addresses, query) }
     }
 
+    override suspend fun findCityAt(point: GeoPoint, locale: Locale): AppResult<City> {
+        if (!cityGeocoder.isPresent()) return AppResult.Failure(AppError.GeocoderUnavailable)
+        val addresses: AppResult<List<GeocodedAddress>> = safeApiCall { cityGeocoder.findAddressesAt(point, locale) }
+        return when (addresses) {
+            is AppResult.Failure -> addresses
+            is AppResult.Success -> toCityAt(addresses.data, point)
+        }
+    }
+
     private fun toCitiesInCountry(addresses: List<GeocodedAddress>, query: CitySearchQuery): List<City> =
         addresses
             .filter { !it.isCountryLevel || it.featureName.equals(query.name, ignoreCase = true) }
             .mapNotNull(GeocodedAddress::toCityOrNull)
             .filter { it.countryCode == query.country.code }
             .distinctBy { Triple(it.name, it.adminArea, it.countryCode) }
+
+    private fun toCityAt(addresses: List<GeocodedAddress>, point: GeoPoint): AppResult<City> {
+        val city: City = addresses
+            .filterNot(GeocodedAddress::isCountryLevel)
+            .firstNotNullOfOrNull(GeocodedAddress::toCityOrNull)
+            ?: return AppResult.Failure(AppError.LocationUnavailable)
+        return AppResult.Success(city.copy(location = point))
+    }
 }

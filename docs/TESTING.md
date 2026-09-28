@@ -11,6 +11,7 @@
 | CheckForNewAlertsUseCase | fetch → match → notify → store ids → lastCheckedAt; batch > 3 → summary; permission missing → suppressed; network error → retry result |
 | Repository | refresh replaces cache; failure keeps cache and returns error; `eventid` 404 → NotFound |
 | City search | country-code filtering, de-duplication, error mapping (with a fake geocoder) |
+| Use my location | permission / location off / timeout → last known / nothing (fake location source); reverse lookup keeps the device point, skips country-level addresses; ViewModel states, located city delivery, analytics |
 | ViewModels | list states (loading/content/empty/error/offline), filter changes, alert settings save + baseline reset, onboarding steps |
 | Locale | supported language list from `BuildConfig`, display names |
 
@@ -53,6 +54,15 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
 - [ ] Fresh install → onboarding → permission dialog (34/35) / no dialog (31/32) → list.
 - [ ] Deny permission → app works, banner in Alerts + Settings, "Open settings" works.
 - [ ] City search: "Izmir" in Türkiye, "Tokyo" in Japan, nonsense text (empty state), airplane mode (error state).
+- [ ] Use my location (onboarding and Alerts): tap → permission dialog (approximate only) → give the emulator a
+      location while it is searching → city named in the app language, set directly; deny → message + "Open
+      settings" (app details); location off → message + "Open settings" (location settings); geocoder error → retry;
+      rotation while locating keeps the result. Giving a location: `adb emu geo fix <lon> <lat>` or Extended
+      controls → Location (worked on API 31; the API 34 AVD ignored it), otherwise test providers:
+      `adb shell appops set com.android.shell android:mock_location allow`, then for `gps`, `fused`, `network`:
+      `adb shell cmd location providers add-test-provider <p>`, `… set-test-provider-enabled <p> true`,
+      `… set-test-provider-location <p> --location 38.42,27.14 --accuracy 10`; afterwards `remove-test-provider <p>`
+      and `appops set … default`.
 - [ ] No area → warning visible in onboarding and Alerts.
 - [ ] Language: switch EN ↔ TR in-app; survives app restart; system settings language page shows the app (33+).
 - [ ] List: pull-to-refresh, filters, airplane mode → offline banner with cached data, dark mode, font scale 1.5×,

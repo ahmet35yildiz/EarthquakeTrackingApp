@@ -9,6 +9,7 @@ data class CitySearchUiState(
     val countries: List<Country> = emptyList(),
     val selectedCountry: Country? = null,
     val result: CitySearchResult = CitySearchResult.Idle,
+    val location: LocationLookup = LocationLookup.Idle,
 )
 
 sealed interface CitySearchResult {
@@ -22,4 +23,15 @@ sealed interface CitySearchResult {
     data class NoResults(val searchedName: String) : CitySearchResult
 
     data class Failed(val error: AppError) : CitySearchResult
+}
+
+sealed interface LocationLookup {
+
+    data object Idle : LocationLookup
+
+    data object Locating : LocationLookup
+
+    data class Found(val city: City) : LocationLookup
+
+    data class Failed(val error: AppError) : LocationLookup
 }

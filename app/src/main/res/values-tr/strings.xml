@@ -208,27 +208,27 @@
     <string name="city_search_loading">Aranıyor…</string>
     <string name="city_search_no_results">%2$s içinde \"%1$s\" adında bir şehir bulunamadı.</string>
     <string name="city_search_error_unavailable">Bu cihazda şehir arama kullanılamıyor.</string>
+    <string name="location_use_mine">Konumumu kullan</string>
+    <string name="location_finding">Konumunuz bulunuyor…</string>
+    <string name="location_error_permission">QuakeAlert için konum izni kapalı. Ayarlardan izin verin veya şehir arayın.</string>
+    <string name="location_error_disabled">Bu cihazda konum kapalı.</string>
+    <string name="location_error_not_found">Konumunuz bulunamadı. Tekrar deneyin veya şehir arayın.</string>
     <string name="selected_city_label">Seçili şehir</string>
     <string name="action_search">Ara</string>
     <string name="action_change">Değiştir</string>
     <string name="action_cancel">Vazgeç</string>
     <string name="action_close">Kapat</string>
 
-    <string name="alerts_switch_title">Deprem bildirimleri</string>
+    <string name="alerts_switch_title">Deprem alarmları</string>
     <string name="alerts_summary_world">Dünyanın her yerindeki M%1$s+ depremler için bildirim alırsın.</string>
     <string name="alerts_summary_city">%3$s çevresinde %2$d km içindeki M%1$s+ depremler için bildirim alırsın.</string>
-    <string name="alerts_summary_off">Bildirimler kapalı. Büyüklük ve bölge seçimin deprem listesini filtrelemeye devam eder.</string>
-    <string name="alert_status_title">Durum</string>
+    <string name="alerts_summary_off">Alarmlar kapalı. Büyüklük ve bölge seçimin deprem listesini filtrelemeye devam eder.</string>
+    <string name="alerts_blocked_title">Alarmlar sana ulaşamıyor</string>
+    <string name="alerts_blocked_message">Alarmlar açık, ama bu cihazda QuakeAlert\'in bildirimleri kapalı. Alarm alabilmek için bildirimlere izin ver.</string>
     <string name="notifications_allowed">Bildirimlere izin verildi</string>
     <string name="notifications_blocked">Bildirim izni kapalı</string>
     <string name="notifications_blocked_message">Bildirimlere izin verene kadar QuakeAlert sana haber veremez.</string>
     <string name="action_open_settings">Ayarları aç</string>
-    <string name="last_checked">Son kontrol: %1$s</string>
-    <string name="last_checked_never">Henüz arka plan kontrolü yapılmadı</string>
-    <plurals name="alert_check_interval_info">
-        <item quantity="one">QuakeAlert yeni depremleri yaklaşık %d dakikada bir kontrol eder. Bildirimler depremden birkaç dakika sonra gelebilir.</item>
-        <item quantity="other">QuakeAlert yeni depremleri yaklaşık %d dakikada bir kontrol eder. Bildirimler depremden birkaç dakika sonra gelebilir.</item>
-    </plurals>
     <string name="alert_settings_saved">Alarm ayarları kaydedildi</string>
 
     <string name="notification_channel_alerts_name">Deprem bildirimleri</string>
@@ -272,7 +272,7 @@
     <string name="developer_result_posted">Bildirim gönderildi.</string>
     <string name="developer_result_already_notified">Zaten bildirildi. Tekrar bildirim gönderilmedi.</string>
     <string name="developer_result_notifications_off">Bildirimler kapalı olduğu için hiçbir şey gösterilmedi.</string>
-    <string name="developer_result_alerts_off">Deprem bildirimleri kapalı. Alarmlar sekmesinden açabilirsin.</string>
+    <string name="developer_result_alerts_off">Deprem alarmları kapalı. Alarmlar sekmesinden açabilirsin.</string>
     <string name="developer_result_check_started">Kontrol başladı. Sonuç olay kaydında görünür.</string>
     <string name="simulated_earthquake_place">Simüle edilmiş deprem (test)</string>
     <string name="developer_result_nothing_to_repeat">Önce bir alarm simüle et.</string>

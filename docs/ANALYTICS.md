@@ -10,7 +10,7 @@ in later as another `AnalyticsTracker` implementation.
 |---|---|---|
 | Do new users finish setting up alerts? | **Activation rate** = `onboarding_completed` / `onboarding_started` | onboarding_* |
 | Can we actually reach them? | **Notification opt-in rate** = granted / requested | notification_permission_result |
-| Do users personalise alerts? | % with an area set; threshold distribution | onboarding_completed, alert_* |
+| Do users personalise alerts? | % with an area set; threshold distribution; located vs. searched areas | onboarding_completed, alert_*, current_location_used, city_search_performed |
 | Are alerts valuable? (**north star**) | **Alert open rate** = `alert_notification_opened` / `alert_notification_posted`; median time to open | alert_notification_* |
 | Are alerts too noisy? | Threshold raised or alerts disabled within 24 h after a notification | alert_threshold_changed, alerts_toggled |
 | Is the list useful on its own? | Detail views per list view; share/map actions; which sort orders people use | earthquake_list_viewed, earthquake_detail_viewed, detail_action_clicked, list_sort_changed |
@@ -34,6 +34,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `alert_area_cleared` | `context` | Switched to whole world |
 | `city_search_performed` | `country_code`, `result_count` | Search completed |
 | `city_search_failed` | `reason` = network \| unavailable \| unknown | Search failed |
+| `current_location_used` | `result` = success \| permission_denied \| location_off \| not_found \| network \| unknown | "Use my location" finished (success = the city was set), or the permission was denied |
 | `earthquake_list_viewed` | `region_filter` = world \| near_city, `magnitude_filter` = all \| above_threshold, `sort` = newest_first \| largest_first \| nearest_first | List screen shown, also when coming back from the detail (not after rotation / language switch) |
 | `earthquake_list_refreshed` | `trigger` = initial \| pull \| stale (pull = any user-started refresh: pull, refresh button, retry), `result` = success \| failure, `count` (cached earthquakes after the refresh) | Refresh finished |
 | `list_filter_changed` | `filter` = region \| magnitude, `value` (same values as above) | Chip tapped |

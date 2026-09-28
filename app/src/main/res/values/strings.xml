@@ -219,6 +219,11 @@
     <string name="city_search_loading">Searching…</string>
     <string name="city_search_no_results">No city named \"%1$s\" found in %2$s.</string>
     <string name="city_search_error_unavailable">City search isn\'t available on this device.</string>
+    <string name="location_use_mine">Use my location</string>
+    <string name="location_finding">Finding your location…</string>
+    <string name="location_error_permission">Location access is off for QuakeAlert. Allow it in settings or search for a city.</string>
+    <string name="location_error_disabled">Location is turned off on this device.</string>
+    <string name="location_error_not_found">Couldn\'t find your location. Try again or search for a city.</string>
     <string name="selected_city_label">Selected city</string>
     <string name="city_region_pair" translatable="false">%1$s, %2$s</string>
     <string name="action_search">Search</string>
@@ -230,17 +235,12 @@
     <string name="alerts_summary_world">You\'ll be notified about M%1$s+ earthquakes anywhere in the world.</string>
     <string name="alerts_summary_city">You\'ll be notified about M%1$s+ earthquakes within %2$d km of %3$s.</string>
     <string name="alerts_summary_off">Alerts are off. Your magnitude and area still filter the earthquake list.</string>
-    <string name="alert_status_title">Status</string>
+    <string name="alerts_blocked_title">Alerts can\'t reach you</string>
+    <string name="alerts_blocked_message">Alerts are on, but notifications for QuakeAlert are turned off on this device. Allow them to get alerts.</string>
     <string name="notifications_allowed">Notifications allowed</string>
     <string name="notifications_blocked">Notification permission is off</string>
     <string name="notifications_blocked_message">QuakeAlert can\'t show alerts until you allow notifications.</string>
     <string name="action_open_settings">Open settings</string>
-    <string name="last_checked">Last checked %1$s</string>
-    <string name="last_checked_never">No background check yet</string>
-    <plurals name="alert_check_interval_info">
-        <item quantity="one">QuakeAlert checks for new earthquakes about every minute. Alerts can arrive a few minutes after an earthquake.</item>
-        <item quantity="other">QuakeAlert checks for new earthquakes about every %d minutes. Alerts can arrive a few minutes after an earthquake.</item>
-    </plurals>
     <string name="alert_settings_saved">Alert settings saved</string>
 
     <string name="notification_channel_alerts_name">Earthquake alerts</string>

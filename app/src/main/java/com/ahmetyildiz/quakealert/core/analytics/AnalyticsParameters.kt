@@ -8,6 +8,8 @@ enum class SetupContext { ONBOARDING, SETTINGS }
 
 enum class CitySearchFailureReason { NETWORK, UNAVAILABLE, UNKNOWN }
 
+enum class CurrentLocationResult { SUCCESS, PERMISSION_DENIED, LOCATION_OFF, NOT_FOUND, NETWORK, UNKNOWN }
+
 enum class RegionFilterValue { WORLD, NEAR_CITY }
 
 enum class MagnitudeFilterValue { ALL, ABOVE_THRESHOLD }

@@ -12,5 +12,11 @@ sealed interface AppError {
 
     data object GeocoderUnavailable : AppError
 
+    data object LocationPermissionDenied : AppError
+
+    data object LocationDisabled : AppError
+
+    data object LocationUnavailable : AppError
+
     data object Unknown : AppError
 }

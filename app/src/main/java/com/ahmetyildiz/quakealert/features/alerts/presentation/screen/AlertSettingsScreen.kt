@@ -27,16 +27,14 @@ import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.navigation.notificationSettingsIntent
 import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
 import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
-import com.ahmetyildiz.quakealert.core.ui.format.rememberCurrentTime
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
-import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AlertStatusCard
+import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AlertsSummaryActions
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AlertsSummaryCard
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AreaSelectorEntry
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.MagnitudeThresholdSelector
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AlertSettingsUiState
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AlertSettingsViewModel
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaSelection
-import java.time.Instant
 
 data class AlertSettingsActions(
     val onAlertsToggled: (Boolean) -> Unit,
@@ -82,7 +80,6 @@ fun AlertSettingsScreen(
     actions: AlertSettingsActions,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    now: Instant = rememberCurrentTime(),
     areaSelector: @Composable () -> Unit,
 ) {
     Scaffold(
@@ -101,18 +98,19 @@ fun AlertSettingsScreen(
                 .padding(horizontal = Spacing.screenMargin, vertical = Spacing.small),
             verticalArrangement = Arrangement.spacedBy(Spacing.large),
         ) {
-            AlertsSummaryCard(settings = uiState.settings, onAlertsToggled = actions.onAlertsToggled)
+            AlertsSummaryCard(
+                settings = uiState.settings,
+                areNotificationsAllowed = uiState.areNotificationsAllowed,
+                actions = AlertsSummaryActions(
+                    onAlertsToggled = actions.onAlertsToggled,
+                    onAllowNotifications = actions.onOpenNotificationSettings,
+                ),
+            )
             MagnitudeThresholdSelector(
                 threshold = uiState.settings.magnitudeThreshold,
                 onThresholdChange = actions.onThresholdChanged,
             )
             areaSelector()
-            AlertStatusCard(
-                areNotificationsAllowed = uiState.areNotificationsAllowed,
-                lastCheckedAt = uiState.lastCheckedAt,
-                now = now,
-                onOpenNotificationSettings = actions.onOpenNotificationSettings,
-            )
         }
     }
 }

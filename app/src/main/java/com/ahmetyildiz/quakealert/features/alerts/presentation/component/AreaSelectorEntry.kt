@@ -1,11 +1,20 @@
 package com.ahmetyildiz.quakealert.features.alerts.presentation.component
 
+import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ahmetyildiz.quakealert.core.location.LOCATION_PERMISSION
+import com.ahmetyildiz.quakealert.core.location.hasLocationPermission
+import com.ahmetyildiz.quakealert.core.navigation.appSettingsIntent
+import com.ahmetyildiz.quakealert.core.navigation.locationSettingsIntent
+import com.ahmetyildiz.quakealert.core.navigation.tryStartActivity
 import com.ahmetyildiz.quakealert.core.ui.format.currentLocale
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaSelection
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.CitySearchUiState
@@ -35,7 +44,27 @@ fun AreaSelectorEntry(
             onCountrySelected = viewModel::onCountrySelected,
             onSearch = viewModel::onSearch,
             onSearchDismissed = viewModel::onSearchDismissed,
+            location = currentLocationActions(viewModel),
         ),
         modifier = modifier,
+    )
+}
+
+@Composable
+private fun currentLocationActions(viewModel: CitySearchViewModel): CurrentLocationActions {
+    val context: Context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if (it) viewModel.onUseMyLocation() else viewModel.onLocationPermissionDenied()
+    }
+    return CurrentLocationActions(
+        onUseMyLocation = {
+            if (context.hasLocationPermission()) {
+                viewModel.onUseMyLocation()
+            } else {
+                permissionLauncher.launch(LOCATION_PERMISSION)
+            }
+        },
+        onOpenAppSettings = { context.tryStartActivity(appSettingsIntent(context)) },
+        onOpenLocationSettings = { context.tryStartActivity(locationSettingsIntent()) },
     )
 }

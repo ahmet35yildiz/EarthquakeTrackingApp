@@ -83,6 +83,11 @@ class AnalyticsEventTest {
                 "reason" to "unavailable",
             ),
             entry(
+                AnalyticsEvent.CurrentLocationUsed(CurrentLocationResult.LOCATION_OFF),
+                "current_location_used",
+                "result" to "location_off",
+            ),
+            entry(
                 AnalyticsEvent.EarthquakeListViewed(
                     RegionFilterValue.NEAR_CITY,
                     MagnitudeFilterValue.ABOVE_THRESHOLD,
