@@ -51,6 +51,9 @@ class PlaceFormatsTest {
             "Easter Island region" to "Paskalya Adası bölgesi",
             "Mid-Indian Ridge" to "Orta Hint Sırtı",
             "Utah" to "Utah",
+            "8 km E of Ridgecrest, California" to "Ridgecrest, Kaliforniya · 8\u00A0km\u00A0Doğu",
+            "Hawaii" to "Havai",
+            "Texas" to "Teksas",
         ).forEach { (text, expected) -> assertEquals(expected, formatPlace(text, resources)) }
     }
 

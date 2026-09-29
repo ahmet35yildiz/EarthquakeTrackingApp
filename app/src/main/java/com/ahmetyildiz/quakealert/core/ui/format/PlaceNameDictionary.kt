@@ -8,6 +8,9 @@ internal object PlaceNameDictionary {
 
     private val TRANSLATED_NAMES: Map<String, Int> = mapOf(
         "south sandwich islands" to R.string.place_name_south_sandwich_islands,
+        "california" to R.string.place_name_california,
+        "hawaii" to R.string.place_name_hawaii,
+        "texas" to R.string.place_name_texas,
         "aleutian islands" to R.string.place_name_aleutian_islands,
         "south shetland islands" to R.string.place_name_south_shetland_islands,
         "loyalty islands" to R.string.place_name_loyalty_islands,

@@ -101,6 +101,10 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
       `KEEP_SCREEN_ON`; tab switch / Home → torch off and "Start" again; rotation → keeps flashing; Stop → off,
       `emergency_tool_toggled` with `enabled` true and false. Emulators have an emulated torch (visible in the same
       dump); "no flashlight" is covered by `EmergencyScreenTest`.
+- [ ] Statistics: 7 days (no request) and 30 days (loading, then data; airplane mode → error, Retry), World and
+      Near {city}; counts equal the USGS count API with the same window, `eventtype=earthquake`, `minmagnitude=2.5`
+      (and `latitude` / `longitude` / `maxradiuskm` for the area); a chip change scrolls to the top; the largest
+      earthquake opens its detail; EN / TR, dark mode, landscape, font scale 2.0.
 - [ ] Whistle on a physical device: Start → three blasts and a pause, repeating, audible with the phone in silent
       mode; alarm volume at maximum while it plays (`adb shell cmd media_session volume --stream 4 --get`) and the
       old volume back after Stop; tab switch / Home stop it, rotation does not; whistle and strobe together.

@@ -14,6 +14,8 @@ import java.time.format.FormatStyle
 
 private const val ZONE_OFFSET_PATTERN: String = "O"
 private const val DAY_LABEL_SKELETON: String = "EEEEdMMMM"
+private const val SHORT_DATE_SKELETON: String = "dMMM"
+private const val SHORT_WEEKDAY_SKELETON: String = "EEE"
 
 @Composable
 fun formatLocalDateTime(time: Instant): String {
@@ -41,3 +43,13 @@ fun formatDayLabel(date: LocalDate, today: LocalDate): String =
             .ofPattern(DateFormat.getBestDateTimePattern(currentLocale(), DAY_LABEL_SKELETON), currentLocale())
             .format(date)
     }
+
+@Composable
+fun formatShortDate(date: LocalDate): String = formatWithSkeleton(date, SHORT_DATE_SKELETON)
+
+@Composable
+fun formatShortWeekday(date: LocalDate): String = formatWithSkeleton(date, SHORT_WEEKDAY_SKELETON)
+
+@Composable
+private fun formatWithSkeleton(date: LocalDate, skeleton: String): String =
+    DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(currentLocale(), skeleton), currentLocale()).format(date)

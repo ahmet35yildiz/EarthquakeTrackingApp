@@ -12,6 +12,8 @@ enum class CurrentLocationResult { SUCCESS, PERMISSION_DENIED, LOCATION_OFF, NOT
 
 enum class RegionFilterValue { WORLD, NEAR_CITY }
 
+enum class StatisticsPeriodValue { LAST_7_DAYS, LAST_30_DAYS }
+
 enum class MagnitudeFilterValue { ALL, ABOVE_THRESHOLD }
 
 enum class SortOrderValue { NEWEST_FIRST, LARGEST_FIRST, NEAREST_FIRST }

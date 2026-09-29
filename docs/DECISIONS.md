@@ -819,3 +819,24 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** Do Not Disturb can still silence alarms depending on the user's settings; changing the alarm
   volume may be refused there, in which case the whistle plays at the current volume. Changing the pattern or pitch
   is a one-line edit in `EmergencyConfig`.
+
+## ADR-059 — Statistics: calendar-day periods, 7 days from the cache, 30 days fetched on demand
+- **Context:** People want to see how active the world, or their area, has been lately. The list cache already holds
+  7 days of M2.5+ earthquakes; 30 days is about 2,000 earthquakes (≈1.4 MB of GeoJSON) and not needed for the list.
+- **Decision:** The Statistics tab belongs to the `earthquakes` feature (another view of the same data, no new
+  cross-feature dependency). A period is today plus the previous 6 or 29 calendar days in the device time zone, so
+  the daily columns add up to the total. 7 days are computed from the cache; 30 days are requested once when chosen
+  (`FetchStatisticsEarthquakesUseCase`) and kept in the ViewModel, with an error state and Retry. All numbers come
+  from one pure `CalculateEarthquakeStatisticsUseCase` (count, largest, average, magnitude classes, per day, top 5
+  regions). Regions are the last part of the USGS place ("Seferihisar, Turkey" → Turkey), with "CA" and "MX" written
+  out (the only abbreviations in 30 days of data) and localized like the list; California, Hawaii and Texas were added
+  to the Turkish place dictionary (ADR-044). Charts are plain Compose (bars and a `Canvas`), no chart library; the
+  magnitude bars reuse the severity colours and name the class next to each bar, and the daily chart describes every
+  day's count for screen readers. `statistics_viewed` records the period and area on open and on each chip change.
+- **Alternatives:** Rolling 24-hour buckets (days that do not match the calendar); storing 30 days in the cache (a
+  bigger table and a slower list for a secondary screen); the USGS count endpoint per bucket (dozens of requests for
+  one screen); a chart library (a dependency for two simple charts).
+- **Consequences:** Checked against the USGS count API with `eventtype=earthquake`: identical counts for 7 and 30
+  days worldwide and within 250 km of Anchorage (the app keeps earthquakes only, so blasts counted by the plain API
+  are missing on purpose). The 30-day numbers are as fresh as the moment they were fetched; reopening the app fetches
+  them again. Opening the tab offline shows 7 days from the cache and an error with Retry for 30 days.

@@ -27,6 +27,8 @@ yeni bir deprem olduğunda bildirim gönderen Android uygulaması. Veri kaynağ�
   seçilebilir (yalnızca yaklaşık konum izni). Her değişiklik anında kaydedilir.
 - **Arka plan kontrolü ve bildirimler:** 15 dakikada bir kontrol; en fazla 3 ayrı bildirim, daha fazlası için tek
   özet. Bildirime dokununca ilgili deprem detayı açılır.
+- **İstatistik sekmesi:** son 7 veya 30 gün, tüm dünya veya kayıtlı bölge; toplam ve ortalama büyüklük, en büyük
+  deprem, büyüklük sınıflarına göre dağılım, günlük deprem grafiği, en aktif 5 bölge.
 - **Acil Durum sekmesi:** düdük (üç kısa düdük + ara, sessiz modda da alarm sesiyle çalar), çakar flaş (telefon feneri
   saniyede iki kez yanıp söner; ikisi çalışırken ekran açık kalır) ve deprem öncesi / anında / sonrası güvenlik
   rehberi (internetsiz çalışır).

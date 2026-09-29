@@ -12,11 +12,12 @@ object EarthquakeFixtures {
         magnitude: Double? = 4.5,
         location: GeoPoint = GeoPoint(0.0, 0.0),
         time: Instant = Instant.parse("2026-09-25T12:00:00Z"),
+        place: String? = "Place of $id",
     ): Earthquake =
         Earthquake(
             id = id,
             magnitude = magnitude?.let { Magnitude(value = it, type = "mb") },
-            place = "Place of $id",
+            place = place,
             time = time,
             location = location,
             depthKm = 10.0,

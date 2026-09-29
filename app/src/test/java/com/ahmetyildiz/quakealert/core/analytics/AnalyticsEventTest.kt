@@ -127,6 +127,11 @@ class AnalyticsEventTest {
                 "source" to "notification",
             ),
             entry(
+                AnalyticsEvent.StatisticsViewed(StatisticsPeriodValue.LAST_30_DAYS, RegionFilterValue.NEAR_CITY),
+                "statistics_viewed",
+                "period" to "last_30_days", "region_filter" to "near_city",
+            ),
+            entry(
                 AnalyticsEvent.DetailActionClicked(DetailAction.USGS),
                 "detail_action_clicked",
                 "action" to "usgs",

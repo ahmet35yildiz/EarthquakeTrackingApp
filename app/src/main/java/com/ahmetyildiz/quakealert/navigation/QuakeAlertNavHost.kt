@@ -18,7 +18,7 @@ import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSetti
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.OnboardingEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeDetailEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeListEntry
-import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeStatisticsScreen
+import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeStatisticsEntry
 import com.ahmetyildiz.quakealert.features.emergency.presentation.screen.EmergencyEntry
 import com.ahmetyildiz.quakealert.features.emergency.presentation.screen.SafetyGuideEntry
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.screen.EventLogEntry
@@ -54,7 +54,9 @@ fun QuakeAlertNavHost(
                     feedback = { if (route.isFromNotification) AlertFeedbackEntry(eventId = route.earthquakeId) },
                 )
             }
-            composable<StatisticsRoute> { EarthquakeStatisticsScreen() }
+            composable<StatisticsRoute> {
+                EarthquakeStatisticsEntry(onEarthquakeClick = { id -> navController.navigate(EarthquakeDetailRoute(id)) })
+            }
             composable<AlertsRoute> { AlertSettingsEntry() }
             composable<EmergencyRoute> {
                 EmergencyEntry(onOpenSafetyGuide = { navController.navigate(SafetyGuideRoute) })

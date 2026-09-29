@@ -650,7 +650,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   `KEEP_SCREEN_ON` set, rotation kept it playing, whistle and strobe together, both stopped on a tab switch;
   events `tool=whistle` with `enabled=true` / `false`.
 
-- [ ] **5.6 Statistics tab** (added on request). Part of the `earthquakes` feature (a view over earthquake data, no
+- [x] **5.6 Statistics tab** (added on request). Part of the `earthquakes` feature (a view over earthquake data, no
   new cross-feature dependency). Period chips: Last 7 days (existing cache, no extra request) / Last 30 days (USGS
   request on demand, M2.5+, kept in memory, not written to the list cache). Region chips as on the list: Whole world /
   My area. Cards: summary (count, largest — tap opens the detail, average magnitude); magnitude distribution
@@ -660,6 +660,19 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   offline states for the 30-day request. Event `statistics_viewed` (`period`, `region_filter`).
   *Done when:* the statistics use case is fully unit-tested (classes, days, empty list, area); counts match the USGS
   count API for sample queries; tests; verified on API 31 and 34 in EN/TR, dark mode and landscape.
+  *Result:* `StatisticsPeriod` (today + previous 6 / 29 calendar days in `Clock.zone()`, new default method),
+  pure `CalculateEarthquakeStatisticsUseCase` (count, largest with newest on a tie, average of known magnitudes, every
+  severity class, every day, top 5 regions), `EarthquakeRegionName` ("CA" / "MX" written out; California, Hawaii,
+  Texas added to the Turkish dictionary), `FetchStatisticsEarthquakesUseCase` for 30 days (kept in the ViewModel,
+  error + Retry), `EarthquakeStatisticsViewModel` / screen with period and area chips (`SelectableFilterChip` shared
+  with the list), Overview (largest opens the detail), By magnitude bars in severity colours, Per day `Canvas` chart
+  with an accessible day-by-day description, Most active regions; a chip change scrolls to the top;
+  `statistics_viewed` (ADR-059). SPEC, ARCHITECTURE, ANALYTICS, TESTING, README updated. 552 unit (+24), 135/135
+  instrumented on API 31 and 34 (+6 `EarthquakeStatisticsScreenTest`), lint clean (only the existing dependency
+  warnings). Against the USGS count API with `eventtype=earthquake`: world 7 days 306 = 306 with every class equal,
+  30 days 1,941 = 1,941 (API 34) and 1,942 = 1,942 later (API 31), 250 km around Anchorage 30 days 79 = 79 (the plain
+  API also counts 2 blasts, which the app leaves out on purpose). Checked on API 34 in EN and TR, dark mode,
+  landscape and font scale 2.0.
 
 - [ ] **5.7 Emergency SMS — decision pending, re-evaluate with the user before starting** (added on request). Draft:
   up to 3 contacts chosen with the system contact picker (no contacts permission), stored on the device; "Send
@@ -733,3 +746,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-29 | 16:01–16:39 | ~38m | 5.3 Statistics + Emergency tabs, safety guide (EN/TR, `safety_guide_viewed`, ADR-056); shared tab label size + scrolling rail after the 2.0 font-scale check (ADR-055); 510 unit, 122/122 instrumented on API 31 and 34; guide text approved |
 | 2026-09-29 | 16:50–17:10 | ~20m | 5.4 Strobe light: camera torch 2 flashes/s, stops when the Emergency screen is left, keeps the screen on (ADR-057); 520 unit, 126/126 instrumented on API 31 and 34; verified on a Galaxy S20 FE |
 | 2026-09-29 | 17:12–17:40 | ~28m | 5.5 Whistle: generated 3 kHz distress pattern looped by AudioTrack on the alarm stream, alarm volume raised and restored (ADR-058); static-track fix found on the emulator + real AudioTrack test; 528 unit, 129/129 instrumented on API 31 and 34; verified on a Galaxy S20 FE in silent mode |
+| 2026-09-29 | 17:41–18:21 | ~40m | 5.6 Statistics tab: 7 days from the cache, 30 days fetched on demand, overview / magnitude / per day / regions, area chip (ADR-059); counts equal the USGS count API; 552 unit, 135/135 instrumented on API 31 and 34 |

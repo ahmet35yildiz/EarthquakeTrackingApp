@@ -60,7 +60,7 @@ class MainTabsTest {
     fun statisticsTabOpensItsScreen() {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             clickTab(scenario.string(R.string.tab_statistics))
-            awaitText(scenario.string(R.string.statistics_placeholder_title))
+            awaitText(scenario.string(R.string.statistics_period_30_days))
         }
     }
 

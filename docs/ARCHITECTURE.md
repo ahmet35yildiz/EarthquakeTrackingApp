@@ -271,6 +271,21 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
 - The list's controls (stale-data banner, filter chips, count + sort) are the first item of the `LazyColumn`, so they
   scroll away with the list and landscape / large font scales keep room for the cards (ADR-040).
 
+### 4.4.1 Statistics (ADR-059)
+- `EarthquakeStatisticsViewModel` combines the chosen options (period, region), `ObserveRecentEarthquakesUseCase`
+  (the cached list + the saved area) and a per-period fetch state, on the default dispatcher.
+- A period whose days fit in `EarthquakesConfig.RECENT_PERIOD` (7 days) uses the cache. A longer one (30 days) is
+  requested once through `FetchStatisticsEarthquakesUseCase` (`EarthquakeRepository.fetchEarthquakes`, which only
+  refreshes rows already cached, so the list cache does not grow) and kept in the ViewModel; Retry refetches.
+- `StatisticsPeriod.days` / `startTime` define the window: today and the previous days in `Clock.zone()`, from local
+  midnight. The pure `CalculateEarthquakeStatisticsUseCase` takes a `StatisticsInput` (earthquakes, period, region,
+  area, now, zone) and returns `EarthquakeStatistics`: count, largest (highest magnitude, newest on a tie), average of
+  known magnitudes, a count for every `MagnitudeSeverity`, a count for every day, and the top regions from
+  `EarthquakeRegionName` (last part of the USGS place, "CA" / "MX" written out).
+- Charts are plain Compose: magnitude bars are `Box`es with `fillMaxWidth(fraction)` in the severity colours; the
+  daily chart is a `Canvas` of columns (2 dp gaps, 4 dp rounded tops, a baseline) with a text description of every
+  day for accessibility. `SelectableFilterChip` is shared with the list's chips.
+
 ### 4.5 Navigation and deep links
 - Root `NavHost` with two graphs: `OnboardingGraphRoute` (onboarding) and `MainGraphRoute` (five tabs + pushed
   screens: detail, safety guide, developer tools, event log). The

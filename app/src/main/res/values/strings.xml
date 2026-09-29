@@ -93,6 +93,9 @@
     <string name="place_side_southwest">southwest</string>
     <string name="place_side_central">central</string>
     <string name="place_name_south_sandwich_islands">South Sandwich Islands</string>
+    <string name="place_name_california">California</string>
+    <string name="place_name_hawaii">Hawaii</string>
+    <string name="place_name_texas">Texas</string>
     <string name="place_name_aleutian_islands">Aleutian Islands</string>
     <string name="place_name_south_shetland_islands">South Shetland Islands</string>
     <string name="place_name_loyalty_islands">Loyalty Islands</string>
@@ -366,8 +369,29 @@
     <string name="action_clear">Clear</string>
     <string name="event_log_share_title">Share event log</string>
 
-    <string name="statistics_placeholder_title">Coming soon</string>
-    <string name="statistics_placeholder_message">Earthquake statistics for the last 7 and 30 days will appear here.</string>
+    <string name="statistics_period_7_days">Last 7 days</string>
+    <string name="statistics_period_30_days">Last 30 days</string>
+    <string name="statistics_overview_title">Overview</string>
+    <string name="statistics_total_label">Earthquakes</string>
+    <string name="statistics_average_label">Average magnitude</string>
+    <string name="statistics_magnitude_value">M%1$s</string>
+    <string name="statistics_no_value">–</string>
+    <string name="statistics_largest_label">Largest</string>
+    <string name="statistics_magnitude_title">By magnitude</string>
+    <string name="statistics_severity_label">%1$s · %2$s</string>
+    <string name="statistics_magnitude_range">M%1$s–%2$s</string>
+    <string name="statistics_magnitude_open_range">M%1$s+</string>
+    <string name="statistics_daily_title">Per day</string>
+    <plurals name="statistics_busiest_day">
+        <item quantity="one">Busiest day: %1$s, %2$d earthquake</item>
+        <item quantity="other">Busiest day: %1$s, %2$d earthquakes</item>
+    </plurals>
+    <string name="statistics_day_count">%1$s: %2$d</string>
+    <string name="statistics_daily_description">Earthquakes per day. %1$s</string>
+    <string name="statistics_regions_title">Most active regions</string>
+    <string name="statistics_empty_title">No earthquakes in this period</string>
+    <string name="statistics_empty_message">Try the whole world or a longer period.</string>
+    <string name="statistics_error_title">Statistics could not be loaded</string>
 
     <string name="emergency_title">Emergency tools</string>
     <string name="whistle_title">Whistle</string>

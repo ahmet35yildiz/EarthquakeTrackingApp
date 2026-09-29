@@ -121,6 +121,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("sort" to sortOrder.paramValue),
     )
 
+    data class StatisticsViewed(val period: StatisticsPeriodValue, val regionFilter: RegionFilterValue) : AnalyticsEvent(
+        name = "statistics_viewed",
+        params = mapOf("period" to period.paramValue, "region_filter" to regionFilter.paramValue),
+    )
+
     data class EarthquakeDetailViewed(val source: DetailSource, val magnitude: Double?) : AnalyticsEvent(
         name = "earthquake_detail_viewed",
         params = buildMap {

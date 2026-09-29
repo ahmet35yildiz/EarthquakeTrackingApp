@@ -34,7 +34,8 @@ publication delay + background check interval). The app says this explicitly in 
 8. Multilingual UI: English (default) + Turkish, in-app language switch.
 9. Light and dark theme, consistent custom Material 3 design.
 10. Emergency tab: whistle, strobe light, safety guide (before / during / after an earthquake).
-11. Statistics tab (placeholder until the statistics screen is built).
+11. Statistics tab: last 7 or 30 days, whole world or the saved area; overview, magnitude classes, earthquakes per
+    day, most active regions.
 
 ### Out of scope (documented in README with reasons)
 | Item | Reason |
@@ -172,7 +173,16 @@ publication delay + background check interval). The app says this explicitly in 
   "Before"; the shown tab survives rotation. Each shown section records `safety_guide_viewed` (ADR-056).
 
 ### 4.9 Statistics (tab "Statistics")
-- Placeholder ("Coming soon") until the statistics screen is built.
+- Chips: Last 7 days | Last 30 days, and World | Near {city} (the area chip only with a saved city, as on the list).
+  A period is today plus the previous 6 or 29 days in the device time zone, M2.5+, earthquakes only.
+- Last 7 days come from the list cache (no request). Last 30 days are requested from USGS when first chosen and kept
+  in memory for the screen; loading, and an error with Retry (network / generic message).
+- Cards: Overview (count, average magnitude, largest earthquake → detail), By magnitude (a bar per class with its
+  range, severity colours, counts), Per day (a column per day; weekday labels for 7 days, first / last date for 30;
+  busiest day under it; the chart's description lists every day's count for screen readers), Most active regions
+  (top 5 by count; the last part of the USGS place, "CA" / "MX" written out, localized like the list).
+- No earthquakes in the chosen period / area → empty state. Changing a chip scrolls back to the top.
+- Records `statistics_viewed` on open (not after rotation) and on each chip change (ADR-059).
 
 ## 5. Alert rules (single source of truth)
 
