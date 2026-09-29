@@ -16,7 +16,6 @@ import com.ahmetyildiz.quakealert.features.alerts.domain.FakeAlertCheckScheduler
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.ObserveAlertSettingsUseCase
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.SyncAlertScheduleUseCase
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.UpdateAlertSettingsUseCase
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -126,15 +125,6 @@ class AlertSettingsViewModelTest {
         assertEquals(AnalyticsEvent.AlertAreaCleared(SetupContext.SETTINGS), analyticsTracker.events.last())
         viewModel.onAreaSelectionChanged(collectState().areaSelection.copy(mode = AreaMode.NEAR_CITY))
         assertEquals(AlertArea.AroundCity(izmir, radiusKm = 100), preferences.alertSettings.area)
-    }
-
-    @Test
-    fun `every saved change emits one saved event`() = runTest {
-        val events: MutableList<AlertSettingsEvent> = mutableListOf()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.events.toList(events) }
-        viewModel.onThresholdChanged(5.0)
-        viewModel.onThresholdChanged(5.0)
-        assertEquals(listOf(AlertSettingsEvent.Saved), events)
     }
 
     @Test

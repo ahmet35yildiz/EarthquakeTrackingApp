@@ -12,12 +12,9 @@ import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertSettingsUpda
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.ObserveAlertSettingsUseCase
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.UpdateAlertSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -33,7 +30,6 @@ class AlertSettingsViewModel @Inject constructor(
 
     private val areaDraft = MutableStateFlow<AreaSelection?>(null)
     private val notificationAccess = MutableStateFlow(notificationAccessChecker.getAlertNotificationAccess())
-    private val eventChannel = MutableSharedFlow<AlertSettingsEvent>(extraBufferCapacity = 1)
 
     val uiState: StateFlow<AlertSettingsUiState> = combine(
         observeAlertSettings(),
@@ -41,8 +37,6 @@ class AlertSettingsViewModel @Inject constructor(
         notificationAccess,
         ::toUiState,
     ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), AlertSettingsUiState())
-
-    val events: SharedFlow<AlertSettingsEvent> = eventChannel.asSharedFlow()
 
     fun onScreenResumed() {
         notificationAccess.value = notificationAccessChecker.getAlertNotificationAccess()
@@ -67,7 +61,6 @@ class AlertSettingsViewModel @Inject constructor(
             val update: AlertSettingsUpdate = updateAlertSettings(transform)
             if (!update.isChanged) return@launch
             update.toAnalyticsEvents(SetupContext.SETTINGS).forEach(analyticsTracker::track)
-            eventChannel.tryEmit(AlertSettingsEvent.Saved)
         }
     }
 

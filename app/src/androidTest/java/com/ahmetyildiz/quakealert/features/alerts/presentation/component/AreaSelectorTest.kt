@@ -79,6 +79,30 @@ class AreaSelectorTest {
     }
 
     @Test
+    fun choosingNearCityWithoutACityOpensTheCitySearch() {
+        setContent(wholeWorld, searchState)
+        composeRule.onNodeWithText(string(R.string.alert_area_near_city)).performClick()
+        composeRule.onNodeWithText(string(R.string.city_search_label)).assertIsDisplayed()
+    }
+
+    @Test
+    fun nearCityWithoutACityOffersTheCitySearchInsteadOfShowingIt() {
+        setContent(nearNoCity, searchState)
+        composeRule.onNodeWithText(string(R.string.city_search_label)).assertDoesNotExist()
+        openCitySearch()
+        composeRule.onNodeWithText(string(R.string.city_search_label)).assertIsDisplayed()
+    }
+
+    @Test
+    fun closingTheCitySearchDismissesIt() {
+        setContent(nearNoCity, searchState)
+        openCitySearch()
+        composeRule.onNodeWithContentDescription(string(R.string.action_close)).performClick()
+        composeRule.onNodeWithText(string(R.string.city_search_label)).assertDoesNotExist()
+        assertEquals(1, dismissCount)
+    }
+
+    @Test
     fun unavailableCitySearchHidesTheModeChoice() {
         setContent(wholeWorld, searchState.copy(isAvailable = false))
         composeRule.onNodeWithText(string(R.string.alert_area_near_city)).assertDoesNotExist()
@@ -91,6 +115,7 @@ class AreaSelectorTest {
         composeRule.onNodeWithText("İzmir").assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.alert_area_city_change_unavailable)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.action_change)).assertDoesNotExist()
+        composeRule.onNodeWithText(string(R.string.city_search_title)).assertDoesNotExist()
         composeRule.onNodeWithText(string(R.string.alert_area_whole_world)).performClick()
         assertEquals(listOf(AreaMode.WHOLE_WORLD), selectedModes)
     }
@@ -105,6 +130,7 @@ class AreaSelectorTest {
     @Test
     fun typedCityNameIsSearched() {
         setContent(nearNoCity, searchState)
+        openCitySearch()
         composeRule.onNodeWithText(string(R.string.city_search_label)).performTextInput("Izmir")
         composeRule.onNodeWithContentDescription(string(R.string.action_search)).performClick()
         assertEquals(listOf("Izmir"), searchedNames)
@@ -113,6 +139,7 @@ class AreaSelectorTest {
     @Test
     fun foundCityCanBePicked() {
         setContent(nearNoCity, searchState.copy(result = CitySearchResult.Found(listOf(izmir))))
+        openCitySearch()
         composeRule.onNodeWithText("İzmir").performScrollTo().performClick()
         assertEquals(listOf(izmir), selectedCities)
     }
@@ -120,6 +147,7 @@ class AreaSelectorTest {
     @Test
     fun noResultsNamesTheSearchAndTheCountry() {
         setContent(nearNoCity, searchState.copy(result = CitySearchResult.NoResults("Atlantis")))
+        openCitySearch()
         composeRule.onNodeWithText(string(R.string.city_search_no_results, "Atlantis", "Türkiye"))
             .performScrollTo()
             .assertIsDisplayed()
@@ -132,8 +160,8 @@ class AreaSelectorTest {
         composeRule.onNodeWithText("Türkiye").assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.action_change)).performClick()
         composeRule.onNodeWithText(string(R.string.city_search_label)).assertIsDisplayed()
-        composeRule.onNodeWithText(string(R.string.action_cancel)).performScrollTo().performClick()
-        composeRule.onNodeWithText(string(R.string.action_change)).assertIsDisplayed()
+        composeRule.onNodeWithContentDescription(string(R.string.action_close)).performClick()
+        composeRule.onNodeWithText(string(R.string.city_search_label)).assertDoesNotExist()
         assertEquals(listOf("TR"), selectedCountries)
         assertEquals(1, dismissCount)
     }
@@ -148,6 +176,7 @@ class AreaSelectorTest {
     @Test
     fun countryIsPickedFromTheSearchableList() {
         setContent(nearNoCity, searchState)
+        openCitySearch()
         composeRule.onNodeWithText("Türkiye").performClick()
         composeRule.onNodeWithText(string(R.string.country_search_hint)).performTextInput("jap")
         composeRule.onAllNodesWithText("Türkiye").assertCountEquals(1)
@@ -158,6 +187,7 @@ class AreaSelectorTest {
     @Test
     fun useMyLocationAsksForTheLocation() {
         setContent(nearNoCity, searchState)
+        openCitySearch()
         composeRule.onNodeWithText(string(R.string.location_use_mine)).performClick()
         assertEquals(1, useMyLocationCount)
     }
@@ -165,6 +195,7 @@ class AreaSelectorTest {
     @Test
     fun locatingShowsProgressAndDisablesTheButton() {
         setContent(nearNoCity, searchState.copy(location = LocationLookup.Locating))
+        openCitySearch()
         composeRule.onNodeWithText(string(R.string.location_finding)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.location_use_mine)).assertIsNotEnabled()
     }
@@ -172,6 +203,7 @@ class AreaSelectorTest {
     @Test
     fun deniedPermissionOffersTheAppSettings() {
         setContent(nearNoCity, searchState.copy(location = LocationLookup.Failed(AppError.LocationPermissionDenied)))
+        openCitySearch()
         composeRule.onNodeWithText(string(R.string.location_error_permission)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
         assertEquals(1, appSettingsCount)
@@ -180,6 +212,7 @@ class AreaSelectorTest {
     @Test
     fun locationTurnedOffOffersTheLocationSettings() {
         setContent(nearNoCity, searchState.copy(location = LocationLookup.Failed(AppError.LocationDisabled)))
+        openCitySearch()
         composeRule.onNodeWithText(string(R.string.location_error_disabled)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
         assertEquals(1, locationSettingsCount)
@@ -188,6 +221,7 @@ class AreaSelectorTest {
     @Test
     fun locationNotFoundCanBeRetried() {
         setContent(nearNoCity, searchState.copy(location = LocationLookup.Failed(AppError.LocationUnavailable)))
+        openCitySearch()
         composeRule.onNodeWithText(string(R.string.action_retry)).performClick()
         assertEquals(1, useMyLocationCount)
     }
@@ -203,8 +237,12 @@ class AreaSelectorTest {
         }
         composeRule.onNodeWithText(string(R.string.action_change)).performClick()
         citySearch.value = searchState.copy(location = LocationLookup.Found(bornova))
-        composeRule.onNodeWithText(string(R.string.action_change)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.city_search_label)).assertDoesNotExist()
         assertEquals(listOf(bornova), selectedCities)
+    }
+
+    private fun openCitySearch() {
+        composeRule.onNodeWithText(string(R.string.city_search_title)).performClick()
     }
 
     private fun string(id: Int, vararg args: Any): String = composeRule.activity.getString(id, *args)

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,8 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -45,21 +42,6 @@ fun OnboardingWelcomePage(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-        )
-        OnboardingFeatureCard(
-            icon = painterResource(R.drawable.ic_waves),
-            title = stringResource(R.string.onboarding_feature_list_title),
-            message = stringResource(R.string.onboarding_feature_list_message),
-        )
-        OnboardingFeatureCard(
-            icon = rememberVectorPainter(Icons.Rounded.Place),
-            title = stringResource(R.string.onboarding_feature_filter_title),
-            message = stringResource(R.string.onboarding_feature_filter_message),
-        )
-        OnboardingFeatureCard(
-            icon = painterResource(R.drawable.ic_notifications),
-            title = stringResource(R.string.onboarding_feature_alert_title),
-            message = stringResource(R.string.onboarding_feature_alert_message),
         )
         DisclaimerCard()
     }

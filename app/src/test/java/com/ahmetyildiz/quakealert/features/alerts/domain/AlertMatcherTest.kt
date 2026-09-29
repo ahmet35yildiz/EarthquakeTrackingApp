@@ -4,6 +4,7 @@ import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
+import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertChoice
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertMatchCriteria
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeFixtures
@@ -31,6 +32,18 @@ class AlertMatcherTest {
     @Test
     fun `earthquake that satisfies every rule matches`() {
         assertTrue(matcher.matches(matchingEarthquake(), criteria))
+    }
+
+    @ParameterizedTest(name = "M{0} → threshold and area rule equals the delivery rule")
+    @CsvSource("4.49", "4.5", "6.0")
+    fun `threshold and area rule gives the same answer as delivery for an eligible earthquake`(magnitude: Double) {
+        val area = AlertArea.AroundCity(City("Center", null, "XX", GeoPoint(0.0, 0.0)), radiusKm = 100)
+        val aroundCity: AlertMatchCriteria = criteria.copy(settings = criteria.settings.copy(area = area))
+        val choice = AlertChoice(magnitudeThreshold = THRESHOLD, area = area)
+        listOf(GeoPoint(0.5, 0.0), GeoPoint(2.0, 0.0)).forEach { location ->
+            val earthquake: Earthquake = matchingEarthquake(magnitude = magnitude, location = location)
+            assertEquals(matcher.matches(earthquake, aroundCity), matcher.matchesThresholdAndArea(earthquake, choice))
+        }
     }
 
     @Nested

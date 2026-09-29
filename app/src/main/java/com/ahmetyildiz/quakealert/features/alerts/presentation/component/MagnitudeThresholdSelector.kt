@@ -31,6 +31,7 @@ fun MagnitudeThresholdSelector(
     threshold: Double,
     onThresholdChange: (Double) -> Unit,
     modifier: Modifier = Modifier,
+    onThresholdDragged: (Double) -> Unit = {},
 ) {
     var sliderValue: Float by remember(threshold) { mutableFloatStateOf(threshold.toFloat()) }
     val magnitudeText: String = stringResource(R.string.magnitude_value, snapToThresholdStep(sliderValue))
@@ -44,7 +45,11 @@ fun MagnitudeThresholdSelector(
     ) {
         Slider(
             value = sliderValue,
-            onValueChange = { sliderValue = snapToThresholdStep(it).toFloat() },
+            onValueChange = {
+                val snapped: Double = snapToThresholdStep(it)
+                sliderValue = snapped.toFloat()
+                onThresholdDragged(snapped)
+            },
             onValueChangeFinished = { onThresholdChange(snapToThresholdStep(sliderValue)) },
             valueRange = AlertConfig.THRESHOLD_RANGE.start.toFloat()..AlertConfig.THRESHOLD_RANGE.endInclusive.toFloat(),
             steps = countThresholdSliderSteps(),
@@ -54,11 +59,6 @@ fun MagnitudeThresholdSelector(
             },
         )
         ThresholdRangeLabels()
-        Text(
-            text = stringResource(R.string.alert_threshold_hint, magnitudeText),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

@@ -50,7 +50,6 @@ data class CitySearchActions(
     val onCountrySelected: (String) -> Unit,
     val onSearch: (String) -> Unit,
     val onCitySelected: (City) -> Unit,
-    val onCancel: (() -> Unit)?,
     val location: CurrentLocationActions,
 )
 
@@ -81,7 +80,6 @@ fun CitySearchPanel(
             onCitySelected = actions.onCitySelected,
             onRetry = search,
         )
-        actions.onCancel?.let { TextButton(onClick = it) { Text(text = stringResource(R.string.action_cancel)) } }
     }
 }
 
@@ -193,7 +191,6 @@ private fun CitySearchPanelPreview() {
                     onCountrySelected = {},
                     onSearch = {},
                     onCitySelected = {},
-                    onCancel = {},
                     location = CurrentLocationActions(onUseMyLocation = {}, onOpenAppSettings = {}, onOpenLocationSettings = {}),
                 ),
                 modifier = Modifier.padding(Spacing.large),

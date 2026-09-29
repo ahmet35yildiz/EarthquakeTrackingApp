@@ -2,12 +2,15 @@ package com.ahmetyildiz.quakealert.features.alerts.presentation.screen
 
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.Text
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.AlertArea
@@ -93,6 +96,23 @@ class AlertSettingsScreenTest {
         )
         composeRule.onNodeWithText(string(R.string.alerts_summary_off)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.alerts_blocked_title)).assertDoesNotExist()
+    }
+
+    @Test
+    fun previewFollowsTheSliderWhileDragging() {
+        composeRule.setContent {
+            QuakeAlertTheme {
+                AlertSettingsScreen(
+                    uiState = AlertSettingsUiState(isLoading = false),
+                    actions = actions,
+                    alertPreview = { Text(text = "Preview for $it") },
+                ) { Text(text = "Area selector") }
+            }
+        }
+        composeRule.onNodeWithText("Preview for 4.5").assertIsDisplayed()
+        composeRule.onNodeWithContentDescription(string(R.string.alert_threshold_title))
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(6.0f) }
+        composeRule.onNodeWithText("Preview for 6.0").assertIsDisplayed()
     }
 
     private fun string(id: Int, vararg args: Any): String = composeRule.activity.getString(id, *args)

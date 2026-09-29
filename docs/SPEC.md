@@ -60,14 +60,16 @@ publication delay + background check interval). The app says this explicitly in 
 ## 4. Screens and behaviour
 
 ### 4.1 Onboarding (first run only; completion stored)
-1. **Welcome:** what the app does, 3 short bullets, disclaimer "not an early-warning system; alerts can be delayed by
-   several minutes".
+1. **Welcome:** app icon, what the app does in one sentence, disclaimer "not an early-warning system; alerts can be
+   delayed by several minutes".
 2. **Alert setup:** magnitude threshold slider + area selection (same components as Alert settings). If the user
    keeps "Whole world", a warning explains that alerts will come for earthquakes anywhere and can be frequent at low
    thresholds.
 3. **Notifications:** explains why the permission is needed → requests `POST_NOTIFICATIONS` on API 33+. Below 33 the
    step only confirms (no runtime permission). Denial is allowed; the app still works and shows a banner later.
 4. Finish → main screen, periodic work scheduled if alerts are enabled.
+5. Every step fits on a phone screen without scrolling at the default font size (scrolling remains only as a fallback
+   for large text, landscape and very small screens). City search therefore opens in its own full-screen dialog.
 
 ### 4.2 Earthquake list (tab "Earthquakes", start destination after onboarding)
 - Data: last **7 days**, **M2.5+**, worldwide, fetched once per refresh and cached in Room. All filtering is local.
@@ -100,8 +102,9 @@ publication delay + background check interval). The app says this explicitly in 
 - Area: `Whole world` (default, with warning) or `City + radius`.
   - Country picker: all ISO countries from `Locale.getISOCountries()`, names localized to the app language, sorted
     with a locale-aware `Collator`, local search box. Default: device locale country.
-  - City search: text field + "Search" action (no live suggestions) → Android `Geocoder` → results filtered to the
-    selected country → user picks one. Loading/empty/error states. Hidden if `Geocoder.isPresent()` is false; a city that is
+  - City search (full-screen "Choose a city" dialog, opened by picking "Near a city" without a city, the "Choose a
+    city" button or "Change"): text field + "Search" action (no live suggestions) → Android `Geocoder` → results
+    filtered to the selected country → user picks one and the dialog closes. Loading/empty/error states. Hidden if `Geocoder.isPresent()` is false; a city that is
     already saved is still shown and can be switched to `Whole world` (it just cannot be changed).
   - "Use my location" (above the country picker, same place as the search): asks for approximate location
     (`ACCESS_COARSE_LOCATION` only) on first use → the device location becomes the circle center and reverse
@@ -110,11 +113,16 @@ publication delay + background check interval). The app says this explicitly in 
     (location settings); no location within 15 s and no recent one, or no place name → retry; offline → network
     message + retry. Searching by name stays available in every case.
   - Radius options: **50 / 100 / 250 / 500 / 1000 km**, default **250 km**.
+- Preview (Alerts tab, below the area; not in onboarding): "With these settings, N earthquakes in the last 3
+  days would have matched your alerts." Counted on the cached list (7 days, M2.5+) with the same threshold and area
+  rule as the alert check; updates while the slider is dragged and on every area/radius change. Hidden while "Near a
+  city" has no city; "Checking recent earthquakes…" while a missing cache loads; a short note if it cannot load.
+  Simulated test earthquakes are not counted.
 - Notification permission: while alerts are on and the permission is off, the summary card shows "Alerts can't
   reach you" with "Allow notifications" (opens the app's notification settings) instead of the summary sentence;
   nothing is flagged while alerts are off. The Settings tab keeps the full permission status row.
-- Every saved change (switch, threshold, area) is stored immediately and resets the alert baseline (see 5.1) so
-  older events never trigger notifications.
+- Every saved change (switch, threshold, area) is stored immediately, without a confirmation message, and resets the
+  alert baseline (see 5.1) so older events never trigger notifications.
 
 ### 4.5 Settings (tab "Settings")
 - Language: `System default` + every language the app ships (generated automatically), applied instantly.

@@ -14,6 +14,7 @@ object AlertConfig {
     val CURRENT_LOCATION_TIMEOUT: Duration = Duration.ofSeconds(15)
     val CHECK_INTERVAL: Duration = Duration.ofMinutes(15)
     val MAX_EVENT_AGE: Duration = Duration.ofHours(6)
+    val PREVIEW_PERIOD: Duration = Duration.ofDays(3)
     val UPDATED_AFTER_OVERLAP: Duration = Duration.ofMinutes(10)
     val NOTIFIED_ID_RETENTION: Duration = Duration.ofDays(30)
     const val MAX_INDIVIDUAL_NOTIFICATIONS: Int = 3

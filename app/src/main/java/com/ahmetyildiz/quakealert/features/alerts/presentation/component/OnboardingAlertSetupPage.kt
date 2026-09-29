@@ -31,11 +31,6 @@ fun OnboardingAlertSetupPage(
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.semantics { heading() },
         )
-        Text(
-            text = stringResource(R.string.onboarding_setup_message),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
         MagnitudeThresholdSelector(threshold = threshold, onThresholdChange = onThresholdChanged)
         areaSelector()
     }

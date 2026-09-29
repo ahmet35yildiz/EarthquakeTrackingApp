@@ -9,14 +9,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -28,6 +26,7 @@ import com.ahmetyildiz.quakealert.core.navigation.notificationSettingsIntent
 import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
 import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
+import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AlertPreviewEntry
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AlertsSummaryActions
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AlertsSummaryCard
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AreaSelectorEntry
@@ -50,17 +49,9 @@ fun AlertSettingsEntry(
 ) {
     val uiState: AlertSettingsUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context: Context = LocalContext.current
-    val snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
-    val savedMessage: String = stringResource(R.string.alert_settings_saved)
     LifecycleResumeEffect(viewModel) {
         viewModel.onScreenResumed()
         onPauseOrDispose {}
-    }
-    LaunchedEffect(viewModel) {
-        viewModel.events.collect {
-            snackbarHostState.currentSnackbarData?.dismiss()
-            snackbarHostState.showSnackbar(message = savedMessage, duration = SnackbarDuration.Short)
-        }
     }
     val actions = AlertSettingsActions(
         onAlertsToggled = viewModel::onAlertsToggled,
@@ -70,7 +61,12 @@ fun AlertSettingsEntry(
             context.startActivity(notificationSettingsIntent(context, uiState.notificationAccess))
         },
     )
-    AlertSettingsScreen(uiState = uiState, actions = actions, snackbarHostState = snackbarHostState, modifier = modifier) {
+    AlertSettingsScreen(
+        uiState = uiState,
+        actions = actions,
+        modifier = modifier,
+        alertPreview = { AlertPreviewEntry(threshold = it, area = uiState.areaSelection.toAlertAreaOrNull()) },
+    ) {
         AreaSelectorEntry(selection = uiState.areaSelection, onSelectionChange = actions.onAreaSelectionChanged)
     }
 }
@@ -81,13 +77,14 @@ fun AlertSettingsScreen(
     uiState: AlertSettingsUiState,
     actions: AlertSettingsActions,
     modifier: Modifier = Modifier,
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    alertPreview: @Composable (threshold: Double) -> Unit = {},
     areaSelector: @Composable () -> Unit,
 ) {
+    val savedThreshold: Double = uiState.settings.magnitudeThreshold
+    var previewThreshold: Double by remember(savedThreshold) { mutableDoubleStateOf(savedThreshold) }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = { TopAppBar(title = { ScreenTitle(text = stringResource(R.string.tab_alerts)) }) },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         if (uiState.isLoading) {
             LoadingState(modifier = Modifier.padding(innerPadding))
@@ -109,10 +106,12 @@ fun AlertSettingsScreen(
                 ),
             )
             MagnitudeThresholdSelector(
-                threshold = uiState.settings.magnitudeThreshold,
+                threshold = savedThreshold,
                 onThresholdChange = actions.onThresholdChanged,
+                onThresholdDragged = { previewThreshold = it },
             )
             areaSelector()
+            alertPreview(previewThreshold)
         }
     }
 }

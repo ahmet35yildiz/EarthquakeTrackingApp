@@ -202,7 +202,17 @@
 
     <string name="alert_threshold_title">Minimum magnitude</string>
     <string name="alert_threshold_badge" translatable="false">M%1$s+</string>
-    <string name="alert_threshold_hint">You\'ll get alerts for M%1$s and stronger earthquakes.</string>
+    <string name="alert_preview_loading">Checking recent earthquakes…</string>
+    <string name="alert_preview_unavailable">Recent earthquakes couldn\'t be loaded, so there\'s no preview of these settings yet.</string>
+    <plurals name="alert_preview_period">
+        <item quantity="one">the last day</item>
+        <item quantity="other">the last %d days</item>
+    </plurals>
+    <string name="alert_preview_none">With these settings, no earthquake in %1$s would have matched your alerts.</string>
+    <plurals name="alert_preview_matches">
+        <item quantity="one">With these settings, %1$d earthquake in %2$s would have matched your alerts.</item>
+        <item quantity="other">With these settings, %1$d earthquakes in %2$s would have matched your alerts.</item>
+    </plurals>
     <string name="alert_area_title">Area</string>
     <string name="alert_area_whole_world">Whole world</string>
     <string name="alert_area_near_city">Near a city</string>
@@ -216,6 +226,7 @@
     <string name="country_placeholder">Select a country</string>
     <string name="country_search_hint">Search countries</string>
     <string name="country_no_match">No country matches \"%1$s\"</string>
+    <string name="city_search_title">Choose a city</string>
     <string name="city_search_label">City</string>
     <string name="city_search_prompt">Type a city name and tap Search.</string>
     <string name="city_search_loading">Searching…</string>
@@ -246,7 +257,6 @@
     <string name="notifications_channel_blocked">Notification category is off</string>
     <string name="notifications_channel_blocked_message">Notifications are allowed, but the “%1$s” category is turned off, so QuakeAlert can\'t show alerts.</string>
     <string name="action_open_settings">Open settings</string>
-    <string name="alert_settings_saved">Alert settings saved</string>
 
     <string name="notification_channel_alerts_name">Earthquake alerts</string>
     <string name="notification_channel_alerts_description">New earthquakes that match your magnitude and area.</string>
@@ -260,15 +270,8 @@
     </plurals>
 
     <string name="onboarding_step_indicator">Step %1$d of %2$d</string>
-    <string name="onboarding_feature_list_title">See recent earthquakes worldwide</string>
-    <string name="onboarding_feature_list_message">Up-to-date data from the U.S. Geological Survey (USGS).</string>
-    <string name="onboarding_feature_filter_title">Choose your magnitude and area</string>
-    <string name="onboarding_feature_filter_message">A minimum magnitude and, if you like, a city with a radius.</string>
-    <string name="onboarding_feature_alert_title">Get alerts for what matters</string>
-    <string name="onboarding_feature_alert_message">Only new earthquakes that match your choice, never the same one twice.</string>
     <string name="onboarding_disclaimer">QuakeAlert is not an early-warning system. Alerts can arrive several minutes after an earthquake.</string>
     <string name="onboarding_setup_title">What should we alert you about?</string>
-    <string name="onboarding_setup_message">You can change this any time in the Alerts tab.</string>
     <string name="onboarding_setup_city_required">Pick a city, or choose Whole world.</string>
     <string name="onboarding_notifications_title">Get notified</string>
     <plurals name="onboarding_notifications_message">

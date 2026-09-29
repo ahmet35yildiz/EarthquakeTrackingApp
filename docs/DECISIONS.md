@@ -314,8 +314,9 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Decision:** No Save button: each change is saved at once through `UpdateAlertSettingsUseCase`, which serializes
   updates with a mutex, reads the stored settings, applies the change and saves it with `baselineAt = now` only when
   something changed. The switch also resets the baseline, so turning alerts back on never notifies about events from
-  while they were off. The ViewModel derives analytics from the returned previous/updated pair and confirms with a
-  short snackbar. "Near a city" without a city is only an on-screen draft. Scheduling / cancelling the background
+  while they were off. The ViewModel derives analytics from the returned previous/updated pair. (The "saved"
+  snackbar was removed on 2026-09-29: the controls already show the new value and the summary card updates, so a
+  message after every slider or radius change was noise.) "Near a city" without a city is only an on-screen draft. Scheduling / cancelling the background
   work will be triggered from the same use case (2.6).
 - **Alternatives:** Explicit Save button (easy to leave the screen with unsaved changes; the list would show old
   settings); one repository call per field (baseline easy to forget, see ADR-019); analytics logged per UI callback
@@ -671,4 +672,42 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Alternatives:** Keep the choice hidden and reset the area to the whole world when no geocoder exists (silently
   changes what the user saved); show the choice always (a "Near a city" that can never be completed).
 - **Consequences:** A saved area can always be removed; new cities still need a geocoder.
+
+## ADR-050 — Onboarding steps fit on one screen; city search moves into a dialog
+- **Context:** The welcome step (three feature cards + disclaimer) and the setup step (threshold, area choice, "Use my
+  location", country, city field, results, radius) needed scrolling on a 6.1–6.4" phone, so the "Next" decision
+  sat below content the user had not seen.
+- **Decision:** Every onboarding step fits without scrolling at the default font size. The welcome step keeps the
+  icon, the one-sentence summary and the early-warning disclaimer; the feature cards are removed (the next two steps
+  show the same things). The setup step drops its subtitle and the slider's "You'll get alerts for M4.5…" sentence
+  (the badge shows the value). City search moves into a full-screen
+  `CitySearchDialog`, opened by choosing "Near a city" without a city, the "Choose a city" button or "Change"; the
+  area card only shows the selected city and the radius. The Alerts tab uses the same component, so it gets the same
+  dialog. `verticalScroll` stays as a fallback for large text, landscape and very small screens.
+  `OnboardingLayoutTest` checks on the emulator that no step has anything to scroll.
+- **Alternatives:** Shrink fonts and spacing (breaks the design scale, still overflows with results); a separate
+  onboarding page for the city (a fourth step for the optional choice); a dialog only in onboarding (two behaviours
+  of one component).
+- **Consequences:** One extra tap to reach the search field from the Alerts tab; search results get the whole
+  screen. The Turkish setup step with a long region name is the tightest case (checked on API 34).
+
+## ADR-051 — Alert preview counts the cached list with the alert rule itself
+- **Context:** Choosing a threshold and radius is abstract; users cannot tell whether "M3.0 within 1000 km" means a
+  few alerts a month or several a day.
+- **Decision:** The Alerts tab shows "With these settings, N earthquakes in the last 3 days would have matched your
+  alerts." (It was first also on the onboarding setup step; removed there on request on 2026-09-29, so the first
+  choice stays short.) `PreviewRecentAlertMatchesUseCase` counts the cached list (the 7-day M2.5+ worldwide
+  query, so any threshold ≥ 2.5 and any area is covered) with `AlertMatcher.matchesThresholdAndArea`, the same
+  function the background check uses; it was split out of `matches` so both cannot drift apart. The delivery-only
+  rules (baseline, already notified, 6 h freshness) are left out because they are about new events. The preview
+  follows the slider while it is dragged and every area/radius change, without saving. A missing cache is loaded, a
+  stale one is shown and refreshed; this refresh is not
+  logged as `earthquake_list_refreshed` (it is not a list refresh). Simulated test earthquakes are not counted.
+  Checked against the USGS count API (whole world M4.5+: 56 = 56; Tokyo 250 km M4.5+: 1 = 1; 1000 km M3.0+: 4 = 4).
+- **Alternatives:** A USGS `count` request per change (network on every slider step, offline gives nothing, a
+  second rule implementation on the server side); counting 7 days (older than the "recent" feeling, and the list
+  already shows 7 days); no preview, only the whole-world warning (says nothing about city settings).
+- **Consequences:** The number is exact for the cached data and costs no network while choosing. `PREVIEW_PERIOD`
+  is one constant; `AlertConfigTest` fails if it outgrows the cached period or the threshold range drops below the
+  cached minimum magnitude. Events revised after the last refresh show their cached values (ADR-048).
 

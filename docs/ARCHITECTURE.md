@@ -184,7 +184,28 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   reported back as a new `AreaSelection`; `toAlertAreaOrNull()` is null while "Near a city" has no city yet.
   Without a geocoder the mode choice stays visible while a city is part of the selection, so a saved city can be
   switched to the whole world; only search and "Change" are hidden (ADR-049).
+- The search itself (location, country, name, results) is `CitySearchPanel` inside the full-screen
+  `CitySearchDialog`; `AreaSelector` shows only the selected city or a "Choose a city" button, so the onboarding
+  setup step fits without scrolling (ADR-050).
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
+
+### 4.3.2 Alert preview (ADR-051)
+```
+MagnitudeThresholdSelector ──onThresholdDragged──▶ previewThreshold (screen state)
+AreaSelection.toAlertAreaOrNull() ──────────────┐        │
+                                                ▼        ▼
+                   AlertPreviewEntry ─▶ AlertPreviewViewModel ─▶ PreviewRecentAlertMatchesUseCase
+                                             │                        ├─ EarthquakeRepository.observeCachedEarthquakes()
+                                             │                        └─ AlertMatcher.matchesThresholdAndArea (same rule as alerts)
+                                             └─ CheckCacheFreshnessUseCase / RefreshEarthquakesUseCase (missing → load, stale → refresh)
+```
+- The count uses the list cache (7 days, M2.5+, worldwide), which covers every selectable threshold and area; the
+  window is `AlertConfig.PREVIEW_PERIOD` (3 days) back from now. `AlertConfigTest` guards both coverage rules.
+- Only the threshold + area part of `AlertMatcher` applies; baseline, already-notified ids and the 6 h freshness
+  limit are delivery rules for new events and do not apply to history. Simulated test events are skipped.
+- Shown on the Alerts tab only (not in onboarding). The slider reports every step while dragging
+  (`onThresholdDragged`), so the preview changes before the threshold is saved; area and radius changes arrive through the selection. `AlertPreviewUiState`: Hidden (no area yet) /
+  Loading / Unavailable / Ready(`AlertPreview`).
 
 ### 4.3.1 "Use my location" (ADR-045)
 ```
@@ -212,8 +233,8 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
 - Alert settings screen (ADR-029): `AlertSettingsViewModel` combines `ObserveAlertSettingsUseCase` (saved alert
   settings), the on-screen `AreaSelection` draft and the notification permission (re-read on resume). Every change goes
   through `UpdateAlertSettingsUseCase` (mutex, reads the stored settings, saves with a new baseline only when
-  something changed, returns previous + updated); the ViewModel logs `toAnalyticsEvents(SETTINGS)` of that update and
-  shows a "saved" snackbar.
+  something changed, returns previous + updated); the ViewModel logs `toAnalyticsEvents(SETTINGS)` of that update. No
+  "saved" message: the controls and the summary card already show the saved state.
 
 ### 4.4 Earthquake detail
 - `EarthquakeDetailRoute(earthquakeId, isFromNotification)` (navigation) → `EarthquakeDetailEntry` →

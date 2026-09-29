@@ -12,6 +12,7 @@
 | Notification access | app off → `permission_denied`, app on + alert channel off → `alert_channel_blocked`; both suppressed, not remembered, delivered once allowed again; ViewModels expose the channel state |
 | Repository | refresh replaces cache; failure keeps cache and returns error; `eventid` 404 → NotFound; fetches replace cached copies but never add events |
 | Detail lookup | list: cache first; notification: USGS first, revised version wins, network error → cached copy flagged, 404 → cached copy unflagged |
+| Alert preview | threshold boundary, radius, period start included, unknown magnitude, simulated events skipped, monotonic in threshold/radius; the shared rule equals delivery for eligible events; ViewModel: hidden / missing → load / load fails / stale → shown + refreshed / recount on change; config coverage of the preview period and threshold range |
 | Onboarding restore | page, threshold and city + radius survive a new ViewModel on the same `SavedStateHandle`; notifications page without a restorable area → setup page |
 | City search | country-code filtering, de-duplication, error mapping (with a fake geocoder) |
 | Use my location | permission / location off / timeout → last known / nothing (fake location source); reverse lookup keeps the device point, skips country-level addresses; ViewModel states, located city delivery, analytics |
@@ -27,7 +28,11 @@ Fakes are preferred over mocks for repositories and the clock (`FakeClock`), so 
   with `@UninstallModules` + `@BindValue`, and initialise a test WorkManager with `HiltWorkerFactory` (the test
   application is not a `Configuration.Provider`).
 - Compose UI tests (screen composables with fixed UI states): list states, filter chips, sort, detail, alert
-  settings interactions, area selector, onboarding pages, settings, developer tools, event log.
+  settings interactions, area selector (city search dialog), onboarding pages, alert preview card, settings,
+  developer tools, event log.
+- Layout (`OnboardingLayoutTest`, on the emulator's own screen size): no onboarding step has anything to scroll
+  (welcome, setup with whole world, setup with a city, notifications denied). `AlertSettingsScreenTest` checks that
+  the preview slot gets the slider value while it is being dragged.
 - End to end (`navigation/OnboardingFlowTest`, real `MainActivity` and ViewModels): first launch → welcome → setup →
   notifications → Finish → earthquake list from the fake USGS, settings + baseline saved, periodic check enqueued;
   a completed onboarding opens straight on the list.
@@ -60,6 +65,12 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
   the onboarding step name the category, their button opens the category page; Simulate → nothing shown,
   `alert_notification_suppressed {reason=alert_channel_blocked}`; turn it on → "Simulate the same alert again" posts,
   a second repeat is `already_notified`.
+- [ ] Onboarding at font scale 1.0 on API 31 and 34, EN and TR: no step scrolls (also whole world vs. a city with a
+  long region name). "Near a city" opens the "Choose a city" dialog; picking a result closes it.
+- [ ] Alerts tab: changing the threshold, area or radius shows no "saved" message; the summary card updates.
+- [ ] Preview (Alerts tab only, not in onboarding): whole world M4.5+ equals `https://earthquake.usgs.gov/fdsnws/event/1/count?starttime=<now-3d>&minmagnitude=4.5`;
+  a city + radius equals the same query with `latitude`, `longitude`, `maxradiuskm`; the number changes while the
+  slider is still held.
 - [ ] Onboarding: pick a city + radius, go to step 3, Home, `adb shell am kill com.ahmetyildiz.quakealert`, reopen →
   step 3 again, Back shows the city, Finish saves it.
 - [ ] City search: "Izmir" in Türkiye, "Tokyo" in Japan, nonsense text (empty state), airplane mode (error state).

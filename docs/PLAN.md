@@ -514,6 +514,23 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   clean; on API 34: category off → suppressed → on → posted once, process kill on step 3 → city kept, notification
   link online / airplane mode; on API 31: category off in onboarding → "Open settings" → back shows allowed.
 
+- [x] **3.11 Onboarding without scrolling + alert preview** (added on request).
+  *Result:* every onboarding step fits on the screen at the default font size: welcome keeps icon, summary and
+  disclaimer (feature cards removed); setup drops its subtitle and the slider's hint sentence, and city search moved
+  into a full-screen "Choose a city" dialog, shared with the Alerts tab (ADR-050). New preview below the area in
+  onboarding and on the Alerts tab: "With these settings, N earthquakes in the last 3 days would have matched your
+  alerts", counted on the cached list with `AlertMatcher.matchesThresholdAndArea` (split out of the delivery rule),
+  live while the slider is dragged, loads a missing cache, skips simulated events (ADR-051). 483 unit, 109/109
+  instrumented on API 31 and 34 (incl. `OnboardingLayoutTest`), lint clean; on API 34 and 31: no step scrolls in EN
+  and TR, counts equal the USGS count API (world M4.5+ 56, Tokyo 250 km M4.5+ 1, 1000 km M3.0+ 4), mid-drag update.
+
+- [x] **3.12 Preview only on the Alerts tab, no "saved" snackbar** (added on request).
+  *Result:* the preview slot and its live threshold were removed from the onboarding setup step (the Alerts tab keeps
+  them, ADR-051 updated); the "Alert settings saved" snackbar, the ViewModel's one-off event flow and the string are
+  gone (ADR-029 updated). 482 unit, 109/109 instrumented on API 31 and 34 (drag test moved to
+  `AlertSettingsScreenTest`), lint clean; on API 34: no preview on step 2, a threshold change on the Alerts tab saves
+  (summary M6.0+) without a message.
+
 ## Phase 4 — Documentation and delivery
 - [x] **4.1 README (Turkish) complete.** All sections filled, structured along the delivery requirements (how to run,
   key decisions, out of scope, time spent, next steps, AI usage: tools, delegated work, verification, link to the
@@ -607,3 +624,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-28 | 16:10–16:30 | ~20m | 3.9 Alerts tab: blocked notifications shown once, in the summary card with "Allow notifications"; status card shows only the background check; Turkish switch renamed "Deprem alarmları" (ADR-046); 440 unit, 90/90 instrumented on API 31 and 34 |
 | 2026-09-28 | 16:35–16:45 | ~10m | 3.9 follow-up: Alerts tab status card removed (last check + interval), use case returns only the settings (ADR-046 updated); 440 unit, 88/88 instrumented on API 31 and 34 |
 | 2026-09-28 | 22:59–23:32 | ~33m | 3.10 Review fixes: blocked notification category suppressed and shown (ADR-047), onboarding area kept across process death (ADR-035 update), notification detail revalidated + cached copies refreshed (ADR-048), saved city clearable without geocoder (ADR-049); 466 unit, 96/96 instrumented on API 31 and 34 |
+| 2026-09-29 | 13:00–13:37 | ~37m | 3.11 Onboarding fits without scrolling (feature cards and hints removed, city search in a dialog, ADR-050); alert preview "N earthquakes in the last 3 days would have matched" with the alert rule on the cached list, live while dragging (ADR-051); 483 unit, 109/109 instrumented on API 31 and 34 |
+| 2026-09-29 | 14:10–14:20 | ~10m | 3.12 Preview removed from onboarding (Alerts tab only, ADR-051 updated); "saved" snackbar on the Alerts tab removed (ADR-029 updated); 482 unit, 109/109 instrumented on API 31 and 34 |

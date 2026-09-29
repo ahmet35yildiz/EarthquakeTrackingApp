@@ -58,3 +58,6 @@ Parameter values are strings. No personal data: never log coordinates or city na
 - Tracking calls happen in ViewModels / use cases / worker, never inside composables' recomposition paths
   (use `LaunchedEffect` keyed on the screen for "viewed" events).
 - `LocalAnalyticsTracker` writes on an IO dispatcher and never throws to callers.
+- The alert preview (ADR-051) logs no event of its own; the cache load it may start is not an
+  `earthquake_list_refreshed` (that event stays a list metric). Whether the preview changes choices can be read from
+  `alert_threshold_changed` / `alert_area_set` in onboarding vs. before it existed.

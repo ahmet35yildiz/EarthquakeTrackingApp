@@ -192,7 +192,17 @@
     <string name="share_text">M%1$s deprem · %2$s\n%3$s · %4$s km derinlikte\n%5$s</string>
 
     <string name="alert_threshold_title">En düşük büyüklük</string>
-    <string name="alert_threshold_hint">M%1$s ve daha büyük depremler için bildirim alırsın.</string>
+    <string name="alert_preview_loading">Son depremlere bakılıyor…</string>
+    <string name="alert_preview_unavailable">Son depremler yüklenemedi; bu ayarların önizlemesi şimdilik yok.</string>
+    <plurals name="alert_preview_period">
+        <item quantity="one">son %d gündeki</item>
+        <item quantity="other">son %d gündeki</item>
+    </plurals>
+    <string name="alert_preview_none">Bu ayarlarla %1$s depremlerin hiçbiri alarm koşullarına uymazdı.</string>
+    <plurals name="alert_preview_matches">
+        <item quantity="one">Bu ayarlarla %2$s depremlerden %1$d tanesi alarm koşullarına uyardı.</item>
+        <item quantity="other">Bu ayarlarla %2$s depremlerden %1$d tanesi alarm koşullarına uyardı.</item>
+    </plurals>
     <string name="alert_area_title">Bölge</string>
     <string name="alert_area_whole_world">Tüm dünya</string>
     <string name="alert_area_near_city">Şehir çevresi</string>
@@ -205,6 +215,7 @@
     <string name="country_placeholder">Ülke seç</string>
     <string name="country_search_hint">Ülke ara</string>
     <string name="country_no_match">\"%1$s\" ile eşleşen ülke yok</string>
+    <string name="city_search_title">Şehir seç</string>
     <string name="city_search_label">Şehir</string>
     <string name="city_search_prompt">Şehir adını yaz ve Ara\'ya dokun.</string>
     <string name="city_search_loading">Aranıyor…</string>
@@ -234,7 +245,6 @@
     <string name="notifications_channel_blocked">Bildirim kategorisi kapalı</string>
     <string name="notifications_channel_blocked_message">Bildirimlere izin verilmiş, ama “%1$s” kategorisi kapalı olduğu için QuakeAlert sana haber veremez.</string>
     <string name="action_open_settings">Ayarları aç</string>
-    <string name="alert_settings_saved">Alarm ayarları kaydedildi</string>
 
     <string name="notification_channel_alerts_name">Deprem bildirimleri</string>
     <string name="notification_channel_alerts_description">Büyüklük ve bölge seçimine uyan yeni depremler.</string>
@@ -246,15 +256,8 @@
     </plurals>
 
     <string name="onboarding_step_indicator">Adım %1$d / %2$d</string>
-    <string name="onboarding_feature_list_title">Dünyadaki son depremleri gör</string>
-    <string name="onboarding_feature_list_message">ABD Jeoloji Araştırmaları Kurumu\'ndan (USGS) güncel veriler.</string>
-    <string name="onboarding_feature_filter_title">Büyüklük ve bölgeni seç</string>
-    <string name="onboarding_feature_filter_message">En düşük büyüklük ve istersen bir şehir ile yarıçap.</string>
-    <string name="onboarding_feature_alert_title">Önemli olanlar için bildirim al</string>
-    <string name="onboarding_feature_alert_message">Yalnızca seçimine uyan yeni depremler, her biri yalnızca bir kez.</string>
     <string name="onboarding_disclaimer">QuakeAlert bir erken uyarı sistemi değildir. Bildirimler depremden birkaç dakika sonra gelebilir.</string>
     <string name="onboarding_setup_title">Hangi depremler için bildirim alalım?</string>
-    <string name="onboarding_setup_message">Bunu istediğin zaman Alarmlar sekmesinden değiştirebilirsin.</string>
     <string name="onboarding_setup_city_required">Bir şehir seç ya da Tüm dünya\'ya geç.</string>
     <string name="onboarding_notifications_title">Haberdar ol</string>
     <plurals name="onboarding_notifications_message">

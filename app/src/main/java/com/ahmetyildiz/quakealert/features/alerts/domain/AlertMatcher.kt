@@ -1,6 +1,7 @@
 package com.ahmetyildiz.quakealert.features.alerts.domain
 
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
+import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertChoice
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertMatchCriteria
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
 import java.time.Instant
@@ -14,12 +15,14 @@ class AlertMatcher @Inject constructor() {
     fun matches(earthquake: Earthquake, criteria: AlertMatchCriteria): Boolean {
         val settings: AlertSettings = criteria.settings
         return settings.isEnabled &&
-            isAtOrAboveThreshold(earthquake, settings.magnitudeThreshold) &&
-            settings.area.contains(earthquake.location) &&
+            matchesThresholdAndArea(earthquake, AlertChoice(settings.magnitudeThreshold, settings.area)) &&
             earthquake.id !in criteria.notifiedEarthquakeIds &&
             isAtOrAfterBaseline(earthquake, criteria.alertBaselineAt) &&
             isWithinMaxEventAge(earthquake, criteria.checkedAt)
     }
+
+    fun matchesThresholdAndArea(earthquake: Earthquake, choice: AlertChoice): Boolean =
+        isAtOrAboveThreshold(earthquake, choice.magnitudeThreshold) && choice.area.contains(earthquake.location)
 
     private fun isAtOrAboveThreshold(earthquake: Earthquake, threshold: Double): Boolean {
         val magnitude: Double = earthquake.magnitude?.value ?: return false

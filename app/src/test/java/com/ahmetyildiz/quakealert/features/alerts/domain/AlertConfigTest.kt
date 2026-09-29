@@ -1,5 +1,6 @@
 package com.ahmetyildiz.quakealert.features.alerts.domain
 
+import com.ahmetyildiz.quakealert.features.earthquakes.domain.EarthquakesConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -19,6 +20,16 @@ class AlertConfigTest {
         val rangeInSteps: Double = (AlertConfig.THRESHOLD_RANGE.endInclusive - AlertConfig.THRESHOLD_RANGE.start) /
             AlertConfig.THRESHOLD_STEP
         assertEquals(0.0, rangeInSteps % 1.0)
+    }
+
+    @Test
+    fun `preview period fits inside the cached list period`() {
+        assertTrue(AlertConfig.PREVIEW_PERIOD <= EarthquakesConfig.RECENT_PERIOD)
+    }
+
+    @Test
+    fun `every selectable threshold is covered by the cached list`() {
+        assertTrue(AlertConfig.THRESHOLD_RANGE.start >= EarthquakesConfig.RECENT_MIN_MAGNITUDE)
     }
 
     @Test

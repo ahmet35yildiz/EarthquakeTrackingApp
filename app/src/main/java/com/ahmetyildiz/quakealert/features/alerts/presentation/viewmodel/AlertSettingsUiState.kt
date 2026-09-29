@@ -10,8 +10,3 @@ data class AlertSettingsUiState(
     val areaSelection: AreaSelection = AreaSelection.from(AlertArea.WholeWorld),
     val notificationAccess: NotificationAccess = NotificationAccess.ALLOWED,
 )
-
-sealed interface AlertSettingsEvent {
-
-    data object Saved : AlertSettingsEvent
-}
