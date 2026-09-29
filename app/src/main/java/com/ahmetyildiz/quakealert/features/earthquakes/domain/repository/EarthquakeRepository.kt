@@ -11,7 +11,9 @@ interface EarthquakeRepository {
 
     suspend fun refreshCache(query: EarthquakeQuery): AppResult<Int>
 
-    suspend fun getEarthquake(id: String): AppResult<Earthquake>
+    suspend fun getCachedEarthquake(id: String): Earthquake?
+
+    suspend fun fetchEarthquake(id: String): AppResult<Earthquake>
 
     suspend fun fetchEarthquakes(query: EarthquakeQuery): AppResult<List<Earthquake>>
 

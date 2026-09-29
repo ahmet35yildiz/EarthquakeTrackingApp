@@ -10,6 +10,7 @@ import com.ahmetyildiz.quakealert.core.testing.MainDispatcherExtension
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeDetails
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeFixtures.earthquake
+import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Magnitude
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.repository.FakeEarthquakeRepository
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.usecase.GetEarthquakeUseCase
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -53,13 +54,37 @@ class EarthquakeDetailViewModelTest {
 
     @Test
     fun `network failure shows the error state and retry loads the earthquake`() {
+        earthquakeRepository.remoteEarthquakes = listOf(earthquake(id = "us2"))
         earthquakeRepository.failure = AppError.Network
-        val viewModel: EarthquakeDetailViewModel = createViewModel(id = "us1")
+        val viewModel: EarthquakeDetailViewModel = createViewModel(id = "us2")
         assertEquals(EarthquakeDetailContent.ERROR, viewModel.uiState.value.content)
         assertEquals(AppError.Network, viewModel.uiState.value.error)
         earthquakeRepository.failure = null
         viewModel.onRetry()
         assertEquals(EarthquakeDetailContent.LOADED, viewModel.uiState.value.content)
+    }
+
+    @Test
+    fun `detail opened from a list shows the cached earthquake`() {
+        earthquakeRepository.remoteEarthquakes = listOf(cachedEarthquake.copy(magnitude = Magnitude(5.6, "mww")))
+        val viewModel: EarthquakeDetailViewModel = createViewModel(id = "us1", source = DetailSource.LIST)
+        assertEquals(cachedEarthquake, viewModel.uiState.value.details?.earthquake)
+    }
+
+    @Test
+    fun `detail opened from a notification shows the latest USGS version`() {
+        val revised: Earthquake = cachedEarthquake.copy(magnitude = Magnitude(5.6, "mww"))
+        earthquakeRepository.remoteEarthquakes = listOf(revised)
+        val viewModel: EarthquakeDetailViewModel = createViewModel(id = "us1", source = DetailSource.NOTIFICATION)
+        assertEquals(revised, viewModel.uiState.value.details?.earthquake)
+    }
+
+    @Test
+    fun `detail opened from a notification offline shows the saved copy with a notice`() {
+        earthquakeRepository.failure = AppError.Network
+        val viewModel: EarthquakeDetailViewModel = createViewModel(id = "us1", source = DetailSource.NOTIFICATION)
+        assertEquals(EarthquakeDetailContent.LOADED, viewModel.uiState.value.content)
+        assertEquals(true, viewModel.uiState.value.details?.isSavedCopyAfterFailedRefresh)
     }
 
     @Test

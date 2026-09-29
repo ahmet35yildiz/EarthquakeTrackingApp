@@ -13,6 +13,7 @@ import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AlertSettingsUiState
@@ -61,11 +62,22 @@ class AlertSettingsScreenTest {
 
     @Test
     fun blockedNotificationsReplaceTheSummaryAndOfferTheSystemSettings() {
-        setContent(AlertSettingsUiState(isLoading = false, areNotificationsAllowed = false))
+        setContent(AlertSettingsUiState(isLoading = false, notificationAccess = NotificationAccess.APP_BLOCKED))
         composeRule.onNodeWithText(string(R.string.alerts_blocked_title)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.alerts_summary_world, string(R.string.magnitude_value, 4.5)))
             .assertDoesNotExist()
         composeRule.onNodeWithText(string(R.string.notifications_blocked)).assertDoesNotExist()
+        composeRule.onNodeWithText(string(R.string.action_allow_notifications)).performClick()
+        assertEquals(1, openSettingsCount)
+    }
+
+    @Test
+    fun blockedAlertChannelNamesTheCategoryAndOffersItsSettings() {
+        setContent(AlertSettingsUiState(isLoading = false, notificationAccess = NotificationAccess.ALERT_CHANNEL_BLOCKED))
+        composeRule.onNodeWithText(string(R.string.alerts_blocked_title)).assertIsDisplayed()
+        val channelName: String = string(R.string.notification_channel_alerts_name)
+        composeRule.onNodeWithText(string(R.string.alerts_blocked_channel_message, channelName)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.alerts_blocked_message)).assertDoesNotExist()
         composeRule.onNodeWithText(string(R.string.action_allow_notifications)).performClick()
         assertEquals(1, openSettingsCount)
     }
@@ -76,7 +88,7 @@ class AlertSettingsScreenTest {
             AlertSettingsUiState(
                 isLoading = false,
                 settings = AlertSettings.DEFAULT.copy(isEnabled = false),
-                areNotificationsAllowed = false,
+                notificationAccess = NotificationAccess.APP_BLOCKED,
             ),
         )
         composeRule.onNodeWithText(string(R.string.alerts_summary_off)).assertIsDisplayed()

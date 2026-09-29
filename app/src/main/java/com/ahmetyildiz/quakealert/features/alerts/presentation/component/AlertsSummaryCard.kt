@@ -26,6 +26,7 @@ import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
@@ -38,7 +39,7 @@ data class AlertsSummaryActions(
 @Composable
 fun AlertsSummaryCard(
     settings: AlertSettings,
-    areNotificationsAllowed: Boolean,
+    notificationAccess: NotificationAccess,
     actions: AlertsSummaryActions,
     modifier: Modifier = Modifier,
 ) {
@@ -51,8 +52,8 @@ fun AlertsSummaryCard(
     ) {
         Column(modifier = Modifier.padding(Spacing.large), verticalArrangement = Arrangement.spacedBy(Spacing.small)) {
             AlertsSwitchRow(isEnabled = settings.isEnabled, onAlertsToggled = actions.onAlertsToggled)
-            if (settings.isEnabled && !areNotificationsAllowed) {
-                NotificationsBlockedNotice(onAllowNotifications = actions.onAllowNotifications)
+            if (settings.isEnabled && !notificationAccess.isAllowed) {
+                NotificationsBlockedNotice(access = notificationAccess, onAllowNotifications = actions.onAllowNotifications)
             } else {
                 Text(text = summaryText(settings), style = MaterialTheme.typography.bodyLarge)
             }
@@ -78,7 +79,7 @@ private fun AlertsSwitchRow(isEnabled: Boolean, onAlertsToggled: (Boolean) -> Un
 }
 
 @Composable
-private fun NotificationsBlockedNotice(onAllowNotifications: () -> Unit) {
+private fun NotificationsBlockedNotice(access: NotificationAccess, onAllowNotifications: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.errorContainer,
@@ -94,7 +95,7 @@ private fun NotificationsBlockedNotice(onAllowNotifications: () -> Unit) {
                 )
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.extraSmall)) {
                     Text(text = stringResource(R.string.alerts_blocked_title), style = MaterialTheme.typography.titleSmall)
-                    Text(text = stringResource(R.string.alerts_blocked_message), style = MaterialTheme.typography.bodyMedium)
+                    Text(text = blockedMessage(access), style = MaterialTheme.typography.bodyMedium)
                 }
             }
             Button(
@@ -109,6 +110,14 @@ private fun NotificationsBlockedNotice(onAllowNotifications: () -> Unit) {
         }
     }
 }
+
+@Composable
+private fun blockedMessage(access: NotificationAccess): String =
+    if (access == NotificationAccess.ALERT_CHANNEL_BLOCKED) {
+        stringResource(R.string.alerts_blocked_channel_message, stringResource(R.string.notification_channel_alerts_name))
+    } else {
+        stringResource(R.string.alerts_blocked_message)
+    }
 
 @Composable
 private fun summaryText(settings: AlertSettings): String {
@@ -139,12 +148,12 @@ private fun AlertsSummaryCardPreview() {
             Column(modifier = Modifier.padding(Spacing.large), verticalArrangement = Arrangement.spacedBy(Spacing.large)) {
                 AlertsSummaryCard(
                     settings = previewSettings,
-                    areNotificationsAllowed = true,
+                    notificationAccess = NotificationAccess.ALLOWED,
                     actions = AlertsSummaryActions(onAlertsToggled = {}, onAllowNotifications = {}),
                 )
                 AlertsSummaryCard(
                     settings = previewSettings,
-                    areNotificationsAllowed = false,
+                    notificationAccess = NotificationAccess.ALERT_CHANNEL_BLOCKED,
                     actions = AlertsSummaryActions(onAlertsToggled = {}, onAllowNotifications = {}),
                 )
             }

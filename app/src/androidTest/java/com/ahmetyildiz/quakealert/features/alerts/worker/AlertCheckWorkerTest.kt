@@ -12,7 +12,8 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.ahmetyildiz.quakealert.core.database.AnalyticsEventDao
 import com.ahmetyildiz.quakealert.core.database.AnalyticsEventEntity
 import com.ahmetyildiz.quakealert.core.di.NotificationModule
-import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccessChecker
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferencesRepository
 import com.ahmetyildiz.quakealert.features.alerts.di.AlertNotificationModule
@@ -24,6 +25,10 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import java.io.IOException
+import java.time.Duration
+import java.time.Instant
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -34,10 +39,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.IOException
-import java.time.Duration
-import java.time.Instant
-import javax.inject.Inject
 
 @HiltAndroidTest
 @UninstallModules(AlertNotificationModule::class, NotificationModule::class)
@@ -55,7 +56,7 @@ class AlertCheckWorkerTest {
 
     @BindValue
     @JvmField
-    val permissionChecker: NotificationPermissionChecker = NotificationPermissionChecker { true }
+    val permissionChecker: NotificationAccessChecker = NotificationAccessChecker { NotificationAccess.ALLOWED }
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory

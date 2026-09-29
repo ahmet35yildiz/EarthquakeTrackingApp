@@ -502,6 +502,18 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   `updatedafter`). 440 unit, 88/88 instrumented on API 31 and 34, lint clean; checked on API 34 in TR and EN, and the
   notice goes away after allowing notifications.
 
+- [x] **3.10 Review fixes: notification category, onboarding restore, notified vs. detail data, saved city without
+  geocoder** (added on request).
+  *Result:* (1) `NotificationAccessChecker` returns app blocked / "Earthquake alerts" category blocked / allowed; a
+  blocked category now suppresses (`reason=alert_channel_blocked`), is not remembered and is delivered once turned
+  on; Alerts, Settings and onboarding name the category and open its own settings page (ADR-047). (2) The onboarding
+  area choice is kept in `SavedStateHandle`; a notifications page restored without an area returns to setup (ADR-035
+  updated). (3) Fetches replace cached copies of the events they return; a detail opened from a notification asks
+  USGS first and, offline, shows the saved copy with a "may be out of date" banner (ADR-048). (4) Without a geocoder a
+  saved city can still be switched to the whole world (ADR-049). 466 unit, 96/96 instrumented on API 31 and 34, lint
+  clean; on API 34: category off → suppressed → on → posted once, process kill on step 3 → city kept, notification
+  link online / airplane mode; on API 31: category off in onboarding → "Open settings" → back shows allowed.
+
 ## Phase 4 — Documentation and delivery
 - [x] **4.1 README (Turkish) complete.** All sections filled, structured along the delivery requirements (how to run,
   key decisions, out of scope, time spent, next steps, AI usage: tools, delegated work, verification, link to the
@@ -594,3 +606,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-28 | 14:45–15:30 | ~45m | Phase 5 trimmed to one item; 5.1 "Use my location": approximate permission, platform LocationManager (all providers in parallel), reverse geocoding, error paths, `current_location_used` (ADR-045); 440 unit, 89/89 instrumented on API 31 and 34 |
 | 2026-09-28 | 16:10–16:30 | ~20m | 3.9 Alerts tab: blocked notifications shown once, in the summary card with "Allow notifications"; status card shows only the background check; Turkish switch renamed "Deprem alarmları" (ADR-046); 440 unit, 90/90 instrumented on API 31 and 34 |
 | 2026-09-28 | 16:35–16:45 | ~10m | 3.9 follow-up: Alerts tab status card removed (last check + interval), use case returns only the settings (ADR-046 updated); 440 unit, 88/88 instrumented on API 31 and 34 |
+| 2026-09-28 | 22:59–23:32 | ~33m | 3.10 Review fixes: blocked notification category suppressed and shown (ADR-047), onboarding area kept across process death (ADR-035 update), notification detail revalidated + cached copies refreshed (ADR-048), saved city clearable without geocoder (ADR-049); 466 unit, 96/96 instrumented on API 31 and 34 |

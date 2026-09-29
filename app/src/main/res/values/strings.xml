@@ -5,7 +5,7 @@
     <string name="tab_alerts">Alerts</string>
     <string name="tab_settings">Settings</string>
 
-    <string name="onboarding_welcome_title">Know when it matters</string>
+    <string name="onboarding_welcome_title">Stay informed about significant earthquakes</string>
     <string name="onboarding_welcome_message">Recent earthquakes around the world, and calm alerts for the ones you care about.</string>
     <string name="action_get_started">Get started</string>
 
@@ -192,6 +192,7 @@
         <item quantity="other">%d people felt it</item>
     </plurals>
     <string name="detail_data_note">Data: U.S. Geological Survey (USGS). Magnitude and location can be revised after publication.</string>
+    <string name="detail_saved_copy_message">Couldn\'t get the latest version from USGS. Showing the copy saved on this device, which may be out of date.</string>
     <string name="detail_not_found_title">Earthquake not found</string>
     <string name="detail_not_found_message">USGS may have removed it or merged it with another event.</string>
     <string name="detail_error_title">Couldn\'t load this earthquake</string>
@@ -207,6 +208,7 @@
     <string name="alert_area_near_city">Near a city</string>
     <string name="alert_area_whole_world_warning_title">Alerts for the whole world</string>
     <string name="alert_area_whole_world_warning_message">You\'ll get alerts for earthquakes anywhere in the world. With a low threshold this can mean several alerts a day.</string>
+    <string name="alert_area_city_change_unavailable">City search isn\'t available on this device, so this city can\'t be changed. You can still switch to Whole world.</string>
     <string name="alert_area_city_search_unavailable">City search isn\'t available on this device, so alerts cover the whole world.</string>
     <string name="alert_radius_title">Alert radius</string>
     <string name="radius_km_value" translatable="false">%1$d km</string>
@@ -237,9 +239,12 @@
     <string name="alerts_summary_off">Alerts are off. Your magnitude and area still filter the earthquake list.</string>
     <string name="alerts_blocked_title">Alerts can\'t reach you</string>
     <string name="alerts_blocked_message">Alerts are on, but notifications for QuakeAlert are turned off on this device. Allow them to get alerts.</string>
+    <string name="alerts_blocked_channel_message">Alerts are on, but the “%1$s” notification category is turned off for QuakeAlert. Turn it on to get alerts.</string>
     <string name="notifications_allowed">Notifications allowed</string>
     <string name="notifications_blocked">Notification permission is off</string>
     <string name="notifications_blocked_message">QuakeAlert can\'t show alerts until you allow notifications.</string>
+    <string name="notifications_channel_blocked">Notification category is off</string>
+    <string name="notifications_channel_blocked_message">Notifications are allowed, but the “%1$s” category is turned off, so QuakeAlert can\'t show alerts.</string>
     <string name="action_open_settings">Open settings</string>
     <string name="alert_settings_saved">Alert settings saved</string>
 

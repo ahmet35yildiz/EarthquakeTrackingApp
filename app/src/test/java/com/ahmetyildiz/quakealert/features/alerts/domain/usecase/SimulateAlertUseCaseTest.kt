@@ -7,6 +7,7 @@ import com.ahmetyildiz.quakealert.core.location.distanceKmTo
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.preferences.FakeUserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.time.FakeClock
@@ -18,11 +19,11 @@ import com.ahmetyildiz.quakealert.features.alerts.domain.model.SimulationRequest
 import com.ahmetyildiz.quakealert.features.alerts.domain.repository.FakeNotifiedEarthquakeRepository
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.repository.FakeEarthquakeRepository
+import java.time.Duration
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.time.Duration
 
 class SimulateAlertUseCaseTest {
 
@@ -31,14 +32,14 @@ class SimulateAlertUseCaseTest {
     private val earthquakeRepository = FakeEarthquakeRepository()
     private val notifier = FakeAlertNotifier()
     private val analyticsTracker = FakeAnalyticsTracker()
-    private var areNotificationsAllowed: Boolean = true
+    private var notificationAccess: NotificationAccess = NotificationAccess.ALLOWED
     private val useCase = SimulateAlertUseCase(
         userPreferencesRepository = preferencesRepository,
         earthquakeRepository = earthquakeRepository,
         deliverAlerts = DeliverAlertsUseCase(
             FakeNotifiedEarthquakeRepository(),
             AlertMatcher(),
-            NotifyAlertsUseCase(notifier, { areNotificationsAllowed }, FakeAnalyticsTracker()),
+            NotifyAlertsUseCase(notifier, { notificationAccess }, FakeAnalyticsTracker()),
         ),
         analyticsTracker = analyticsTracker,
         clock = clock,
@@ -122,7 +123,7 @@ class SimulateAlertUseCaseTest {
     @Test
     fun `missing permission is reported`() = runTest {
         save(AlertSettings.DEFAULT)
-        areNotificationsAllowed = false
+        notificationAccess = NotificationAccess.APP_BLOCKED
         assertEquals(SimulationOutcome.NOTIFICATIONS_OFF, useCase(request()).outcome)
     }
 

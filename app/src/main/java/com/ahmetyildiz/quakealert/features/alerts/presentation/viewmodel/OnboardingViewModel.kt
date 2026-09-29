@@ -8,7 +8,7 @@ import com.ahmetyildiz.quakealert.core.analytics.AnalyticsTracker
 import com.ahmetyildiz.quakealert.core.analytics.OnboardingStep
 import com.ahmetyildiz.quakealert.core.analytics.SetupContext
 import com.ahmetyildiz.quakealert.core.model.AlertArea
-import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccessChecker
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.features.alerts.domain.AlertConfig
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertSettingsUpdate
@@ -25,17 +25,11 @@ import javax.inject.Inject
 class OnboardingViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val completeOnboarding: CompleteOnboardingUseCase,
-    private val notificationPermissionChecker: NotificationPermissionChecker,
+    private val notificationAccessChecker: NotificationAccessChecker,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
-    private val state = MutableStateFlow(
-        OnboardingUiState(
-            page = savedStateHandle.get<String>(KEY_PAGE)?.let(OnboardingPage::valueOf) ?: OnboardingPage.WELCOME,
-            threshold = savedStateHandle.get<Double>(KEY_THRESHOLD) ?: AlertConfig.DEFAULT_THRESHOLD,
-            areNotificationsAllowed = notificationPermissionChecker.areNotificationsAllowed(),
-        ),
-    )
+    private val state = MutableStateFlow(restoreState())
     private val mutableIsCompleted = MutableStateFlow(false)
 
     val uiState: StateFlow<OnboardingUiState> = state.asStateFlow()
@@ -44,6 +38,7 @@ class OnboardingViewModel @Inject constructor(
     init {
         if (!savedStateHandle.contains(KEY_PAGE)) {
             analyticsTracker.track(AnalyticsEvent.OnboardingStarted)
+            savedStateHandle.saveAreaSelection(state.value.areaSelection)
             showPage(OnboardingPage.WELCOME)
         }
     }
@@ -67,11 +62,12 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun onAreaSelectionChanged(selection: AreaSelection) {
+        savedStateHandle.saveAreaSelection(selection)
         state.update { it.copy(areaSelection = selection) }
     }
 
     fun onScreenResumed() {
-        state.update { it.copy(areNotificationsAllowed = notificationPermissionChecker.areNotificationsAllowed()) }
+        state.update { it.copy(notificationAccess = notificationAccessChecker.getAlertNotificationAccess()) }
     }
 
     fun onPermissionRequested() {
@@ -80,7 +76,9 @@ class OnboardingViewModel @Inject constructor(
 
     fun onPermissionResult(isGranted: Boolean) {
         analyticsTracker.track(AnalyticsEvent.NotificationPermissionResult(isGranted))
-        state.update { it.copy(areNotificationsAllowed = isGranted, isPermissionDenied = !isGranted) }
+        state.update {
+            it.copy(notificationAccess = notificationAccessChecker.getAlertNotificationAccess(), isPermissionDenied = !isGranted)
+        }
     }
 
     fun onFinish() {
@@ -90,9 +88,27 @@ class OnboardingViewModel @Inject constructor(
         state.update { it.copy(isFinishing = true) }
         viewModelScope.launch {
             val settings = AlertSettings(isEnabled = true, magnitudeThreshold = current.threshold, area = area)
-            trackCompletion(completeOnboarding(settings), current.areNotificationsAllowed)
+            trackCompletion(completeOnboarding(settings), current.notificationAccess.isAllowed)
             mutableIsCompleted.value = true
         }
+    }
+
+    private fun restoreState(): OnboardingUiState {
+        val areaSelection: AreaSelection? = savedStateHandle.restoreAreaSelectionOrNull()
+        return OnboardingUiState(
+            page = restorePage(hasRestoredArea = areaSelection?.toAlertAreaOrNull() != null),
+            threshold = savedStateHandle.get<Double>(KEY_THRESHOLD) ?: AlertConfig.DEFAULT_THRESHOLD,
+            areaSelection = areaSelection ?: AreaSelection.from(AlertArea.WholeWorld),
+            notificationAccess = notificationAccessChecker.getAlertNotificationAccess(),
+        )
+    }
+
+    private fun restorePage(hasRestoredArea: Boolean): OnboardingPage {
+        val savedPage: OnboardingPage =
+            savedStateHandle.get<String>(KEY_PAGE)?.let(OnboardingPage::valueOf) ?: OnboardingPage.WELCOME
+        if (savedPage != OnboardingPage.NOTIFICATIONS || hasRestoredArea) return savedPage
+        savedStateHandle[KEY_PAGE] = OnboardingPage.ALERT_SETUP.name
+        return OnboardingPage.ALERT_SETUP
     }
 
     private fun showPage(page: OnboardingPage) {

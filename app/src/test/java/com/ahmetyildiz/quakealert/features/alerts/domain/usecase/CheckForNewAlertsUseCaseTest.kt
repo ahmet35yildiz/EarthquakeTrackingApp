@@ -7,6 +7,7 @@ import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.preferences.FakeUserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferences
@@ -19,14 +20,14 @@ import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeFixtures
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeQuery
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.repository.FakeEarthquakeRepository
+import java.time.Duration
+import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.Instant
 
 class CheckForNewAlertsUseCaseTest {
 
@@ -37,7 +38,7 @@ class CheckForNewAlertsUseCaseTest {
     private val notifiedRepository = FakeNotifiedEarthquakeRepository()
     private val notifier = FakeAlertNotifier()
     private val analyticsTracker = FakeAnalyticsTracker()
-    private var areNotificationsAllowed: Boolean = true
+    private var notificationAccess: NotificationAccess = NotificationAccess.ALLOWED
     private val useCase = CheckForNewAlertsUseCase(
         userPreferencesRepository = preferencesRepository,
         earthquakeRepository = earthquakeRepository,
@@ -45,7 +46,7 @@ class CheckForNewAlertsUseCaseTest {
         deliverAlerts = DeliverAlertsUseCase(
             notifiedRepository,
             AlertMatcher(),
-            NotifyAlertsUseCase(notifier, { areNotificationsAllowed }, analyticsTracker),
+            NotifyAlertsUseCase(notifier, { notificationAccess }, analyticsTracker),
         ),
         analyticsTracker = analyticsTracker,
         clock = clock,
@@ -115,10 +116,10 @@ class CheckForNewAlertsUseCaseTest {
     fun `suppressed events are not remembered so they can still alert once allowed`() = runTest {
         saveSettings(AlertSettings.DEFAULT)
         earthquakeRepository.remoteEarthquakes = listOf(fresh)
-        areNotificationsAllowed = false
+        notificationAccess = NotificationAccess.APP_BLOCKED
         assertEquals(AlertCheckResult.Completed(fetched = 1, matched = 1, notified = 0), useCase())
         assertTrue(notifiedRepository.notifiedAt.isEmpty())
-        areNotificationsAllowed = true
+        notificationAccess = NotificationAccess.ALLOWED
         assertEquals(AlertCheckResult.Completed(fetched = 1, matched = 1, notified = 1), useCase())
     }
 

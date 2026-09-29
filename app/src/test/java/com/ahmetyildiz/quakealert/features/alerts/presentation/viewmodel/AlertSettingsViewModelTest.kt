@@ -6,6 +6,7 @@ import com.ahmetyildiz.quakealert.core.analytics.SetupContext
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.preferences.FakeUserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferences
@@ -37,7 +38,7 @@ class AlertSettingsViewModelTest {
     private val izmir = City(name = "İzmir", adminArea = null, countryCode = "TR", location = GeoPoint(38.42, 27.14))
     private val preferencesRepository = FakeUserPreferencesRepository()
     private val analyticsTracker = FakeAnalyticsTracker()
-    private var areNotificationsAllowed: Boolean = true
+    private var notificationAccess: NotificationAccess = NotificationAccess.ALLOWED
     private val viewModel: AlertSettingsViewModel by lazy {
         AlertSettingsViewModel(
             observeAlertSettings = ObserveAlertSettingsUseCase(preferencesRepository),
@@ -46,7 +47,7 @@ class AlertSettingsViewModelTest {
                 clock,
                 SyncAlertScheduleUseCase(preferencesRepository, FakeAlertCheckScheduler()),
             ),
-            notificationPermissionChecker = { areNotificationsAllowed },
+            notificationAccessChecker = { notificationAccess },
             analyticsTracker = analyticsTracker,
         )
     }
@@ -114,6 +115,20 @@ class AlertSettingsViewModelTest {
     }
 
     @Test
+    fun `saved city can be cleared to the whole world from the screen state alone`() = runTest {
+        preferencesRepository.saveAlertSettings(
+            AlertSettings.DEFAULT.copy(area = AlertArea.AroundCity(izmir, radiusKm = 100)),
+            baselineAt = clock.now(),
+        )
+        val saved: AreaSelection = collectState().areaSelection
+        viewModel.onAreaSelectionChanged(saved.copy(mode = AreaMode.WHOLE_WORLD))
+        assertEquals(AlertArea.WholeWorld, preferences.alertSettings.area)
+        assertEquals(AnalyticsEvent.AlertAreaCleared(SetupContext.SETTINGS), analyticsTracker.events.last())
+        viewModel.onAreaSelectionChanged(collectState().areaSelection.copy(mode = AreaMode.NEAR_CITY))
+        assertEquals(AlertArea.AroundCity(izmir, radiusKm = 100), preferences.alertSettings.area)
+    }
+
+    @Test
     fun `every saved change emits one saved event`() = runTest {
         val events: MutableList<AlertSettingsEvent> = mutableListOf()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.events.toList(events) }
@@ -124,10 +139,17 @@ class AlertSettingsViewModelTest {
 
     @Test
     fun `permission is checked again when the screen resumes`() = runTest {
-        assertTrue(collectState().areNotificationsAllowed)
-        areNotificationsAllowed = false
+        assertEquals(NotificationAccess.ALLOWED, collectState().notificationAccess)
+        notificationAccess = NotificationAccess.APP_BLOCKED
         viewModel.onScreenResumed()
-        assertFalse(collectState().areNotificationsAllowed)
+        assertEquals(NotificationAccess.APP_BLOCKED, collectState().notificationAccess)
+    }
+
+    @Test
+    fun `alert channel turned off while notifications stay allowed is seen on resume`() = runTest {
+        notificationAccess = NotificationAccess.ALERT_CHANNEL_BLOCKED
+        viewModel.onScreenResumed()
+        assertEquals(NotificationAccess.ALERT_CHANNEL_BLOCKED, collectState().notificationAccess)
     }
 
     private fun TestScope.collectState(): AlertSettingsUiState {

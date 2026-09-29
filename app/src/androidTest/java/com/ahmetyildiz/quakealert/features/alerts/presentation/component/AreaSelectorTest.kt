@@ -86,6 +86,23 @@ class AreaSelectorTest {
     }
 
     @Test
+    fun unavailableCitySearchStillLetsASavedCityBeClearedToTheWholeWorld() {
+        setContent(nearIzmir, searchState.copy(isAvailable = false))
+        composeRule.onNodeWithText("İzmir").assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.alert_area_city_change_unavailable)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.action_change)).assertDoesNotExist()
+        composeRule.onNodeWithText(string(R.string.alert_area_whole_world)).performClick()
+        assertEquals(listOf(AreaMode.WHOLE_WORLD), selectedModes)
+    }
+
+    @Test
+    fun unavailableCitySearchLetsTheClearedCityBePickedAgain() {
+        setContent(nearIzmir.copy(mode = AreaMode.WHOLE_WORLD), searchState.copy(isAvailable = false))
+        composeRule.onNodeWithText(string(R.string.alert_area_near_city)).performClick()
+        assertEquals(listOf(AreaMode.NEAR_CITY), selectedModes)
+    }
+
+    @Test
     fun typedCityNameIsSearched() {
         setContent(nearNoCity, searchState)
         composeRule.onNodeWithText(string(R.string.city_search_label)).performTextInput("Izmir")

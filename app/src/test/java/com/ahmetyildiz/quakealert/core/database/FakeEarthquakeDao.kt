@@ -21,6 +21,11 @@ class FakeEarthquakeDao(initial: List<EarthquakeEntity> = emptyList()) : Earthqu
         this.earthquakes.value = this.earthquakes.value.filterNot { it.id in newIds } + earthquakes
     }
 
+    override suspend fun updateExisting(earthquakes: List<EarthquakeEntity>) {
+        val updates: Map<String, EarthquakeEntity> = earthquakes.associateBy { it.id }
+        this.earthquakes.value = this.earthquakes.value.map { updates[it.id] ?: it }
+    }
+
     override suspend fun deleteAll() {
         earthquakes.value = emptyList()
     }

@@ -17,6 +17,8 @@ class FakeEarthquakeRepository(cached: List<Earthquake> = emptyList()) : Earthqu
 
     val receivedQueries: MutableList<EarthquakeQuery> = mutableListOf()
 
+    val fetchedIds: MutableList<String> = mutableListOf()
+
     override fun observeCachedEarthquakes(): Flow<List<Earthquake>> = cachedEarthquakes
 
     override suspend fun refreshCache(query: EarthquakeQuery): AppResult<Int> {
@@ -26,20 +28,30 @@ class FakeEarthquakeRepository(cached: List<Earthquake> = emptyList()) : Earthqu
         return AppResult.Success(remoteEarthquakes.size)
     }
 
-    override suspend fun getEarthquake(id: String): AppResult<Earthquake> {
+    override suspend fun getCachedEarthquake(id: String): Earthquake? = cachedEarthquakes.value.firstOrNull { it.id == id }
+
+    override suspend fun fetchEarthquake(id: String): AppResult<Earthquake> {
+        fetchedIds += id
         failure?.let { return AppResult.Failure(it) }
-        val earthquake: Earthquake = (cachedEarthquakes.value + remoteEarthquakes).firstOrNull { it.id == id }
+        val earthquake: Earthquake = remoteEarthquakes.firstOrNull { it.id == id }
             ?: return AppResult.Failure(AppError.NotFound)
+        updateCachedCopies(listOf(earthquake))
         return AppResult.Success(earthquake)
     }
 
     override suspend fun fetchEarthquakes(query: EarthquakeQuery): AppResult<List<Earthquake>> {
         receivedQueries += query
         failure?.let { return AppResult.Failure(it) }
+        updateCachedCopies(remoteEarthquakes)
         return AppResult.Success(remoteEarthquakes)
     }
 
     override suspend fun addToCache(earthquake: Earthquake) {
         cachedEarthquakes.value = cachedEarthquakes.value.filterNot { it.id == earthquake.id } + earthquake
+    }
+
+    private fun updateCachedCopies(earthquakes: List<Earthquake>) {
+        val updates: Map<String, Earthquake> = earthquakes.associateBy(Earthquake::id)
+        cachedEarthquakes.value = cachedEarthquakes.value.map { updates[it.id] ?: it }
     }
 }

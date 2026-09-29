@@ -48,6 +48,14 @@ class EarthquakeDaoTest {
     }
 
     @Test
+    fun updateExistingRevisesCachedRowsAndIgnoresUnknownOnes() = runBlocking {
+        dao.insertAll(listOf(earthquake(id = "cached", time = 1_000)))
+        val revised: EarthquakeEntity = earthquake(id = "cached", time = 1_000).copy(magnitude = 5.0)
+        dao.updateExisting(listOf(revised, earthquake(id = "unknown", time = 2_000)))
+        assertEquals(listOf(revised), dao.observeAll().first())
+    }
+
+    @Test
     fun nullableColumnsAreStoredAsNull() = runBlocking {
         val withoutOptionalFields: EarthquakeEntity = earthquake(id = "bare", time = 1_000).copy(
             magnitude = null,

@@ -9,7 +9,10 @@
 | Distance / AlertArea | haversine known distances, boundary (exactly on radius), whole-world area |
 | AlertMatcher | threshold boundary (equal passes), null magnitude, outside radius, already notified, before baseline, older than max age |
 | CheckForNewAlertsUseCase | fetch → match → notify → store ids → lastCheckedAt; batch > 3 → summary; permission missing → suppressed; network error → retry result |
-| Repository | refresh replaces cache; failure keeps cache and returns error; `eventid` 404 → NotFound |
+| Notification access | app off → `permission_denied`, app on + alert channel off → `alert_channel_blocked`; both suppressed, not remembered, delivered once allowed again; ViewModels expose the channel state |
+| Repository | refresh replaces cache; failure keeps cache and returns error; `eventid` 404 → NotFound; fetches replace cached copies but never add events |
+| Detail lookup | list: cache first; notification: USGS first, revised version wins, network error → cached copy flagged, 404 → cached copy unflagged |
+| Onboarding restore | page, threshold and city + radius survive a new ViewModel on the same `SavedStateHandle`; notifications page without a restorable area → setup page |
 | City search | country-code filtering, de-duplication, error mapping (with a fake geocoder) |
 | Use my location | permission / location off / timeout → last known / nothing (fake location source); reverse lookup keeps the device point, skips country-level addresses; ViewModel states, located city delivery, analytics |
 | ViewModels | list states (loading/content/empty/error/offline), filter changes, alert settings save + baseline reset, onboarding steps |
@@ -53,6 +56,12 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
 
 - [ ] Fresh install → onboarding → permission dialog (34/35) / no dialog (31/32) → list.
 - [ ] Deny permission → app works, banner in Alerts + Settings, "Open settings" works.
+- [ ] Notifications allowed but the "Earthquake alerts" category turned off (system settings) → Alerts, Settings and
+  the onboarding step name the category, their button opens the category page; Simulate → nothing shown,
+  `alert_notification_suppressed {reason=alert_channel_blocked}`; turn it on → "Simulate the same alert again" posts,
+  a second repeat is `already_notified`.
+- [ ] Onboarding: pick a city + radius, go to step 3, Home, `adb shell am kill com.ahmetyildiz.quakealert`, reopen →
+  step 3 again, Back shows the city, Finish saves it.
 - [ ] City search: "Izmir" in Türkiye, "Tokyo" in Japan, nonsense text (empty state), airplane mode (error state).
 - [ ] Use my location (onboarding and Alerts): tap → permission dialog (approximate only) → give the emulator a
       location while it is searching → city named in the app language, set directly; deny → message + "Open
@@ -68,6 +77,8 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
 - [ ] List: pull-to-refresh, filters, airplane mode → offline banner with cached data, dark mode, font scale 1.5×,
       rotation.
 - [ ] Detail: open in maps, open USGS, share; open from notification (cold start and warm start).
+- [ ] Detail from a notification link (`?isFromNotification=true`) for a cached event: online → no banner; airplane
+  mode → the saved copy with the "may be out of date" banner and Retry.
 - [ ] Deep link: `adb shell am start -a android.intent.action.VIEW -d "quakealert://earthquake/<id>"` with the app
       closed and open (another tab): detail opens, back goes to the list, one `app_opened`, no `earthquake_list_viewed`
       on cold start; an unknown id shows "not found".

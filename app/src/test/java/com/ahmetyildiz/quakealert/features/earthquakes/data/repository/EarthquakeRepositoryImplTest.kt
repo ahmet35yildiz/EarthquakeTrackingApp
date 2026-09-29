@@ -70,42 +70,68 @@ class EarthquakeRepositoryImplTest {
     }
 
     @Test
-    fun `get earthquake returns the cached one without a network request`() = runTest {
+    fun `cached earthquake is read without a network request`() = runTest {
         dao.insertAll(listOf(singleEarthquake.toEntity()))
-        val result: AppResult<Earthquake> = repository.getEarthquake(singleEarthquake.id)
-        assertEquals(AppResult.Success(singleEarthquake), result)
+        assertEquals(singleEarthquake, repository.getCachedEarthquake(singleEarthquake.id))
         assertEquals(0, api.singleEventRequestCount)
     }
 
     @Test
-    fun `get earthquake falls back to the network when it is not cached`() = runTest {
-        val result: AppResult<Earthquake> = repository.getEarthquake(singleEarthquake.id)
+    fun `earthquake that is not cached reads as nothing`() = runTest {
+        assertEquals(null, repository.getCachedEarthquake(singleEarthquake.id))
+    }
+
+    @Test
+    fun `fetched earthquake that is not cached is returned without being added to the cache`() = runTest {
+        val result: AppResult<Earthquake> = repository.fetchEarthquake(singleEarthquake.id)
         assertEquals(AppResult.Success(singleEarthquake), result)
+        assertEquals(emptyList<EarthquakeEntity>(), dao.storedEarthquakes)
+    }
+
+    @Test
+    fun `fetched earthquake replaces its cached copy`() = runTest {
+        val outdated: Earthquake = singleEarthquake.copy(magnitude = singleEarthquake.magnitude?.copy(value = 1.0))
+        dao.insertAll(listOf(outdated.toEntity()))
+        repository.fetchEarthquake(singleEarthquake.id)
+        assertEquals(singleEarthquake, repository.getCachedEarthquake(singleEarthquake.id))
     }
 
     @Test
     fun `unknown earthquake id is reported as not found`() = runTest {
-        assertEquals(AppResult.Failure(AppError.NotFound), repository.getEarthquake("xx00000000"))
+        assertEquals(AppResult.Failure(AppError.NotFound), repository.fetchEarthquake("xx00000000"))
     }
 
     @Test
     fun `event id that is not an earthquake is reported as not found`() = runTest {
         val quarryBlast: UsgsFeatureDto = collection.features[2]
         api.features = mapOf(quarryBlast.id to quarryBlast)
-        assertEquals(AppResult.Failure(AppError.NotFound), repository.getEarthquake(quarryBlast.id))
+        assertEquals(AppResult.Failure(AppError.NotFound), repository.fetchEarthquake(quarryBlast.id))
     }
 
     @Test
-    fun `get earthquake offline and not cached reports a network error`() = runTest {
+    fun `fetching one earthquake offline reports a network error and keeps the cached copy`() = runTest {
+        dao.insertAll(listOf(singleEarthquake.toEntity()))
         api.failure = IOException("offline")
-        assertEquals(AppResult.Failure(AppError.Network), repository.getEarthquake(singleEarthquake.id))
+        assertEquals(AppResult.Failure(AppError.Network), repository.fetchEarthquake(singleEarthquake.id))
+        assertEquals(singleEarthquake, repository.getCachedEarthquake(singleEarthquake.id))
     }
 
     @Test
-    fun `fetch returns earthquakes without touching the cache`() = runTest {
+    fun `fetch returns earthquakes without adding them to the cache`() = runTest {
         val result: AppResult<List<Earthquake>> = repository.fetchEarthquakes(query.copy(updatedAfter = Instant.EPOCH))
         assertEquals(AppResult.Success(listedEarthquakes), result)
         assertEquals(emptyList<EarthquakeEntity>(), dao.storedEarthquakes)
         assertEquals("1970-01-01T00:00:00Z", api.lastQueryParameters?.get("updatedafter"))
+    }
+
+    @Test
+    fun `fetch replaces the cached copies of revised earthquakes and keeps the rest of the cache`() = runTest {
+        val revised: Earthquake = listedEarthquakes.first()
+        val outdated: Earthquake = revised.copy(magnitude = revised.magnitude?.copy(value = 1.0))
+        dao.insertAll(listOf(outdated.toEntity(), singleEarthquake.toEntity()))
+        repository.fetchEarthquakes(query)
+        assertEquals(revised, repository.getCachedEarthquake(revised.id))
+        assertEquals(singleEarthquake, repository.getCachedEarthquake(singleEarthquake.id))
+        assertEquals(2, dao.storedEarthquakes.size)
     }
 }

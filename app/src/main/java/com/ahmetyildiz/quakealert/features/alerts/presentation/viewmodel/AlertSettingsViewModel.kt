@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetyildiz.quakealert.core.analytics.AnalyticsTracker
 import com.ahmetyildiz.quakealert.core.analytics.SetupContext
 import com.ahmetyildiz.quakealert.core.model.AlertArea
-import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccessChecker
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.features.alerts.domain.model.AlertSettingsUpdate
 import com.ahmetyildiz.quakealert.features.alerts.domain.usecase.ObserveAlertSettingsUseCase
@@ -26,25 +27,25 @@ import javax.inject.Inject
 class AlertSettingsViewModel @Inject constructor(
     observeAlertSettings: ObserveAlertSettingsUseCase,
     private val updateAlertSettings: UpdateAlertSettingsUseCase,
-    private val notificationPermissionChecker: NotificationPermissionChecker,
+    private val notificationAccessChecker: NotificationAccessChecker,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
     private val areaDraft = MutableStateFlow<AreaSelection?>(null)
-    private val areNotificationsAllowed = MutableStateFlow(notificationPermissionChecker.areNotificationsAllowed())
+    private val notificationAccess = MutableStateFlow(notificationAccessChecker.getAlertNotificationAccess())
     private val eventChannel = MutableSharedFlow<AlertSettingsEvent>(extraBufferCapacity = 1)
 
     val uiState: StateFlow<AlertSettingsUiState> = combine(
         observeAlertSettings(),
         areaDraft,
-        areNotificationsAllowed,
+        notificationAccess,
         ::toUiState,
     ).stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), AlertSettingsUiState())
 
     val events: SharedFlow<AlertSettingsEvent> = eventChannel.asSharedFlow()
 
     fun onScreenResumed() {
-        areNotificationsAllowed.value = notificationPermissionChecker.areNotificationsAllowed()
+        notificationAccess.value = notificationAccessChecker.getAlertNotificationAccess()
     }
 
     fun onAlertsToggled(isEnabled: Boolean) {
@@ -73,13 +74,13 @@ class AlertSettingsViewModel @Inject constructor(
     private fun toUiState(
         settings: AlertSettings,
         draft: AreaSelection?,
-        areNotificationsAllowed: Boolean,
+        notificationAccess: NotificationAccess,
     ): AlertSettingsUiState =
         AlertSettingsUiState(
             isLoading = false,
             settings = settings,
             areaSelection = draft ?: AreaSelection.from(settings.area),
-            areNotificationsAllowed = areNotificationsAllowed,
+            notificationAccess = notificationAccess,
         )
 
     private companion object {

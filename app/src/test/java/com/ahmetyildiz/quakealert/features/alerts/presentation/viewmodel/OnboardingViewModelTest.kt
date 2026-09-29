@@ -8,6 +8,7 @@ import com.ahmetyildiz.quakealert.core.analytics.SetupContext
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.preferences.FakeUserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferences
 import com.ahmetyildiz.quakealert.core.testing.MainDispatcherExtension
@@ -32,7 +33,7 @@ class OnboardingViewModelTest {
     private val scheduler = FakeAlertCheckScheduler()
     private val analyticsTracker = FakeAnalyticsTracker()
     private val savedStateHandle = SavedStateHandle()
-    private var areNotificationsAllowed: Boolean = false
+    private var notificationAccess: NotificationAccess = NotificationAccess.APP_BLOCKED
     private val izmir = City(name = "İzmir", adminArea = null, countryCode = "TR", location = GeoPoint(38.42, 27.14))
     private val viewModel: OnboardingViewModel by lazy { createViewModel() }
 
@@ -61,6 +62,37 @@ class OnboardingViewModelTest {
         assertEquals(OnboardingPage.ALERT_SETUP, restored.uiState.value.page)
         assertEquals(6.0, restored.uiState.value.threshold)
         assertTrue(analyticsTracker.events.isEmpty())
+    }
+
+    @Test
+    fun `restored notifications page keeps the chosen city and radius and finishes with them`() {
+        viewModel.onNext()
+        viewModel.onAreaSelectionChanged(AreaSelection(AreaMode.NEAR_CITY, city = izmir, radiusKm = 100))
+        viewModel.onNext()
+        val restored: OnboardingViewModel = createViewModel()
+        assertEquals(OnboardingPage.NOTIFICATIONS, restored.uiState.value.page)
+        assertEquals(AreaSelection(AreaMode.NEAR_CITY, city = izmir, radiusKm = 100), restored.uiState.value.areaSelection)
+        restored.onFinish()
+        assertEquals(AlertArea.AroundCity(izmir, radiusKm = 100), preferences.alertSettings.area)
+    }
+
+    @Test
+    fun `restored notifications page keeps the default whole world choice`() {
+        viewModel.onNext()
+        viewModel.onNext()
+        val restored: OnboardingViewModel = createViewModel()
+        assertEquals(OnboardingPage.NOTIFICATIONS, restored.uiState.value.page)
+        assertEquals(AlertArea.WholeWorld, restored.uiState.value.areaSelection.toAlertAreaOrNull())
+    }
+
+    @Test
+    fun `notifications page without a restorable area goes back to the setup page`() {
+        val savedWithoutArea = SavedStateHandle(mapOf("onboarding_page" to OnboardingPage.NOTIFICATIONS.name))
+        val restored: OnboardingViewModel = createViewModel(savedWithoutArea)
+        assertEquals(OnboardingPage.ALERT_SETUP, restored.uiState.value.page)
+        restored.onNext()
+        assertEquals(OnboardingPage.NOTIFICATIONS, restored.uiState.value.page)
+        assertFalse(preferences.isOnboardingCompleted)
     }
 
     @Test
@@ -94,7 +126,7 @@ class OnboardingViewModelTest {
         viewModel.onPermissionRequested()
         viewModel.onPermissionResult(isGranted = false)
         assertTrue(state.isPermissionDenied)
-        assertFalse(state.areNotificationsAllowed)
+        assertEquals(NotificationAccess.APP_BLOCKED, state.notificationAccess)
         val expected: List<AnalyticsEvent> = listOf(
             AnalyticsEvent.NotificationPermissionRequested(SetupContext.ONBOARDING),
             AnalyticsEvent.NotificationPermissionResult(isGranted = false),
@@ -104,9 +136,17 @@ class OnboardingViewModelTest {
 
     @Test
     fun `permission granted in the system settings is seen on resume`() {
-        areNotificationsAllowed = true
+        notificationAccess = NotificationAccess.ALLOWED
         viewModel.onScreenResumed()
-        assertTrue(state.areNotificationsAllowed)
+        assertEquals(NotificationAccess.ALLOWED, state.notificationAccess)
+    }
+
+    @Test
+    fun `granted permission with the alert channel blocked is not shown as allowed`() {
+        notificationAccess = NotificationAccess.ALERT_CHANNEL_BLOCKED
+        viewModel.onPermissionResult(isGranted = true)
+        assertEquals(NotificationAccess.ALERT_CHANNEL_BLOCKED, state.notificationAccess)
+        assertFalse(state.isPermissionDenied)
     }
 
     @Test
@@ -124,7 +164,7 @@ class OnboardingViewModelTest {
     @Test
     fun `finishing tracks the choice with the onboarding context`() {
         viewModel.onAreaSelectionChanged(AreaSelection(AreaMode.NEAR_CITY, city = izmir, radiusKm = 100))
-        areNotificationsAllowed = true
+        notificationAccess = NotificationAccess.ALLOWED
         viewModel.onScreenResumed()
         viewModel.onFinish()
         val expected: List<AnalyticsEvent> = listOf(
@@ -141,15 +181,15 @@ class OnboardingViewModelTest {
         assertEquals(1, analyticsTracker.events.count { it is AnalyticsEvent.OnboardingCompleted })
     }
 
-    private fun createViewModel(): OnboardingViewModel =
+    private fun createViewModel(handle: SavedStateHandle = savedStateHandle): OnboardingViewModel =
         OnboardingViewModel(
-            savedStateHandle = savedStateHandle,
+            savedStateHandle = handle,
             completeOnboarding = CompleteOnboardingUseCase(
                 preferencesRepository,
                 clock,
                 SyncAlertScheduleUseCase(preferencesRepository, scheduler),
             ),
-            notificationPermissionChecker = { areNotificationsAllowed },
+            notificationAccessChecker = { notificationAccess },
             analyticsTracker = analyticsTracker,
         )
 }

@@ -8,7 +8,7 @@ import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.appearance.ThemeModeManager
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.locale.AppLanguageManager
-import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccessChecker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val appLanguageManager: AppLanguageManager,
     private val themeModeManager: ThemeModeManager,
-    private val notificationPermissionChecker: NotificationPermissionChecker,
+    private val notificationAccessChecker: NotificationAccessChecker,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
@@ -52,7 +52,7 @@ class SettingsViewModel @Inject constructor(
             languages = appLanguageManager.getSupportedLanguages(),
             selectedLanguage = appLanguageManager.getSelectedLanguage(),
             selectedThemeMode = themeModeManager.getSelectedMode(),
-            areNotificationsAllowed = notificationPermissionChecker.areNotificationsAllowed(),
+            notificationAccess = notificationAccessChecker.getAlertNotificationAccess(),
             appVersion = AppVersion(name = BuildConfig.VERSION_NAME, code = BuildConfig.VERSION_CODE),
         )
 }

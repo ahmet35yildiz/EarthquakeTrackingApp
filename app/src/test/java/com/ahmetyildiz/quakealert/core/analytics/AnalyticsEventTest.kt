@@ -142,6 +142,11 @@ class AnalyticsEventTest {
                 "reason" to "permission_denied",
             ),
             entry(
+                AnalyticsEvent.AlertNotificationSuppressed(SuppressionReason.ALERT_CHANNEL_BLOCKED),
+                "alert_notification_suppressed",
+                "reason" to "alert_channel_blocked",
+            ),
+            entry(
                 AnalyticsEvent.AlertNotificationOpened(eventId = "us7000abcd", delaySeconds = 42),
                 "alert_notification_opened",
                 "event_id" to "us7000abcd", "delay_seconds" to "42",

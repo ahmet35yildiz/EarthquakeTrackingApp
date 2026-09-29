@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.navigation.notificationSettingsIntent
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.alerts.presentation.component.AreaSelectorEntry
@@ -93,7 +94,9 @@ fun OnboardingEntry(
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         },
-        onOpenNotificationSettings = { context.startActivity(notificationSettingsIntent(context)) },
+        onOpenNotificationSettings = {
+            context.startActivity(notificationSettingsIntent(context, uiState.notificationAccess))
+        },
         onFinish = viewModel::onFinish,
     )
     OnboardingScreen(
@@ -163,7 +166,7 @@ private fun PageContent(uiState: OnboardingUiState, actions: OnboardingActions, 
             areaSelector = areaSelector,
         )
         OnboardingPage.NOTIFICATIONS -> OnboardingNotificationsPage(
-            areNotificationsAllowed = uiState.areNotificationsAllowed,
+            notificationAccess = uiState.notificationAccess,
             isPermissionDenied = uiState.isPermissionDenied,
         )
     }
@@ -200,14 +203,16 @@ private fun AlertSetupActions(isEnabled: Boolean, onNext: () -> Unit) {
 @Composable
 private fun NotificationActions(uiState: OnboardingUiState, actions: OnboardingActions, isPermissionRequestSupported: Boolean) {
     val isEnabled: Boolean = !uiState.isFinishing
-    val canRequest: Boolean = isPermissionRequestSupported && !uiState.areNotificationsAllowed && !uiState.isPermissionDenied
+    val canRequest: Boolean = isPermissionRequestSupported &&
+        uiState.notificationAccess == NotificationAccess.APP_BLOCKED &&
+        !uiState.isPermissionDenied
     if (canRequest) {
         PrimaryButton(R.string.action_allow_notifications, onClick = actions.onAllowNotifications, isEnabled = isEnabled)
         SecondaryButton(R.string.action_not_now, onClick = actions.onFinish, isEnabled = isEnabled)
         return
     }
     PrimaryButton(R.string.action_finish, onClick = actions.onFinish, isEnabled = isEnabled)
-    if (!uiState.areNotificationsAllowed) {
+    if (!uiState.notificationAccess.isAllowed) {
         SecondaryButton(R.string.action_open_settings, onClick = actions.onOpenNotificationSettings, isEnabled = isEnabled)
     }
 }

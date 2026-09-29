@@ -22,13 +22,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
+import com.ahmetyildiz.quakealert.core.ui.component.alertChannelBlockedMessage
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.alerts.domain.AlertConfig
 
 @Composable
 fun OnboardingNotificationsPage(
-    areNotificationsAllowed: Boolean,
+    notificationAccess: NotificationAccess,
     isPermissionDenied: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -52,7 +54,12 @@ fun OnboardingNotificationsPage(
             textAlign = TextAlign.Center,
         )
         when {
-            areNotificationsAllowed -> AllowedRow()
+            notificationAccess.isAllowed -> AllowedRow()
+            notificationAccess == NotificationAccess.ALERT_CHANNEL_BLOCKED -> Text(
+                text = alertChannelBlockedMessage(),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+            )
             isPermissionDenied -> Text(
                 text = stringResource(R.string.onboarding_notifications_denied),
                 style = MaterialTheme.typography.bodyMedium,
@@ -82,7 +89,7 @@ private fun OnboardingNotificationsPagePreview() {
     QuakeAlertTheme {
         Surface {
             OnboardingNotificationsPage(
-                areNotificationsAllowed = false,
+                notificationAccess = NotificationAccess.APP_BLOCKED,
                 isPermissionDenied = true,
                 modifier = Modifier.padding(Spacing.large),
             )

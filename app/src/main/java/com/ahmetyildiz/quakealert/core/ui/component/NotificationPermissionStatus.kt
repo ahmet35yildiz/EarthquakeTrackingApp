@@ -17,15 +17,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
 @Composable
 fun NotificationPermissionStatus(
-    isAllowed: Boolean,
+    access: NotificationAccess,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isAllowed: Boolean = access.isAllowed
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -44,7 +46,7 @@ fun NotificationPermissionStatus(
                     contentDescription = null,
                     tint = if (isAllowed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                 )
-                PermissionTexts(isAllowed = isAllowed, modifier = Modifier.weight(1f))
+                PermissionTexts(access = access, modifier = Modifier.weight(1f))
             }
             if (!isAllowed) {
                 FilledTonalButton(onClick = onOpenSettings) { Text(text = stringResource(R.string.action_open_settings)) }
@@ -54,21 +56,37 @@ fun NotificationPermissionStatus(
 }
 
 @Composable
-private fun PermissionTexts(isAllowed: Boolean, modifier: Modifier = Modifier) {
+private fun PermissionTexts(access: NotificationAccess, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text(
-            text = stringResource(if (isAllowed) R.string.notifications_allowed else R.string.notifications_blocked),
-            style = MaterialTheme.typography.titleSmall,
-        )
-        if (!isAllowed) {
+        Text(text = stringResource(access.titleRes), style = MaterialTheme.typography.titleSmall)
+        blockedMessageOrNull(access)?.let { message ->
             Text(
-                text = stringResource(R.string.notifications_blocked_message),
+                text = message,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
 }
+
+private val NotificationAccess.titleRes: Int
+    get() = when (this) {
+        NotificationAccess.ALLOWED -> R.string.notifications_allowed
+        NotificationAccess.APP_BLOCKED -> R.string.notifications_blocked
+        NotificationAccess.ALERT_CHANNEL_BLOCKED -> R.string.notifications_channel_blocked
+    }
+
+@Composable
+private fun blockedMessageOrNull(access: NotificationAccess): String? =
+    when (access) {
+        NotificationAccess.ALLOWED -> null
+        NotificationAccess.APP_BLOCKED -> stringResource(R.string.notifications_blocked_message)
+        NotificationAccess.ALERT_CHANNEL_BLOCKED -> alertChannelBlockedMessage()
+    }
+
+@Composable
+fun alertChannelBlockedMessage(): String =
+    stringResource(R.string.notifications_channel_blocked_message, stringResource(R.string.notification_channel_alerts_name))
 
 @PreviewLightDark
 @Composable
@@ -79,8 +97,7 @@ private fun NotificationPermissionStatusPreview() {
                 modifier = Modifier.padding(Spacing.large),
                 verticalArrangement = Arrangement.spacedBy(Spacing.medium),
             ) {
-                NotificationPermissionStatus(isAllowed = true, onOpenSettings = {})
-                NotificationPermissionStatus(isAllowed = false, onOpenSettings = {})
+                NotificationAccess.entries.forEach { NotificationPermissionStatus(access = it, onOpenSettings = {}) }
             }
         }
     }

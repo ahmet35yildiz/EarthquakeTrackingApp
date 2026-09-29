@@ -46,7 +46,9 @@ class EarthquakeDetailViewModel @AssistedInject constructor(
     private fun load() {
         mutableUiState.value = EarthquakeDetailUiState(content = EarthquakeDetailContent.LOADING)
         viewModelScope.launch {
-            mutableUiState.value = when (val result: AppResult<EarthquakeDetails> = getEarthquake(earthquakeId)) {
+            val result: AppResult<EarthquakeDetails> =
+                getEarthquake(earthquakeId, shouldRevalidate = source == DetailSource.NOTIFICATION)
+            mutableUiState.value = when (result) {
                 is AppResult.Success -> loadedState(result.data)
                 is AppResult.Failure -> failedState(result.error)
             }

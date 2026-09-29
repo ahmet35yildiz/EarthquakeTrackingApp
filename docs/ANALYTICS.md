@@ -41,8 +41,8 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `list_sort_changed` | `sort` = newest_first \| largest_first \| nearest_first | Sort order picked |
 | `earthquake_detail_viewed` | `source` = list \| notification (an external `quakealert://` link counts as list; the app only publishes it in notifications), `magnitude` (omitted when unknown) | Detail loaded; once per opened detail (not for not-found / error, not again after rotation) |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
-| `alert_notification_posted` | `event_id` (`summary` for the summary), `magnitude` (largest for the summary), `batch_size` | Once per notification shown (up to 3 individual ones, or 1 summary) |
-| `alert_notification_suppressed` | `reason` = permission_denied | Match found but cannot notify |
+| `alert_notification_posted` | `event_id` (`summary` for the summary), `magnitude` (largest for the summary), `batch_size` | Once per notification handed to Android while app notifications and the "Earthquake alerts" category were on (up to 3 individual ones, or 1 summary). Handed over, not seen: Do Not Disturb or a dismissed notification are invisible to the app; `alert_notification_opened` is the only "seen" signal |
+| `alert_notification_suppressed` | `reason` = permission_denied (app notifications off) \| alert_channel_blocked (app allowed, "Earthquake alerts" category off) | Match found but cannot notify; the match is not remembered and is retried by the next check |
 | `alert_notification_opened` | `event_id` (`summary` for the summary), `delay_seconds` | Notification tapped (cold or warm start) |
 | `background_check_completed` | `fetched`, `matched`, `notified`, `duration_ms` | Worker success |
 | `background_check_failed` | `reason` = network \| server \| parsing \| unknown | Worker failure/retry |

@@ -66,7 +66,9 @@ fun AlertSettingsEntry(
         onAlertsToggled = viewModel::onAlertsToggled,
         onThresholdChanged = viewModel::onThresholdChanged,
         onAreaSelectionChanged = viewModel::onAreaSelectionChanged,
-        onOpenNotificationSettings = { context.startActivity(notificationSettingsIntent(context)) },
+        onOpenNotificationSettings = {
+            context.startActivity(notificationSettingsIntent(context, uiState.notificationAccess))
+        },
     )
     AlertSettingsScreen(uiState = uiState, actions = actions, snackbarHostState = snackbarHostState, modifier = modifier) {
         AreaSelectorEntry(selection = uiState.areaSelection, onSelectionChange = actions.onAreaSelectionChanged)
@@ -100,7 +102,7 @@ fun AlertSettingsScreen(
         ) {
             AlertsSummaryCard(
                 settings = uiState.settings,
-                areNotificationsAllowed = uiState.areNotificationsAllowed,
+                notificationAccess = uiState.notificationAccess,
                 actions = AlertsSummaryActions(
                     onAlertsToggled = actions.onAlertsToggled,
                     onAllowNotifications = actions.onOpenNotificationSettings,

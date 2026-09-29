@@ -3,7 +3,9 @@ package com.ahmetyildiz.quakealert.features.alerts.presentation.component
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Place
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,7 +52,7 @@ fun AreaSelector(
         icon = rememberVectorPainter(Icons.Rounded.Place),
         modifier = modifier,
     ) {
-        if (citySearch.isAvailable) {
+        if (canChooseMode(selection, citySearch)) {
             AreaModeSelector(mode = selection.mode, onModeSelected = actions.onModeSelected)
         }
         when (selection.mode) {
@@ -59,6 +61,9 @@ fun AreaSelector(
         }
     }
 }
+
+private fun canChooseMode(selection: AreaSelection, citySearch: CitySearchUiState): Boolean =
+    citySearch.isAvailable || selection.mode == AreaMode.NEAR_CITY || selection.city != null
 
 @Composable
 private fun AreaModeSelector(mode: AreaMode, onModeSelected: (AreaMode) -> Unit) {
@@ -100,6 +105,13 @@ private fun NearCityContent(selection: AreaSelection, citySearch: CitySearchUiSt
                 null
             },
         )
+        if (!citySearch.isAvailable) {
+            Text(
+                text = stringResource(R.string.alert_area_city_change_unavailable),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     } else {
         CitySearchPanel(
             state = citySearch,

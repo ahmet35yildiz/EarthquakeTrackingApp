@@ -101,7 +101,8 @@ publication delay + background check interval). The app says this explicitly in 
   - Country picker: all ISO countries from `Locale.getISOCountries()`, names localized to the app language, sorted
     with a locale-aware `Collator`, local search box. Default: device locale country.
   - City search: text field + "Search" action (no live suggestions) → Android `Geocoder` → results filtered to the
-    selected country → user picks one. Loading/empty/error states. Hidden if `Geocoder.isPresent()` is false.
+    selected country → user picks one. Loading/empty/error states. Hidden if `Geocoder.isPresent()` is false; a city that is
+    already saved is still shown and can be switched to `Whole world` (it just cannot be changed).
   - "Use my location" (above the country picker, same place as the search): asks for approximate location
     (`ACCESS_COARSE_LOCATION` only) on first use → the device location becomes the circle center and reverse
     geocoding gives the name (city + admin area + country, in the app language); the city is set directly, no

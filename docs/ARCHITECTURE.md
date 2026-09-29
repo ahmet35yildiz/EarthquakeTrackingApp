@@ -37,7 +37,7 @@ com.ahmetyildiz.quakealert/
 │   ├── model/                       # GeoPoint, City, AlertArea, MagnitudeSeverity … pure Kotlin shared models
 │   ├── location/                    # Distance (haversine) utilities, location permission check
 │   ├── network/                     # Retrofit/OkHttp/Json setup
-│   ├── notification/                # NotificationChannels, NotificationPermissionChecker, AlertNotificationTap extras
+│   ├── notification/                # NotificationChannels, NotificationAccessChecker (app + channel), AlertNotificationTap extras
 │   ├── navigation/                  # DeepLinkConfig (detail deep link builder), ExternalIntents (browser, notification settings)
 │   ├── locale/                      # AppLanguage, AppLanguageManager (per-app language), DeviceRegionProvider, CountryNames
 │   ├── appearance/                  # ThemeMode, ThemeModeManager (system / light / dark through AppCompat night mode)
@@ -71,7 +71,7 @@ com.ahmetyildiz.quakealert/
 - Features never import each other's screens; the `navigation` package wires all routes.
 - Onboarding lives in `alerts` because it is the alert setup flow (reuses the same threshold/area components).
 - `settings` depends on `core` only (ADR-038): `SettingsViewModel` reads `AppLanguageManager`, `ThemeModeManager` and
-  `NotificationPermissionChecker` directly. Pieces used by more than one feature moved to `core` — the permission
+  `NotificationAccessChecker` directly. Pieces used by more than one feature moved to `core` — the permission
   status row (`core/ui/component/NotificationPermissionStatus`, now shown only in Settings; the Alerts tab flags a
   blocked permission in its summary card, ADR-046) and the outgoing intents
   (`core/navigation/ExternalIntents`). The Settings tab only shows a "Developer tools" entry (debug builds); `DeveloperToolsScreen` (settings) is a pushed
@@ -92,8 +92,10 @@ EarthquakeListScreen ─▶ EarthquakeListViewModel
   replaces the cache in one transaction. A failed refresh leaves the cache untouched.
 - The repository holds no product rules: every query (time window, magnitude, area, `updatedafter`) comes from a use
   case as an `EarthquakeQuery`, mapped to USGS parameters in the data layer.
-- Detail by id: cache first, then USGS `eventid` (404 or a non-earthquake event → `NotFound`); the network result is
-  not written to the cache, which always mirrors the last list refresh.
+- Detail by id: `getCachedEarthquake(id)` and `fetchEarthquake(id)` (USGS `eventid`; 404 or a non-earthquake event →
+  `NotFound`); `GetEarthquakeUseCase` decides the order (ADR-048). Fetches never add events to the cache, but they
+  replace the cached copy of every event they return (`EarthquakeDao.updateExisting`), so the cache keeps the list's
+  scope with the newest version the app has seen.
 - Features that are not earthquakes or lack valid coordinates/depth are dropped while mapping.
 - Filters and distances are computed in the domain layer (haversine) on the cached list:
   `ObserveRecentEarthquakesUseCase(options)` combines the cache with the user preferences and returns
@@ -180,6 +182,8 @@ AreaSelectorEntry ─▶ CitySearchViewModel ─▶ SearchCitiesUseCase ─▶ C
   (`DeviceRegionProvider`, system locale — not the per-app language), search states Idle / Loading / Found /
   NoResults / Failed, `city_search_performed` / `city_search_failed`. Picking a city, the radius or the mode is
   reported back as a new `AreaSelection`; `toAlertAreaOrNull()` is null while "Near a city" has no city yet.
+  Without a geocoder the mode choice stays visible while a city is part of the selection, so a saved city can be
+  switched to the whole world; only search and "Change" are hidden (ADR-049).
 - Must be verified on API < 33 **and** API ≥ 33 emulators (see TESTING.md).
 
 ### 4.3.1 "Use my location" (ADR-045)
@@ -214,8 +218,10 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
 ### 4.4 Earthquake detail
 - `EarthquakeDetailRoute(earthquakeId, isFromNotification)` (navigation) → `EarthquakeDetailEntry` →
   `EarthquakeDetailViewModel`, which receives the id and the analytics source through Hilt assisted injection
-  (ADR-024) → `GetEarthquakeUseCase` (cache first, then USGS `eventid`) → `EarthquakeDetails` (earthquake +
-  `DistanceFromCity` with `isWithinAlertArea` from `AlertArea.contains`, the same rule as alerts).
+  (ADR-024) → `GetEarthquakeUseCase(id, shouldRevalidate = isFromNotification)` → `EarthquakeDetails` (earthquake +
+  `DistanceFromCity` with `isWithinAlertArea` from `AlertArea.contains`, the same rule as alerts, +
+  `isSavedCopyAfterFailedRefresh`). From the list: cache first, then USGS. From a notification: USGS first; on a
+  network / server error the cached copy is shown under a "may be out of date" banner with Retry (ADR-048).
 - States: `LOADING` | `LOADED` | `NOT_FOUND` (HTTP 404 or not an earthquake) | `ERROR` (retry).
 - Maps (`geo:` intent), USGS page (browser) and share (chooser) are launched by the entry composable; the ViewModel
   only logs `detail_action_clicked`. A missing handler app shows a snackbar instead of crashing.
@@ -240,16 +246,18 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
 - A deep link before onboarding is completed opens the detail with onboarding underneath (only reachable from adb
   or another app; notifications exist only after onboarding).
 - Onboarding (ADR-035) is one route, `OnboardingEntry` → `OnboardingViewModel`, with pages `WELCOME` →
-  `ALERT_SETUP` → `NOTIFICATIONS` held in the ViewModel (page and threshold in `SavedStateHandle`, `BackHandler` for
-  the previous page). The setup page reuses `MagnitudeThresholdSelector` + `AreaSelectorEntry`; the notifications
+  `ALERT_SETUP` → `NOTIFICATIONS` held in the ViewModel (page, threshold and area choice in `SavedStateHandle`;
+  a notifications page restored without an area returns to the setup page, ADR-035; `BackHandler` for the previous
+  page). The setup page reuses `MagnitudeThresholdSelector` + `AreaSelectorEntry`; the notifications
   page requests `POST_NOTIFICATIONS` through `rememberLauncherForActivityResult` on API 33+. Finish →
   `CompleteOnboardingUseCase` (save settings + baseline, completion flag, schedule) → `navigateToMainGraph()`.
 
 ### 4.6 Notifications (ADR-030)
 - Channel `earthquake_alerts` ("Earthquake alerts", high importance) is registered in `QuakeAlertApplication.onCreate`
   (every process start, including a worker-only process).
-- `NotifyAlertsUseCase(earthquakes, settings)`: empty → `NOTHING_TO_NOTIFY`; no permission → `SUPPRESSED` +
-  `alert_notification_suppressed`; ≤ `AlertConfig.MAX_INDIVIDUAL_NOTIFICATIONS` (3) → `AlertNotifier.showAlerts`
+- `NotifyAlertsUseCase(earthquakes, settings)`: empty → `NOTHING_TO_NOTIFY`; app notifications off or the
+  `earthquake_alerts` channel blocked (`NotificationAccess`, ADR-047) → `SUPPRESSED` + `alert_notification_suppressed`
+  (not remembered, retried by the next check); ≤ `AlertConfig.MAX_INDIVIDUAL_NOTIFICATIONS` (3) → `AlertNotifier.showAlerts`
   (oldest first), more → `showSummary`; one `alert_notification_posted` per shown notification.
 - `EarthquakeAlertNotifier` builds with `AlertNotificationBuilder` from a context in the app language
   (`LocalizedContextProvider`): title with distance when an area is set, text place · local time, notification id =

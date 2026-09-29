@@ -11,6 +11,7 @@ import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.DistanceFrom
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeDetails
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeFixtures.earthquake
+import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Magnitude
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.repository.FakeEarthquakeRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -53,14 +54,58 @@ class GetEarthquakeUseCaseTest {
     }
 
     @Test
+    fun `cached earthquake is read without asking USGS`() = runTest {
+        useCase("us1")
+        assertTrue(earthquakeRepository.fetchedIds.isEmpty())
+    }
+
+    @Test
+    fun `earthquake that is not cached is fetched from USGS`() = runTest {
+        val remote: Earthquake = earthquake(id = "us2")
+        earthquakeRepository.remoteEarthquakes = listOf(remote)
+        assertEquals(AppResult.Success(EarthquakeDetails(remote, distanceFromCity = null)), useCase("us2"))
+    }
+
+    @Test
     fun `missing earthquake is reported as not found`() = runTest {
         assertEquals(AppResult.Failure(AppError.NotFound), useCase("unknown"))
     }
 
     @Test
-    fun `network failure is passed on`() = runTest {
+    fun `network failure is passed on when nothing is cached`() = runTest {
         earthquakeRepository.failure = AppError.Network
-        assertEquals(AppResult.Failure(AppError.Network), useCase("us1"))
+        assertEquals(AppResult.Failure(AppError.Network), useCase("unknown"))
+    }
+
+    @Test
+    fun `revalidation shows the revised earthquake instead of the cached one`() = runTest {
+        val revised: Earthquake = cachedEarthquake.copy(magnitude = Magnitude(value = 5.0, type = "mww"))
+        earthquakeRepository.remoteEarthquakes = listOf(revised)
+        val details: EarthquakeDetails = (useCase("us1", shouldRevalidate = true) as AppResult.Success).data
+        assertEquals(revised, details.earthquake)
+        assertFalse(details.isSavedCopyAfterFailedRefresh)
+        assertEquals(listOf(revised), earthquakeRepository.cachedEarthquakes.value)
+    }
+
+    @Test
+    fun `failed revalidation falls back to the cached copy and says so`() = runTest {
+        earthquakeRepository.failure = AppError.Network
+        val details: EarthquakeDetails = (useCase("us1", shouldRevalidate = true) as AppResult.Success).data
+        assertEquals(cachedEarthquake, details.earthquake)
+        assertTrue(details.isSavedCopyAfterFailedRefresh)
+    }
+
+    @Test
+    fun `revalidation of an earthquake USGS does not know keeps the cached copy without a notice`() = runTest {
+        val details: EarthquakeDetails = (useCase("us1", shouldRevalidate = true) as AppResult.Success).data
+        assertEquals(cachedEarthquake, details.earthquake)
+        assertFalse(details.isSavedCopyAfterFailedRefresh)
+    }
+
+    @Test
+    fun `failed revalidation without a cached copy reports the error`() = runTest {
+        earthquakeRepository.failure = AppError.Network
+        assertEquals(AppResult.Failure(AppError.Network), useCase("unknown", shouldRevalidate = true))
     }
 
     private suspend fun detailsOf(id: String): EarthquakeDetails = (useCase(id) as AppResult.Success).data

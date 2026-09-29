@@ -3,7 +3,7 @@
     <string name="tab_alerts">Alarmlar</string>
     <string name="tab_settings">Ayarlar</string>
 
-    <string name="onboarding_welcome_title">Önemli olduğunda haberin olsun</string>
+    <string name="onboarding_welcome_title">Önemli depremlerden haberin olsun</string>
     <string name="onboarding_welcome_message">Dünyadaki son depremler ve yalnızca önemsediklerin için sakin bildirimler.</string>
     <string name="action_get_started">Başla</string>
 
@@ -183,6 +183,7 @@
         <item quantity="other">%d kişi hissetti</item>
     </plurals>
     <string name="detail_data_note">Veri: ABD Jeoloji Araştırmaları Kurumu (USGS). Büyüklük ve konum yayından sonra güncellenebilir.</string>
+    <string name="detail_saved_copy_message">USGS\'ten en güncel hali alınamadı. Bu cihazda kayıtlı kopya gösteriliyor; güncel olmayabilir.</string>
     <string name="detail_not_found_title">Deprem bulunamadı</string>
     <string name="detail_not_found_message">USGS bu kaydı kaldırmış ya da başka bir kayıtla birleştirmiş olabilir.</string>
     <string name="detail_error_title">Bu deprem yüklenemedi</string>
@@ -197,6 +198,7 @@
     <string name="alert_area_near_city">Şehir çevresi</string>
     <string name="alert_area_whole_world_warning_title">Tüm dünya için bildirim</string>
     <string name="alert_area_whole_world_warning_message">Dünyanın her yerindeki depremler için bildirim alırsın. Eşik düşükse günde birkaç bildirim gelebilir.</string>
+    <string name="alert_area_city_change_unavailable">Bu cihazda şehir arama kullanılamıyor; bu şehir değiştirilemez. Yine de Tüm dünya seçeneğine geçebilirsin.</string>
     <string name="alert_area_city_search_unavailable">Bu cihazda şehir arama kullanılamıyor; bildirimler tüm dünyayı kapsar.</string>
     <string name="alert_radius_title">Alarm yarıçapı</string>
     <string name="country_label">Ülke</string>
@@ -225,9 +227,12 @@
     <string name="alerts_summary_off">Alarmlar kapalı. Büyüklük ve bölge seçimin deprem listesini filtrelemeye devam eder.</string>
     <string name="alerts_blocked_title">Alarmlar sana ulaşamıyor</string>
     <string name="alerts_blocked_message">Alarmlar açık, ama bu cihazda QuakeAlert\'in bildirimleri kapalı. Alarm alabilmek için bildirimlere izin ver.</string>
+    <string name="alerts_blocked_channel_message">Alarmlar açık, ama QuakeAlert\'in “%1$s” bildirim kategorisi kapalı. Alarm alabilmek için bu kategoriyi aç.</string>
     <string name="notifications_allowed">Bildirimlere izin verildi</string>
     <string name="notifications_blocked">Bildirim izni kapalı</string>
     <string name="notifications_blocked_message">Bildirimlere izin verene kadar QuakeAlert sana haber veremez.</string>
+    <string name="notifications_channel_blocked">Bildirim kategorisi kapalı</string>
+    <string name="notifications_channel_blocked_message">Bildirimlere izin verilmiş, ama “%1$s” kategorisi kapalı olduğu için QuakeAlert sana haber veremez.</string>
     <string name="action_open_settings">Ayarları aç</string>
     <string name="alert_settings_saved">Alarm ayarları kaydedildi</string>
 

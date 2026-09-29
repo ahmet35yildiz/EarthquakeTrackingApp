@@ -7,6 +7,7 @@ import com.ahmetyildiz.quakealert.core.appearance.FakeThemeModeManager
 import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.locale.FakeAppLanguageManager
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
@@ -20,12 +21,12 @@ class SettingsViewModelTest {
     private val languageManager = FakeAppLanguageManager()
     private val themeModeManager = FakeThemeModeManager()
     private val analyticsTracker = FakeAnalyticsTracker()
-    private var areNotificationsAllowed: Boolean = true
+    private var notificationAccess: NotificationAccess = NotificationAccess.ALLOWED
     private val viewModel: SettingsViewModel by lazy {
         SettingsViewModel(
             appLanguageManager = languageManager,
             themeModeManager = themeModeManager,
-            notificationPermissionChecker = { areNotificationsAllowed },
+            notificationAccessChecker = { notificationAccess },
             analyticsTracker = analyticsTracker,
         )
     }
@@ -33,11 +34,11 @@ class SettingsViewModelTest {
     @Test
     fun `state lists the supported languages, the selection, permission and version`() {
         languageManager.currentLanguage = turkish
-        areNotificationsAllowed = false
+        notificationAccess = NotificationAccess.APP_BLOCKED
         val state: SettingsUiState = viewModel.uiState.value
         assertEquals(listOf(english, turkish), state.languages)
         assertEquals(turkish, state.selectedLanguage)
-        assertFalse(state.areNotificationsAllowed)
+        assertEquals(NotificationAccess.APP_BLOCKED, state.notificationAccess)
         assertEquals(AppVersion(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE), state.appVersion)
     }
 
@@ -90,11 +91,11 @@ class SettingsViewModelTest {
 
     @Test
     fun `resuming re-reads permission and a language changed in the system settings`() {
-        assertTrue(viewModel.uiState.value.areNotificationsAllowed)
-        areNotificationsAllowed = false
+        assertEquals(NotificationAccess.ALLOWED, viewModel.uiState.value.notificationAccess)
+        notificationAccess = NotificationAccess.APP_BLOCKED
         languageManager.currentLanguage = turkish
         viewModel.onScreenResumed()
-        assertFalse(viewModel.uiState.value.areNotificationsAllowed)
+        assertEquals(NotificationAccess.APP_BLOCKED, viewModel.uiState.value.notificationAccess)
         assertEquals(turkish, viewModel.uiState.value.selectedLanguage)
     }
 }

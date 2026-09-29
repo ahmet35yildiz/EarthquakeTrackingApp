@@ -5,11 +5,24 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import androidx.core.net.toUri
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
+import com.ahmetyildiz.quakealert.core.notification.NotificationChannels
 
 fun browserIntent(url: String): Intent = Intent(Intent.ACTION_VIEW, url.toUri())
 
-fun notificationSettingsIntent(context: Context): Intent =
+fun notificationSettingsIntent(context: Context, access: NotificationAccess): Intent =
+    when (access) {
+        NotificationAccess.ALERT_CHANNEL_BLOCKED -> alertChannelSettingsIntent(context)
+        NotificationAccess.ALLOWED, NotificationAccess.APP_BLOCKED -> appNotificationSettingsIntent(context)
+    }
+
+private fun appNotificationSettingsIntent(context: Context): Intent =
     Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+
+private fun alertChannelSettingsIntent(context: Context): Intent =
+    Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+        .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        .putExtra(Settings.EXTRA_CHANNEL_ID, NotificationChannels.EARTHQUAKE_ALERTS_CHANNEL_ID)
 
 fun appSettingsIntent(context: Context): Intent =
     Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:${context.packageName}".toUri())

@@ -20,7 +20,8 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.ahmetyildiz.quakealert.MainActivity
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.di.NotificationModule
-import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccessChecker
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferences
 import com.ahmetyildiz.quakealert.core.preferences.UserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.ui.format.formatPlace
@@ -31,6 +32,8 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import java.time.Instant
+import javax.inject.Inject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -40,8 +43,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.Instant
-import javax.inject.Inject
 
 @HiltAndroidTest
 @UninstallModules(NotificationModule::class)
@@ -56,7 +57,7 @@ class OnboardingFlowTest {
 
     @BindValue
     @JvmField
-    val permissionChecker: NotificationPermissionChecker = NotificationPermissionChecker { true }
+    val permissionChecker: NotificationAccessChecker = NotificationAccessChecker { NotificationAccess.ALLOWED }
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory

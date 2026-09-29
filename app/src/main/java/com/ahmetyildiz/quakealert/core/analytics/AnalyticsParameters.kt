@@ -22,7 +22,7 @@ enum class DetailSource { LIST, NOTIFICATION }
 
 enum class DetailAction { MAP, USGS, SHARE }
 
-enum class SuppressionReason { PERMISSION_DENIED }
+enum class SuppressionReason { PERMISSION_DENIED, ALERT_CHANNEL_BLOCKED }
 
 enum class BackgroundCheckFailureReason { NETWORK, SERVER, PARSING, UNKNOWN }
 

@@ -3,7 +3,8 @@ package com.ahmetyildiz.quakealert.features.alerts.domain.usecase
 import com.ahmetyildiz.quakealert.core.analytics.AnalyticsEvent
 import com.ahmetyildiz.quakealert.core.analytics.AnalyticsTracker
 import com.ahmetyildiz.quakealert.core.analytics.SuppressionReason
-import com.ahmetyildiz.quakealert.core.notification.NotificationPermissionChecker
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccessChecker
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.features.alerts.domain.AlertConfig
 import com.ahmetyildiz.quakealert.features.alerts.domain.AlertNotifier
@@ -15,14 +16,15 @@ import javax.inject.Inject
 
 class NotifyAlertsUseCase @Inject constructor(
     private val alertNotifier: AlertNotifier,
-    private val notificationPermissionChecker: NotificationPermissionChecker,
+    private val notificationAccessChecker: NotificationAccessChecker,
     private val analyticsTracker: AnalyticsTracker,
 ) {
 
     operator fun invoke(earthquakes: List<Earthquake>, settings: AlertSettings): AlertNotificationResult {
         if (earthquakes.isEmpty()) return AlertNotificationResult.NOTHING_TO_NOTIFY
-        if (!notificationPermissionChecker.areNotificationsAllowed()) {
-            analyticsTracker.track(AnalyticsEvent.AlertNotificationSuppressed(SuppressionReason.PERMISSION_DENIED))
+        val access: NotificationAccess = notificationAccessChecker.getAlertNotificationAccess()
+        if (!access.isAllowed) {
+            analyticsTracker.track(AnalyticsEvent.AlertNotificationSuppressed(access.toSuppressionReason()))
             return AlertNotificationResult.SUPPRESSED
         }
         val alerts: List<EarthquakeAlert> = earthquakes
@@ -37,6 +39,13 @@ class NotifyAlertsUseCase @Inject constructor(
         }
         return AlertNotificationResult.POSTED
     }
+
+    private fun NotificationAccess.toSuppressionReason(): SuppressionReason =
+        if (this == NotificationAccess.ALERT_CHANNEL_BLOCKED) {
+            SuppressionReason.ALERT_CHANNEL_BLOCKED
+        } else {
+            SuppressionReason.PERMISSION_DENIED
+        }
 
     private fun magnitudeOf(alert: EarthquakeAlert): Double = alert.earthquake.magnitude?.value ?: 0.0
 

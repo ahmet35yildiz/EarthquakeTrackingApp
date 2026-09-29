@@ -199,7 +199,8 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Alternatives:** Remote/local data source wrappers (one-line pass-through classes); repository methods with the
   query rules built in (the list and the alert check would need different methods for the same call).
 - **Consequences:** One class shows the whole data flow. Changing what the list or the alerts fetch is a use case
-  change. The cache always equals the last list refresh.
+  change. The cache holds the events of the last list refresh; since ADR-048, any later fetch replaces the cached copy
+  of an event it returns (never adds one), so a revised magnitude reaches the list and the detail too.
 
 ## ADR-022 — No comments in source, build and resource files
 - **Context:** Comments drift away from the code they describe, and the rationale for decisions already lives in
@@ -406,8 +407,12 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Alternatives:** One navigation destination per step (three routes, arguments to carry the draft, more back-stack
   handling for the same result); asking for the permission on first launch before explaining it (lower grant rate);
   saving only when the choice differs from the defaults (no baseline, no schedule).
-- **Consequences:** Rotation and back keep the flow; process death restarts the setup page with the default area
-  (the city draft is not saved). Every finished onboarding starts background checks right away.
+- **Consequences:** Rotation and back keep the flow. Every finished onboarding starts background checks right away.
+- **Update (process death):** The area choice (mode, radius and every city field) is also kept in `SavedStateHandle`
+  as plain values (`AreaSelectionSavedState`), written on first start and on every change. After process death the
+  page, threshold and area come back as they were. If the notifications page is restored without an area that can be
+  saved (missing or unreadable values, e.g. state written by an older version), the flow returns to the setup page,
+  so Finish never saves an area the user did not see; a chosen city never silently turns into the whole world.
 
 ## ADR-036 — Developer tools reuse the real delivery path and live behind a debug-only slot
 - **Context:** Alerts must be demonstrable on demand (a real matching earthquake may take hours), including the tap
@@ -443,7 +448,7 @@ Add a new record (next number) whenever a significant decision is made; never re
   and the developer tools slot. The permission row already existed privately in `alerts`, and the browser intent
   helper in `earthquakes`; `settings` must not depend on other features.
 - **Decision:** `settings` has only a presentation layer. `SettingsViewModel` reads `AppLanguageManager` and
-  `NotificationPermissionChecker` (both `core` interfaces) and logs `language_changed` only when the pick differs from
+  `NotificationPermissionChecker` (both `core` interfaces; renamed `NotificationAccessChecker` in ADR-047) and logs `language_changed` only when the pick differs from
   the current language. Language and permission are re-read on resume. The permission row became
   `core/ui/component/NotificationPermissionStatus` (used by Alerts and Settings) and the outgoing intents
   (`browserIntent`, `notificationSettingsIntent`, `tryStartActivity`) moved to `core/navigation/ExternalIntents`.
@@ -616,3 +621,54 @@ Add a new record (next number) whenever a significant decision is made; never re
   permission is off (it would overwrite the user's choice and the saved baseline).
 - **Consequences:** One answer to "will I get alerts?" at the top of the tab. The Settings tab still shows the full
   permission row, since it is about the device, not the alert choice.
+
+## ADR-047 — Notification access is the app permission and the alert channel together
+- **Context:** Only `areNotificationsEnabled()` was checked. On Android 8+ the user can turn off the "Earthquake
+  alerts" category (channel) while notifications stay allowed for the app. Posting then succeeds without error but
+  nothing is shown, so the delivery counted as `POSTED`: the event went into the notified table (never retried),
+  `alert_notification_posted` was logged and every screen said "Notifications allowed".
+- **Decision:** `NotificationAccessChecker` (was `NotificationPermissionChecker`) returns `NotificationAccess`:
+  `APP_BLOCKED` (app notifications off), `ALERT_CHANNEL_BLOCKED` (app allowed, `earthquake_alerts` importance
+  `NONE`), or `ALLOWED`. Only `ALLOWED` lets `NotifyAlertsUseCase` post; anything else is `SUPPRESSED`, logged as
+  `alert_notification_suppressed` with `reason` = `permission_denied` or `alert_channel_blocked`, and not remembered
+  (ADR-033), so the next check after the category is turned on delivers it. The Alerts summary card, the Settings row
+  and the onboarding notifications page name the blocked category, and their button opens the channel's own settings
+  page (`ACTION_CHANNEL_NOTIFICATION_SETTINGS`) instead of the app page; the permission dialog is offered only for
+  `APP_BLOCKED`. `POSTED` / `alert_notification_posted` mean "handed to Android while app and channel were allowed",
+  not "seen": Do Not Disturb, a dismissed or bundled notification are not visible to the app; seeing is measured only
+  by `alert_notification_opened`.
+- **Alternatives:** Let the notifier report whether Android showed the notification (Android gives no such answer
+  for a blocked channel); check only the channel (misses the app switch); open the app page for both cases (the
+  category switch is one level deeper and easy to miss).
+- **Consequences:** UI, delivery result, notified table and analytics agree on every access state. A blocked channel
+  group or a race between the check and the post are not covered (the app uses no groups; the window is a few ms).
+
+## ADR-048 — A notification opens the latest USGS version; fetches refresh cached copies
+- **Context:** The background check fetched the revised event (e.g. 4.7 → 5.0) and notified, but the list cache kept
+  the old copy, and the detail read the cache first. Tapping the notification showed 4.7.
+- **Decision:** Two changes. (1) `EarthquakeRepositoryImpl.fetchEarthquakes` and `fetchEarthquake(id)` replace the
+  cached copy of every event they return (`EarthquakeDao.updateExisting`, a Room `@Update`: rows that are not cached
+  are ignored), so the cache keeps the list's scope but never an older version than the app has seen. (2)
+  `GetEarthquakeUseCase(id, shouldRevalidate)`: from the list it stays cache first (the detail matches the row the
+  user tapped, works offline); from a notification it asks USGS first. If that fails with a network or server error
+  and a cached copy exists, the copy is shown with a notice ("Couldn't get the latest version…", Retry); if USGS does
+  not know the id (404, e.g. a simulated alert) the cached copy is shown without a notice, as before; with no cached
+  copy the error / not-found states stay.
+- **Alternatives:** Insert every fetched alert into the cache (the list would show single events outside its query
+  and gaps between them); always ask USGS first (the list-to-detail path would lose offline use and show values that
+  differ from the row just tapped); a per-row "last updated" time (a schema migration for one notice).
+- **Consequences:** Notification, list and detail show the same version as soon as the check has run; an offline
+  tap still shows the event and says it may be out of date. The repository contract changed from `getEarthquake` to
+  `getCachedEarthquake` + `fetchEarthquake`; the cache-or-network rule now lives in the use case.
+
+## ADR-049 — Clearing a saved city does not need the geocoder
+- **Context:** Without a geocoder (`Geocoder.isPresent() == false`) the whole area choice was hidden. A user with a
+  saved city (restored backup, geocoding removed later) saw the city but could not switch to the whole world.
+- **Decision:** Only searching needs the geocoder. The "Whole world / Near a city" choice is shown when city search
+  is available or a city is part of the selection; without a geocoder the selected city card has no "Change" button
+  and a short note says the city cannot be changed here but the whole world can still be chosen. Switching back to
+  "Near a city" restores the kept city (the selection keeps it, ADR-028).
+- **Alternatives:** Keep the choice hidden and reset the area to the whole world when no geocoder exists (silently
+  changes what the user saved); show the choice always (a "Near a city" that can never be completed).
+- **Consequences:** A saved area can always be removed; new cities still need a geocoder.
+

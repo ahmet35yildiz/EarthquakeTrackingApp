@@ -52,6 +52,7 @@ import com.ahmetyildiz.quakealert.core.ui.component.EmptyState
 import com.ahmetyildiz.quakealert.core.ui.component.ErrorState
 import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
 import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
+import com.ahmetyildiz.quakealert.core.ui.component.StaleDataBanner
 import com.ahmetyildiz.quakealert.core.ui.format.formatLocalDateTime
 import com.ahmetyildiz.quakealert.core.ui.format.formatWholeNumber
 import com.ahmetyildiz.quakealert.core.ui.format.localizedPlace
@@ -226,6 +227,9 @@ private fun DetailContent(
             .padding(horizontal = Spacing.screenMargin, vertical = Spacing.small),
         verticalArrangement = Arrangement.spacedBy(Spacing.medium),
     ) {
+        if (details.isSavedCopyAfterFailedRefresh) {
+            StaleDataBanner(message = stringResource(R.string.detail_saved_copy_message), onRetry = actions.onRetry)
+        }
         DetailHeaderCard(earthquake = details.earthquake, now = now)
         details.distanceFromCity?.let { DistanceCard(distance = it) }
         DetailFactsCard(earthquake = details.earthquake)

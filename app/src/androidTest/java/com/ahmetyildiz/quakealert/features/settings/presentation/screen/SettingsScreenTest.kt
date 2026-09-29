@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.appearance.ThemeMode
 import com.ahmetyildiz.quakealert.core.locale.AppLanguage
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.AppVersion
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.SettingsUiState
@@ -85,8 +86,17 @@ class SettingsScreenTest {
 
     @Test
     fun blockedNotificationsOfferTheSystemSettings() {
-        setContent(defaultState.copy(areNotificationsAllowed = false))
+        setContent(defaultState.copy(notificationAccess = NotificationAccess.APP_BLOCKED))
         composeRule.onNodeWithText(string(R.string.notifications_blocked)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
+        assertEquals(1, openNotificationSettingsCount)
+    }
+
+    @Test
+    fun blockedAlertChannelIsShownAsOffEvenWithNotificationsAllowed() {
+        setContent(defaultState.copy(notificationAccess = NotificationAccess.ALERT_CHANNEL_BLOCKED))
+        composeRule.onNodeWithText(string(R.string.notifications_channel_blocked)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.notifications_allowed)).assertDoesNotExist()
         composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
         assertEquals(1, openNotificationSettingsCount)
     }

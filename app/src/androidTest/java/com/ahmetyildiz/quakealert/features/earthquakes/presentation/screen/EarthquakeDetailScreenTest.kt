@@ -62,6 +62,25 @@ class EarthquakeDetailScreenTest {
     )
 
     @Test
+    fun savedCopyAfterAFailedRefreshSaysSoAndCanBeRetried() {
+        setContent(
+            EarthquakeDetailUiState(
+                content = EarthquakeDetailContent.LOADED,
+                details = EarthquakeDetails(earthquake, distanceFromCity = null, isSavedCopyAfterFailedRefresh = true),
+            ),
+        )
+        composeRule.onNodeWithText(string(R.string.detail_saved_copy_message)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.action_retry)).performClick()
+        assertEquals(listOf("retry"), clickedActions)
+    }
+
+    @Test
+    fun freshDetailsShowNoSavedCopyNotice() {
+        setContent(loaded(distance))
+        composeRule.onNodeWithText(string(R.string.detail_saved_copy_message)).assertDoesNotExist()
+    }
+
+    @Test
     fun loadedStateShowsTheKeyFacts() {
         setContent(loaded(distance))
         composeRule.onNodeWithText(displayedPlace()).assertIsDisplayed()

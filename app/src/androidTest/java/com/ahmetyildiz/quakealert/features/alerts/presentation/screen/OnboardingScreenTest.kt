@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaMode
 import com.ahmetyildiz.quakealert.features.alerts.presentation.viewmodel.AreaSelection
@@ -73,7 +74,10 @@ class OnboardingScreenTest {
 
     @Test
     fun withoutARuntimePermissionTheStepOnlyConfirms() {
-        setContent(OnboardingUiState(page = OnboardingPage.NOTIFICATIONS, areNotificationsAllowed = true), isRequestSupported = false)
+        setContent(
+            OnboardingUiState(page = OnboardingPage.NOTIFICATIONS, notificationAccess = NotificationAccess.ALLOWED),
+            isRequestSupported = false,
+        )
         composeRule.onNodeWithText(string(R.string.notifications_allowed)).assertIsDisplayed()
         composeRule.onNodeWithText(string(R.string.action_allow_notifications)).assertDoesNotExist()
         composeRule.onNodeWithText(string(R.string.action_finish)).performClick()
@@ -84,6 +88,17 @@ class OnboardingScreenTest {
     fun deniedPermissionOffersTheSettingsAndStillFinishes() {
         setContent(OnboardingUiState(page = OnboardingPage.NOTIFICATIONS, isPermissionDenied = true))
         composeRule.onNodeWithText(string(R.string.onboarding_notifications_denied)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
+        composeRule.onNodeWithText(string(R.string.action_finish)).performClick()
+        assertEquals(listOf("settings", "finish"), clicks)
+    }
+
+    @Test
+    fun blockedAlertChannelOpensItsSettingsInsteadOfThePermissionDialog() {
+        setContent(OnboardingUiState(page = OnboardingPage.NOTIFICATIONS, notificationAccess = NotificationAccess.ALERT_CHANNEL_BLOCKED))
+        val channelName: String = string(R.string.notification_channel_alerts_name)
+        composeRule.onNodeWithText(string(R.string.notifications_channel_blocked_message, channelName)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.action_allow_notifications)).assertDoesNotExist()
         composeRule.onNodeWithText(string(R.string.action_open_settings)).performClick()
         composeRule.onNodeWithText(string(R.string.action_finish)).performClick()
         assertEquals(listOf("settings", "finish"), clicks)

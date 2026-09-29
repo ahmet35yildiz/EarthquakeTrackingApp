@@ -70,7 +70,9 @@ fun SettingsEntry(
     val actions = SettingsActions(
         onLanguageSelected = viewModel::onLanguageSelected,
         onThemeModeSelected = viewModel::onThemeModeSelected,
-        onOpenNotificationSettings = { context.startActivity(notificationSettingsIntent(context)) },
+        onOpenNotificationSettings = {
+            context.startActivity(notificationSettingsIntent(context, uiState.notificationAccess))
+        },
         onOpenUsgsWebsite = {
             if (!context.tryStartActivity(browserIntent(SettingsConfig.USGS_WEBSITE_URL))) {
                 scope.launch { snackbarHostState.showSnackbar(noAppMessage) }
@@ -118,7 +120,7 @@ fun SettingsScreen(
                 icon = painterResource(R.drawable.ic_notifications),
             ) {
                 NotificationPermissionStatus(
-                    isAllowed = uiState.areNotificationsAllowed,
+                    access = uiState.notificationAccess,
                     onOpenSettings = actions.onOpenNotificationSettings,
                 )
             }

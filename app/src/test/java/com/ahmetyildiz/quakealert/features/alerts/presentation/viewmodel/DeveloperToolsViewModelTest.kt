@@ -5,6 +5,7 @@ import com.ahmetyildiz.quakealert.core.analytics.FakeAnalyticsTracker
 import com.ahmetyildiz.quakealert.core.model.AlertArea
 import com.ahmetyildiz.quakealert.core.model.City
 import com.ahmetyildiz.quakealert.core.model.GeoPoint
+import com.ahmetyildiz.quakealert.core.notification.NotificationAccess
 import com.ahmetyildiz.quakealert.core.preferences.AlertSettings
 import com.ahmetyildiz.quakealert.core.preferences.FakeUserPreferencesRepository
 import com.ahmetyildiz.quakealert.core.testing.MainDispatcherExtension
@@ -49,7 +50,7 @@ class DeveloperToolsViewModelTest {
                 DeliverAlertsUseCase(
                     FakeNotifiedEarthquakeRepository(),
                     AlertMatcher(),
-                    NotifyAlertsUseCase(FakeAlertNotifier(), { true }, FakeAnalyticsTracker()),
+                    NotifyAlertsUseCase(FakeAlertNotifier(), { NotificationAccess.ALLOWED }, FakeAnalyticsTracker()),
                 ),
                 analyticsTracker,
                 clock,
