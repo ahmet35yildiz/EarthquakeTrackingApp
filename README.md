@@ -27,6 +27,7 @@ yeni bir deprem olduğunda bildirim gönderen Android uygulaması. Veri kaynağ�
   seçilebilir (yalnızca yaklaşık konum izni). Her değişiklik anında kaydedilir.
 - **Arka plan kontrolü ve bildirimler:** 15 dakikada bir kontrol; en fazla 3 ayrı bildirim, daha fazlası için tek
   özet. Bildirime dokununca ilgili deprem detayı açılır.
+- **Acil Durum sekmesi:** deprem öncesi / anında / sonrası güvenlik rehberi (internetsiz çalışır).
 - **Ayarlar:** uygulama dili (sistem, English, Türkçe), tema (sistem, açık, koyu), bildirim izni durumu, hakkında.
 - **Geliştirici araçları (sadece debug build):** alarm simülasyonu, hemen kontrol, event log.
 - Açık ve koyu tema, yatay ekran ve büyük yazı desteği. USGS'in İngilizce yer metinleri seçili dilde gösterilir

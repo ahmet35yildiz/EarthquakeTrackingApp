@@ -32,6 +32,7 @@ import com.ahmetyildiz.quakealert.core.locale.AppLanguage
 import com.ahmetyildiz.quakealert.core.navigation.browserIntent
 import com.ahmetyildiz.quakealert.core.navigation.notificationSettingsIntent
 import com.ahmetyildiz.quakealert.core.navigation.tryStartActivity
+import com.ahmetyildiz.quakealert.core.ui.component.NavigationCard
 import com.ahmetyildiz.quakealert.core.ui.component.NotificationPermissionStatus
 import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
 import com.ahmetyildiz.quakealert.core.ui.component.SectionCard
@@ -39,7 +40,6 @@ import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.settings.SettingsConfig
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.AboutSection
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.LanguageSection
-import com.ahmetyildiz.quakealert.features.settings.presentation.component.SettingsNavigationCard
 import com.ahmetyildiz.quakealert.features.settings.presentation.component.ThemeSection
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.SettingsUiState
 import com.ahmetyildiz.quakealert.features.settings.presentation.viewmodel.SettingsViewModel
@@ -126,7 +126,7 @@ fun SettingsScreen(
             }
             AboutSection(appVersion = uiState.appVersion, onOpenUsgsWebsite = actions.onOpenUsgsWebsite)
             onOpenDeveloperTools?.let { onClick ->
-                SettingsNavigationCard(
+                NavigationCard(
                     title = stringResource(R.string.developer_tools_title),
                     description = stringResource(R.string.settings_developer_tools_description),
                     icon = rememberVectorPainter(Icons.Rounded.Build),

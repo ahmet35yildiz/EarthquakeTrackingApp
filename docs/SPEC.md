@@ -24,7 +24,8 @@ publication delay + background check interval). The app says this explicitly in 
 ### In scope (MVP)
 1. First-run onboarding: value proposition + disclaimer → alert setup (threshold, area) → notification permission.
 2. Earthquake list: recent events, filters, pull-to-refresh, offline cache, loading/empty/error states.
-3. Earthquake detail: all key facts, distance to the user's city, open in maps, open on USGS, share.
+3. Earthquake detail: all key facts, distance to the user's city, open in maps, "I felt it" (USGS form), open on
+   USGS, share.
 4. Alert settings: enable/disable, magnitude threshold, area (country → city search → radius, or "Use my
    location") or whole world.
 5. Background check with WorkManager (every 15 min) + local notifications for new matching earthquakes.
@@ -32,6 +33,8 @@ publication delay + background check interval). The app says this explicitly in 
 7. Developer tools: "Simulate alert" and "Run check now" to demonstrate the notification flow on demand.
 8. Multilingual UI: English (default) + Turkish, in-app language switch.
 9. Light and dark theme, consistent custom Material 3 design.
+10. Emergency tab: safety guide (before / during / after an earthquake); whistle and strobe light follow.
+11. Statistics tab (placeholder until the statistics screen is built).
 
 ### Out of scope (documented in README with reasons)
 | Item | Reason |
@@ -145,10 +148,22 @@ publication delay + background check interval). The app says this explicitly in 
   or threshold raised in settings within 24 h after a notification (notifications followed / posted, with both counts).
 
 ### 4.7 Navigation
-- Bottom bar with 3 tabs: Earthquakes, Alerts, Settings (a navigation rail on wide windows: landscape, tablets). Detail, Developer tools and Event log are pushed on top
-  (no bottom bar, back arrow).
+- Bottom bar with 5 tabs: Earthquakes, Statistics, Alerts, Emergency, Settings (a navigation rail on wide windows:
+  landscape, tablets; it scrolls when the tabs do not fit). Detail, Safety guide, Developer tools and Event log are
+  pushed on top (no bottom bar, back arrow).
+- Tab labels share one text size: the theme size, or, when a label would not fit, the largest size at which all
+  labels fit, never smaller than the size at 100 % font scale (ADR-055).
 - Start: onboarding graph if not completed, otherwise main graph.
 - Notification tap → app opens directly on the earthquake detail (back goes to the list).
+
+### 4.8 Emergency tools (tab "Emergency")
+- A list of cards. Now: "Safety guide" → pushed Safety guide screen. A whistle and a strobe light follow.
+- Safety guide: tabs Before / During / After, each a numbered list of 5–7 short items (same count in every
+  language), plus a source line (AFAD, Ready.gov; follow local authorities). Static, works offline. Opens on
+  "Before"; the shown tab survives rotation. Each shown section records `safety_guide_viewed` (ADR-056).
+
+### 4.9 Statistics (tab "Statistics")
+- Placeholder ("Coming soon") until the statistics screen is built.
 
 ## 5. Alert rules (single source of truth)
 

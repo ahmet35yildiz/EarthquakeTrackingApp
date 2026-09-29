@@ -3,6 +3,8 @@ package com.ahmetyildiz.quakealert.navigation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.runtime.Composable
@@ -18,7 +20,9 @@ fun QuakeAlertNavigationRail(
 ) {
     NavigationRail {
         Column(
-            modifier = Modifier.fillMaxHeight(),
+            modifier = Modifier
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacing.medium, Alignment.CenterVertically),
         ) {
             TopLevelDestination.entries.forEach { destination ->

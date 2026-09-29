@@ -21,7 +21,13 @@ sealed interface TopLevelRoute
 data object EarthquakesRoute : TopLevelRoute
 
 @Serializable
+data object StatisticsRoute : TopLevelRoute
+
+@Serializable
 data object AlertsRoute : TopLevelRoute
+
+@Serializable
+data object EmergencyRoute : TopLevelRoute
 
 @Serializable
 data object SettingsRoute : TopLevelRoute
@@ -31,6 +37,9 @@ data object DeveloperToolsRoute
 
 @Serializable
 data object EventLogRoute
+
+@Serializable
+data object SafetyGuideRoute
 
 @Serializable
 data class EarthquakeDetailRoute(

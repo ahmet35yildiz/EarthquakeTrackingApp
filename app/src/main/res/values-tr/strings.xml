@@ -1,6 +1,8 @@
 <resources>
     <string name="tab_earthquakes">Depremler</string>
     <string name="tab_alerts">Alarmlar</string>
+    <string name="tab_statistics">İstatistik</string>
+    <string name="tab_emergency">Acil Durum</string>
     <string name="tab_settings">Ayarlar</string>
 
     <string name="onboarding_welcome_title">Önemli depremlerden haberin olsun</string>
@@ -349,4 +351,42 @@
     </plurals>
     <string name="action_clear">Temizle</string>
     <string name="event_log_share_title">Olay kaydını paylaş</string>
+
+    <string name="statistics_placeholder_title">Yakında</string>
+    <string name="statistics_placeholder_message">Son 7 ve 30 günün deprem istatistikleri burada görünecek.</string>
+
+    <string name="emergency_title">Acil durum araçları</string>
+    <string name="safety_guide_title">Güvenlik rehberi</string>
+    <string name="safety_guide_card_description">Deprem öncesinde, sırasında ve sonrasında yapılması gerekenler.</string>
+    <string name="safety_guide_section_before">Depremden Önce</string>
+    <string name="safety_guide_section_during">Deprem Anında</string>
+    <string name="safety_guide_section_after">Depremden Sonra</string>
+    <string name="safety_guide_source">AFAD ve Ready.gov önerilerine dayanan genel bilgilerdir. Her zaman yerel yetkililerin talimatlarına uyun.</string>
+    <string-array name="safety_guide_before_items">
+        <item>Dolap, kitaplık ve şofben gibi eşyaları duvara sabitleyin.</item>
+        <item>Ağır ve kırılabilir eşyaları alt raflara, yataklardan uzağa koyun.</item>
+        <item>Deprem çantası hazırlayın: su, yiyecek, el feneri, düdük, ilk yardım çantası, ilaçlar, powerbank ve belgelerinizin kopyaları.</item>
+        <item>Her odada güvenli bir yer belirleyin: sağlam eşyaların yanı, pencerelerden uzak.</item>
+        <item>Gazı, suyu ve elektriği nasıl kapatacağınızı öğrenin.</item>
+        <item>Ailenizle bir buluşma noktası ve bölge dışından bir iletişim kişisi belirleyin.</item>
+        <item>Size en yakın acil toplanma alanını öğrenin.</item>
+    </string-array>
+    <string-array name="safety_guide_during_items">
+        <item>Çök, Kapan, Tutun: yere çökün, başınızı ve boynunuzu koruyun, sarsıntı bitene kadar tutunun.</item>
+        <item>İçerideyseniz içeride kalın. Sarsıntı sırasında dışarı koşmayın, merdiven kullanmayın.</item>
+        <item>Pencerelerden, camlardan ve düşebilecek eşyalardan uzak durun.</item>
+        <item>Asansörü kesinlikle kullanmayın.</item>
+        <item>Yataktaysanız yatakta kalın ve başınızı yastıkla koruyun.</item>
+        <item>Dışarıdaysanız binalardan, direklerden ve elektrik hatlarından uzaklaşın.</item>
+        <item>Araç kullanıyorsanız köprü ve üst geçitlerden uzak, güvenli bir yerde durun ve araçta kalın.</item>
+    </string-array>
+    <string-array name="safety_guide_after_items">
+        <item>Kendinizi ve çevrenizdekileri yaralanmaya karşı kontrol edin, yapabiliyorsanız ilk yardım uygulayın.</item>
+        <item>Artçı sarsıntılara hazırlıklı olun: her birinde yeniden Çök, Kapan, Tutun.</item>
+        <item>Gaz kokusu alırsanız elektrik düğmelerine dokunmayın, ateş yakmayın. Gazı kapatın ve binayı terk edin.</item>
+        <item>Hasarlı binayı merdivenle, dikkatlice terk edin ve açık bir alana ya da toplanma alanına gidin.</item>
+        <item>Enkaz altında kalırsanız ağzınızı ve burnunuzu kapatın. Bağırmak yerine borulara ya da duvara vurun veya düdük çalın.</item>
+        <item>Telefonu yalnızca acil durumlar için kullanın; arama yerine mesaj gönderin.</item>
+        <item>Resmî duyuruları takip edin.</item>
+    </string-array>
 </resources>

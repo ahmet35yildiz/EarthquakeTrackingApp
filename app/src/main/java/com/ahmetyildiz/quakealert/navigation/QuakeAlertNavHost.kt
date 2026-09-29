@@ -18,6 +18,9 @@ import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.AlertSetti
 import com.ahmetyildiz.quakealert.features.alerts.presentation.screen.OnboardingEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeDetailEntry
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeListEntry
+import com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen.EarthquakeStatisticsScreen
+import com.ahmetyildiz.quakealert.features.emergency.presentation.screen.EmergencyScreen
+import com.ahmetyildiz.quakealert.features.emergency.presentation.screen.SafetyGuideEntry
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.screen.EventLogEntry
 import com.ahmetyildiz.quakealert.features.settings.presentation.screen.DeveloperToolsScreen
 import com.ahmetyildiz.quakealert.features.settings.presentation.screen.SettingsEntry
@@ -51,7 +54,12 @@ fun QuakeAlertNavHost(
                     feedback = { if (route.isFromNotification) AlertFeedbackEntry(eventId = route.earthquakeId) },
                 )
             }
+            composable<StatisticsRoute> { EarthquakeStatisticsScreen() }
             composable<AlertsRoute> { AlertSettingsEntry() }
+            composable<EmergencyRoute> {
+                EmergencyScreen(onOpenSafetyGuide = { navController.navigate(SafetyGuideRoute) })
+            }
+            composable<SafetyGuideRoute> { SafetyGuideEntry(onBack = navController::navigateUp) }
             composable<SettingsRoute> {
                 SettingsEntry(
                     onOpenDeveloperTools = if (BuildConfig.DEBUG) { { navController.navigate(DeveloperToolsRoute) } } else null,

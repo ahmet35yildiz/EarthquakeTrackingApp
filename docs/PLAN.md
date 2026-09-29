@@ -591,7 +591,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   opens `…/eventpage/nc75444322/tellus` with the "Felt Report - Tell Us!" form of the same M4.7, `felt_reported
   {event_id=nc75444322, magnitude=4.73}` logged.
 
-- [ ] **5.3 Two new tabs + safety guide** (added on request). Bottom bar and navigation rail get five destinations:
+- [x] **5.3 Two new tabs + safety guide** (added on request). Bottom bar and navigation rail get five destinations:
   Earthquakes · Statistics · Alerts · Emergency · Settings; new drawables for both tab icons (approved 2026-09-29).
   Statistics shows a placeholder until 5.6. New feature `features/emergency` (no dependency on other features); the
   Emergency tab is a list of cards: whistle (5.5), strobe light (5.4), safety guide, emergency SMS (5.7, pending).
@@ -600,6 +600,19 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   (`section`). The guide text is reviewed by the user before the task is done.
   *Done when:* five tabs work in portrait and landscape, labels fit at the default font and stay on one line at 2.0,
   tab back stacks behave as before, guide text approved; tests; verified on API 31 and 34.
+  *Result:* routes `StatisticsRoute` / `EmergencyRoute` / `SafetyGuideRoute`,
+  tab icons `ic_bar_chart`, `ic_emergency`, `ic_emergency_filled` (Material Symbols Rounded). Statistics shows a
+  "Coming soon" placeholder in `earthquakes`. New `features/emergency` (presentation only, core only): Emergency tab
+  with the guide card (`NavigationCard`, moved from settings to `core/ui/component`), Safety guide screen with
+  Before / During / After tabs, 7 items each from `string-array`s (EN + TR) and the source line;
+  `SafetyGuideViewModel` keeps the section in `SavedStateHandle` and records `safety_guide_viewed` (ADR-056). Found
+  on the emulator: with five tabs every label was cut at font scale 2.0 and per-label auto-size looked uneven, so
+  bottom bar labels now share one measured size (letter spacing scaled too, never below 100 % scale); in landscape
+  at 2.0 the rail's Settings tab was off screen, so the rail scrolls (ADR-055, ADR-040 updated). SPEC, ARCHITECTURE,
+  ANALYTICS, TESTING, README updated. 510 unit (+5), 122/122 instrumented on API 31 and 34 (+7: guide screen,
+  Emergency screen, `MainTabsTest` through `MainActivity`), lint clean (only the existing dependency warnings); on
+  API 34: EN/TR at font scale 1.0, 1.3, 2.0 (all labels complete, one size), landscape 1.0 / 2.0, guide tabs and back;
+  on API 31: tabs, placeholder, guide. Guide text approved by the user as written (2026-09-29).
 
 - [ ] **5.4 Strobe light** (added on request). `TorchController` interface in the emergency domain, implemented with
   `CameraManager.setTorchMode` (no permission). On/off card on the Emergency tab; while on, the torch blinks at a fixed
@@ -696,3 +709,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-29 | 14:32–14:54 | ~22m | 3.13 Optional alert feedback on the notification detail (ADR-052); on-device alert metrics card in the event log: setup completion, opens, useful among answers, opt-out within 24 h (ADR-053); 499 unit, 115/115 instrumented on API 31 and 34 |
 | 2026-09-29 | 15:02–15:45 | ~43m | Planning of 5.2–5.7 (I felt it, two new tabs + safety guide, strobe light, whistle, statistics with 7/30 days, emergency SMS pending); location precision options checked |
 | 2026-09-29 | 15:45–15:58 | ~13m | 5.2 "I felt it" on the detail: `felt_reported` + USGS felt report form (ADR-054); 505 unit, 115/115 instrumented on API 31 and 34 |
+| 2026-09-29 | 16:01–16:39 | ~38m | 5.3 Statistics + Emergency tabs, safety guide (EN/TR, `safety_guide_viewed`, ADR-056); shared tab label size + scrolling rail after the 2.0 font-scale check (ADR-055); 510 unit, 122/122 instrumented on API 31 and 34; guide text approved |

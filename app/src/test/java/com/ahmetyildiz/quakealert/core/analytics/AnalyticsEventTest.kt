@@ -132,6 +132,11 @@ class AnalyticsEventTest {
                 "action" to "usgs",
             ),
             entry(
+                AnalyticsEvent.SafetyGuideViewed(SafetyGuideSectionValue.DURING),
+                "safety_guide_viewed",
+                "section" to "during",
+            ),
+            entry(
                 AnalyticsEvent.FeltReported(eventId = "us7000abcd", magnitude = 5.3),
                 "felt_reported",
                 "event_id" to "us7000abcd", "magnitude" to "5.3",

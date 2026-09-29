@@ -3,6 +3,8 @@
 
     <string name="tab_earthquakes">Earthquakes</string>
     <string name="tab_alerts">Alerts</string>
+    <string name="tab_statistics">Statistics</string>
+    <string name="tab_emergency">Emergency</string>
     <string name="tab_settings">Settings</string>
 
     <string name="onboarding_welcome_title">Stay informed about significant earthquakes</string>
@@ -363,4 +365,42 @@
     </plurals>
     <string name="action_clear">Clear</string>
     <string name="event_log_share_title">Share event log</string>
+
+    <string name="statistics_placeholder_title">Coming soon</string>
+    <string name="statistics_placeholder_message">Earthquake statistics for the last 7 and 30 days will appear here.</string>
+
+    <string name="emergency_title">Emergency tools</string>
+    <string name="safety_guide_title">Safety guide</string>
+    <string name="safety_guide_card_description">What to do before, during and after an earthquake.</string>
+    <string name="safety_guide_section_before">Before an Earthquake</string>
+    <string name="safety_guide_section_during">During an Earthquake</string>
+    <string name="safety_guide_section_after">After an Earthquake</string>
+    <string name="safety_guide_source">General guidance based on AFAD and Ready.gov. Always follow the instructions of local authorities.</string>
+    <string-array name="safety_guide_before_items">
+        <item>Fix tall furniture, shelves and water heaters to the wall.</item>
+        <item>Keep heavy and breakable objects on low shelves, away from beds.</item>
+        <item>Prepare an emergency bag: water, food, a flashlight, a whistle, a first aid kit, medicines, a power bank and copies of your documents.</item>
+        <item>Pick a safe spot in every room: next to sturdy furniture, away from windows.</item>
+        <item>Learn how to turn off the gas, water and electricity.</item>
+        <item>Agree on a meeting point and a contact outside your area with your family.</item>
+        <item>Find the nearest emergency assembly area.</item>
+    </string-array>
+    <string-array name="safety_guide_during_items">
+        <item>Drop, Cover, Hold On: get down, protect your head and neck, and hold on until the shaking stops.</item>
+        <item>If you are inside, stay inside. Do not run outside or use the stairs while the ground is shaking.</item>
+        <item>Stay away from windows, glass and anything that can fall.</item>
+        <item>Never use the elevator.</item>
+        <item>If you are in bed, stay there and protect your head with a pillow.</item>
+        <item>If you are outside, move away from buildings, poles and power lines.</item>
+        <item>If you are driving, stop in a safe place away from bridges and overpasses and stay in the car.</item>
+    </string-array>
+    <string-array name="safety_guide_after_items">
+        <item>Check yourself and the people around you for injuries and give first aid if you can.</item>
+        <item>Expect aftershocks: Drop, Cover, Hold On again each time.</item>
+        <item>If you smell gas, do not touch switches or light a flame. Turn off the gas and leave the building.</item>
+        <item>Leave a damaged building carefully, using the stairs, and go to an open area or an assembly area.</item>
+        <item>If you are trapped, cover your mouth and nose. Tap on a pipe or wall or use a whistle instead of shouting.</item>
+        <item>Use the phone only for emergencies; send messages instead of calling.</item>
+        <item>Follow official announcements.</item>
+    </string-array>
 </resources>

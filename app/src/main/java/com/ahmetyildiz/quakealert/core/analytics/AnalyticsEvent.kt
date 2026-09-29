@@ -142,6 +142,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         },
     )
 
+    data class SafetyGuideViewed(val section: SafetyGuideSectionValue) : AnalyticsEvent(
+        name = "safety_guide_viewed",
+        params = mapOf("section" to section.paramValue),
+    )
+
     data class AlertNotificationPosted(val eventId: String, val magnitude: Double, val batchSize: Int) : AnalyticsEvent(
         name = "alert_notification_posted",
         params = mapOf(

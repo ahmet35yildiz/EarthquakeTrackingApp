@@ -94,6 +94,10 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
 - [ ] Language: switch EN ↔ TR in-app; survives app restart; system settings language page shows the app (33+).
 - [ ] List: pull-to-refresh, filters, airplane mode → offline banner with cached data, dark mode, font scale 1.5×,
       rotation.
+- [ ] Five tabs (Earthquakes, Statistics, Alerts, Emergency, Settings) in EN and TR at font scale 1.0, 1.3 and 2.0:
+      labels complete and the same size; landscape: rail centred at 1.0, scrolls to Settings at 2.0.
+- [ ] Emergency → Safety guide: Before / During / After switch, back returns to the Emergency tab; rotation keeps the
+      section; `safety_guide_viewed` once per shown section.
 - [ ] Detail: open in maps, I felt it (USGS form of the same event opens, `felt_reported` logged), open USGS, share; open from notification (cold start and warm start).
 - [ ] Detail from a notification link (`?isFromNotification=true`) for a cached event: online → no banner; airplane
   mode → the saved copy with the "may be out of date" banner and Retry.

@@ -44,9 +44,9 @@ com.ahmetyildiz.quakealert/
 │   ├── error/                       # AppResult, AppError
 │   ├── time/                        # Clock abstraction (testable "now"), formatters
 │   ├── di/                          # App-wide Hilt modules (network, database, datastore, dispatchers, app scope, clock)
-│   └── ui/                          # Reusable composables (states, badges, SectionCard, NotificationPermissionStatus) + theme/
+│   └── ui/                          # Reusable composables (states, badges, SectionCard, NavigationCard, NotificationPermissionStatus) + theme/
 ├── features/
-│   ├── earthquakes/                 # List + detail + USGS data
+│   ├── earthquakes/                 # List + detail + statistics tab + USGS data
 │   │   ├── data/model | source | repository
 │   │   ├── domain/model | repository | usecase
 │   │   ├── presentation/viewmodel | screen | component
@@ -60,7 +60,8 @@ com.ahmetyildiz.quakealert/
 │   │   └── di/
 │   ├── settings/                    # Language, about, permission status, developer entry points
 │   │   └── presentation/viewmodel | screen | component   (+ SettingsConfig; no data/domain: reads core only)
-│   └── eventlog/                    # Developer event log: data (AnalyticsEventDao) | domain (LoggedEvent, filter, share text) | presentation
+│   ├── eventlog/                    # Developer event log: data (AnalyticsEventDao) | domain (LoggedEvent, filter, share text) | presentation
+│   └── emergency/                   # Emergency tools tab + safety guide (presentation only so far; core only)
 ```
 
 ### Cross-feature rules
@@ -69,6 +70,9 @@ com.ahmetyildiz.quakealert/
 - Shared user preferences (alerts enabled, threshold, area, onboarding flag, baseline, last check) live in
   `core/preferences` because both the list (filters, distance) and alerts need them.
 - Features never import each other's screens; the `navigation` package wires all routes.
+- `emergency` depends on `core` only. The Statistics tab lives in `earthquakes` (a view over earthquake data), so it
+  adds no cross-feature dependency. The tappable card with a chevron is shared as `core/ui/component/NavigationCard`
+  (Settings, Developer tools, Emergency).
 - Onboarding lives in `alerts` because it is the alert setup flow (reuses the same threshold/area components).
 - `settings` depends on `core` only (ADR-038): `SettingsViewModel` reads `AppLanguageManager`, `ThemeModeManager` and
   `NotificationAccessChecker` directly. Pieces used by more than one feature moved to `core` — the permission
@@ -264,12 +268,17 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
   scroll away with the list and landscape / large font scales keep room for the cards (ADR-040).
 
 ### 4.5 Navigation and deep links
-- Root `NavHost` with two graphs: `OnboardingGraphRoute` (onboarding) and `MainGraphRoute` (three tabs + detail). The
+- Root `NavHost` with two graphs: `OnboardingGraphRoute` (onboarding) and `MainGraphRoute` (five tabs + pushed
+  screens: detail, safety guide, developer tools, event log). The
   start graph comes from `StartDestinationViewModel`, which reads `isOnboardingCompleted` once per session (the
   first frame stays empty for that read); finishing onboarding navigates to the main graph and pops onboarding.
-- Tabs pop up to `MainGraphRoute` with save/restore state; the tab navigation is shown only on the three tab
-  destinations: a bottom bar below 600 dp window width, a navigation rail from 600 dp (landscape phones, tablets),
-  decided in `QuakeAlertApp` from `LocalWindowInfo.containerSize` (ADR-040). Tab labels stay on one line.
+- Tabs pop up to `MainGraphRoute` with save/restore state; the tab navigation is shown only on the five tab
+  destinations (`TopLevelDestination`): a bottom bar below 600 dp window width, a navigation rail from 600 dp
+  (landscape phones, tablets), decided in `QuakeAlertApp` from `LocalWindowInfo.containerSize` (ADR-040). Tab labels
+  stay on one line. In the bottom bar all labels share one style from `rememberTabLabelStyle` (ADR-055): it measures
+  every label with a `TextMeasurer` against the item width (bar width minus Material's 8 dp item spacing, divided by
+  the tab count) and steps the font size (and letter spacing with it) down from the theme size to the size that
+  equals 100 % font scale. The rail's column scrolls when the tabs are taller than the window.
 - `EarthquakeDetailRoute` declares `navDeepLink` `quakealert://earthquake/{earthquakeId}?isFromNotification={bool}`
   (manifest: `VIEW` + scheme `quakealert`, `launchMode="singleTop"`). Cold start: the NavController handles the
   activity intent while setting the graph; any later intent (`onNewIntent`, also right after a restore from process

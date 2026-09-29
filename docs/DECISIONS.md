@@ -491,6 +491,7 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Update (3.5):** the list header no longer uses the fixed-height `TopAppBar`: at font scale 1.5 on API 31 its
   title and two-line subtitle overflowed upwards into the status bar. A row with a 64 dp minimum height keeps the
   normal look and grows with the text.
+- **Update (5.3):** with five tabs, bottom bar labels share one computed text size and the rail scrolls (ADR-055).
 
 ## ADR-041 — Instrumented tests run on Hilt with isolated storage and a fake USGS
 - **Context:** The onboarding happy path and the worker need the real object graph (ViewModels, use cases, DataStore,
@@ -752,3 +753,38 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** The app knows the button was tapped, not whether the form was sent. The form is USGS's own
   page and follows its languages. Simulated events have no USGS page, so nothing opens and the usual "no app"
   message appears (developer tools only, same as "View on USGS"); the tap is still recorded.
+
+## ADR-055 — Five tabs; bottom bar labels share one size; the rail scrolls
+- **Context:** Statistics and Emergency become tabs next to Earthquakes, Alerts and Settings. With five tabs an item
+  is about 76 dp wide on a 411 dp phone: at font scale 2.0 every label was cut ("Depr…", "Acil …"), and letting each
+  label shrink on its own (`TextAutoSize`) gave five different sizes. In landscape at 2.0 the rail's last tab fell
+  off the screen.
+- **Decision:** Order Earthquakes · Statistics · Alerts · Emergency · Settings (data first, then setup, help,
+  preferences). `rememberTabLabelStyle` gives all bottom bar labels one style: the theme's `labelMedium` when every
+  label fits, otherwise the largest size (0.25 sp steps, letter spacing scaled with it) at which all labels fit,
+  never below the size that equals 100 % font scale (`dp.toSp()`, which respects Android 14's non-linear font
+  scaling). The rail keeps Material's own label sizing and its column scrolls when the tabs are taller than the
+  window. New tab icons: Material Symbols Rounded `bar_chart` and `e911_emergency` (outlined + filled), the same
+  source as the existing icons.
+- **Alternatives:** Five-way ellipsis (unreadable at large scales); per-label auto-size (uneven bar); shorter labels
+  only (still cut at 2.0 in both languages); hiding unselected labels (worse orientation); capping the label font
+  scale at a fixed value (does not adapt to the language or screen width).
+- **Consequences:** At large font scales tab labels grow only as far as the longest label allows, the rest of the
+  screen keeps the full scale. The bar's item spacing (8 dp) mirrors Material's internal constant; if Material
+  changes it, the computed size may be slightly off (the ellipsis remains as a fallback). A new tab or a longer label
+  needs no code change.
+
+## ADR-056 — Safety guide is static, localized content tracked per section
+- **Context:** People want to know what to do before, during and after an earthquake, including offline and in a
+  hurry. The guidance must be correct and the same in every language.
+- **Decision:** A pushed Safety guide screen from the Emergency tab, three tabs (Before / During / After), each a
+  numbered list from a `string-array` in `strings.xml` (5–7 items, English + Turkish, the same count in each
+  language, checked by a test), with a source line (AFAD, Ready.gov; follow local authorities). Content is written
+  from those agencies' public guidance and was reviewed by the product owner. `SafetyGuideViewModel` keeps the shown
+  section in `SavedStateHandle` and records `safety_guide_viewed` (`section`) when the guide opens and on each tab
+  change, not again after rotation or process death.
+- **Alternatives:** Linking to the agencies' websites (needs a connection exactly when it may be missing, different
+  per country); a remote content service (no backend); one long page (harder to find the "during" part quickly).
+- **Consequences:** Adding a language means translating three arrays with the same item count. Content changes are
+  resource edits, no code change. Country-specific numbers (e.g. emergency phone numbers) are deliberately left out
+  because the app is global.

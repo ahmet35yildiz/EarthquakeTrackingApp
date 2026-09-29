@@ -1,4 +1,4 @@
-package com.ahmetyildiz.quakealert.features.settings.presentation.component
+package com.ahmetyildiz.quakealert.core.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +26,7 @@ import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 
 @Composable
-fun SettingsNavigationCard(
+fun NavigationCard(
     title: String,
     description: String,
     icon: Painter,
@@ -64,10 +64,10 @@ fun SettingsNavigationCard(
 
 @PreviewLightDark
 @Composable
-private fun SettingsNavigationCardPreview() {
+private fun NavigationCardPreview() {
     QuakeAlertTheme {
         Surface {
-            SettingsNavigationCard(
+            NavigationCard(
                 title = "Developer tools",
                 description = "Simulate alerts, run a check now and view the event log.",
                 icon = rememberVectorPainter(Icons.Rounded.Build),
