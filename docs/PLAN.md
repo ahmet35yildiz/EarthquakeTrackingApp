@@ -632,12 +632,23 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   kept it flashing, Stop turned it off; events `enabled=true` / `enabled=false`. The emulators expose an emulated
   torch (switches visible in `dumpsys media.camera`), so the "no flashlight" state is covered by the UI test instead.
 
-- [ ] **5.5 Whistle** (added on request). Tone generated in code (`AudioTrack`, ~3 kHz, no audio file) on the alarm
+- [x] **5.5 Whistle** (added on request). Tone generated in code (`AudioTrack`, ~3 kHz, no audio file) on the alarm
   stream, pattern "three short blasts + pause" (distress signal) in a loop; frequency, blast and pause lengths in
   `EmergencyConfig`. On → alarm volume to maximum, off → previous volume restored. Same screen-on / background rules
   as 5.4; whistle and strobe can run together. Event `emergency_tool_toggled` (`tool=whistle`, `enabled`).
   *Done when:* pattern timing unit-tested with a fake player; audible on the emulator and the physical device,
   silent mode checked, volume restored after turning it off.
+  *Result:* `WhistlePattern` in `EmergencyConfig` (3 kHz, three 500 ms blasts, 250 ms gaps, 1500 ms pause),
+  `WhistleWaveform` (one cycle of PCM with 10 ms fades, pure Kotlin), `AudioTrackWhistlePlayer` (static `AudioTrack`,
+  usage `ALARM`, looped with `setLoopPoints`, alarm volume to maximum and restored on stop), Whistle card first on the
+  Emergency tab; the UI state moved to one `ToolState` per tool and both cards share `EmergencyToolCard` (ADR-058).
+  Found on the emulator: a static track is `STATE_INITIALIZED` only after its data is written, so the first version
+  always failed; fixed and covered by `AudioTrackWhistlePlayerTest` (real `AudioTrack`). SPEC, ARCHITECTURE,
+  ANALYTICS, TESTING, README updated. 528 unit (+8), 129/129 instrumented on API 31 and 34 (+3), lint clean (only the
+  existing dependency warnings). On the Galaxy S20 FE in silent mode: pattern clearly audible and loud enough
+  (confirmed by the user), alarm volume 14 → 15 while playing and back to 14 after Stop and after a tab switch,
+  `KEEP_SCREEN_ON` set, rotation kept it playing, whistle and strobe together, both stopped on a tab switch;
+  events `tool=whistle` with `enabled=true` / `false`.
 
 - [ ] **5.6 Statistics tab** (added on request). Part of the `earthquakes` feature (a view over earthquake data, no
   new cross-feature dependency). Period chips: Last 7 days (existing cache, no extra request) / Last 30 days (USGS
@@ -721,3 +732,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-29 | 15:45–15:58 | ~13m | 5.2 "I felt it" on the detail: `felt_reported` + USGS felt report form (ADR-054); 505 unit, 115/115 instrumented on API 31 and 34 |
 | 2026-09-29 | 16:01–16:39 | ~38m | 5.3 Statistics + Emergency tabs, safety guide (EN/TR, `safety_guide_viewed`, ADR-056); shared tab label size + scrolling rail after the 2.0 font-scale check (ADR-055); 510 unit, 122/122 instrumented on API 31 and 34; guide text approved |
 | 2026-09-29 | 16:50–17:10 | ~20m | 5.4 Strobe light: camera torch 2 flashes/s, stops when the Emergency screen is left, keeps the screen on (ADR-057); 520 unit, 126/126 instrumented on API 31 and 34; verified on a Galaxy S20 FE |
+| 2026-09-29 | 17:12–17:40 | ~28m | 5.5 Whistle: generated 3 kHz distress pattern looped by AudioTrack on the alarm stream, alarm volume raised and restored (ADR-058); static-track fix found on the emulator + real AudioTrack test; 528 unit, 129/129 instrumented on API 31 and 34; verified on a Galaxy S20 FE in silent mode |

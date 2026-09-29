@@ -45,7 +45,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `list_sort_changed` | `sort` = newest_first \| largest_first \| nearest_first | Sort order picked |
 | `earthquake_detail_viewed` | `source` = list \| notification (an external `quakealert://` link counts as list; the app only publishes it in notifications), `magnitude` (omitted when unknown) | Detail loaded; once per opened detail (not for not-found / error, not again after rotation) |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
-| `emergency_tool_toggled` | `tool` = strobe, `enabled` = true \| false | Start / Stop tapped on an emergency tool (automatic stops are not recorded) |
+| `emergency_tool_toggled` | `tool` = whistle \| strobe, `enabled` = true \| false | Start / Stop tapped on an emergency tool (automatic stops are not recorded) |
 | `safety_guide_viewed` | `section` = before \| during \| after | Safety guide opened (its first section) and each tab switch; not again after rotation |
 | `felt_reported` | `event_id`, `magnitude` (omitted when unknown) | "I felt it" tapped on the detail (before the USGS form opens; whether the form was sent is not visible to the app) |
 | `alert_notification_posted` | `event_id` (`summary` for the summary), `magnitude` (largest for the summary), `batch_size` | Once per notification handed to Android while app notifications and the "Earthquake alerts" category were on (up to 3 individual ones, or 1 summary). Handed over, not seen: Do Not Disturb or a dismissed notification are invisible to the app; `alert_notification_opened` is the only "seen" signal |

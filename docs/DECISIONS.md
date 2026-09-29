@@ -803,3 +803,19 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** The strobe stops if the user locks the phone or goes elsewhere, which also prevents a forgotten
   torch from draining the battery. Real flashing can only be verified on a device; emulators expose an emulated torch
   (visible in `adb shell dumpsys media.camera`), and the "no flashlight" state is covered by a UI test.
+
+## ADR-058 — Whistle: a generated distress pattern looped by AudioTrack on the alarm stream
+- **Context:** People trapped under debris are told to signal with a whistle instead of shouting. A phone can do
+  the same loudly and for a long time.
+- **Decision:** A ~3 kHz sine (the range of emergency whistles and where phone speakers are loudest) in the
+  international distress pattern: three blasts (0.5 s, 0.25 s gaps), then 1.5 s pause, all in
+  `EmergencyConfig.WHISTLE_PATTERN`. One cycle is generated in code (`WhistleWaveform`, no audio file) and looped
+  gap-free by a static `AudioTrack` with usage `ALARM`, so it plays in silent mode. While it plays the alarm volume is
+  set to maximum and restored on stop. It follows the strobe light's rules (runs while the Emergency screen is
+  visible, keeps the screen on, rotation keeps it going) and records `emergency_tool_toggled` with `tool=whistle`.
+- **Alternatives:** A bundled sound file (an asset to maintain, harder to tune); `ToneGenerator` (fixed tones, no
+  control over the pattern); timing blasts with coroutines (drift and gaps); media stream (muted in silent mode,
+  lower default volume).
+- **Consequences:** Do Not Disturb can still silence alarms depending on the user's settings; changing the alarm
+  volume may be refused there, in which case the whistle plays at the current volume. Changing the pattern or pitch
+  is a one-line edit in `EmergencyConfig`.

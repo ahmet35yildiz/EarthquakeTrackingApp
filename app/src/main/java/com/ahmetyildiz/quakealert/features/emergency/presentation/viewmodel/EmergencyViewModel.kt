@@ -6,6 +6,7 @@ import com.ahmetyildiz.quakealert.core.analytics.AnalyticsEvent
 import com.ahmetyildiz.quakealert.core.analytics.AnalyticsTracker
 import com.ahmetyildiz.quakealert.core.analytics.EmergencyToolValue
 import com.ahmetyildiz.quakealert.features.emergency.domain.TorchController
+import com.ahmetyildiz.quakealert.features.emergency.domain.WhistlePlayer
 import com.ahmetyildiz.quakealert.features.emergency.domain.usecase.RunStrobeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class EmergencyViewModel @Inject constructor(
     torchController: TorchController,
     private val runStrobe: RunStrobeUseCase,
+    private val whistlePlayer: WhistlePlayer,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
@@ -28,27 +30,56 @@ class EmergencyViewModel @Inject constructor(
     private var strobeJob: Job? = null
 
     fun onStrobeToggled() {
-        val isTurningOn: Boolean = !uiState.value.isStrobeOn
+        val isTurningOn: Boolean = !uiState.value.strobe.isOn
         if (isTurningOn) startStrobe() else stopStrobe()
-        analyticsTracker.track(AnalyticsEvent.EmergencyToolToggled(EmergencyToolValue.STROBE, isEnabled = isTurningOn))
+        trackToggled(EmergencyToolValue.STROBE, isTurningOn)
+    }
+
+    fun onWhistleToggled() {
+        val isTurningOn: Boolean = !uiState.value.whistle.isOn
+        if (isTurningOn) startWhistle() else stopWhistle()
+        trackToggled(EmergencyToolValue.WHISTLE, isTurningOn)
     }
 
     fun onScreenStopped(isConfigurationChange: Boolean) {
         if (isConfigurationChange) return
-        stopStrobe()
+        stopAllTools()
+    }
+
+    override fun onCleared() {
+        stopAllTools()
     }
 
     private fun startStrobe() {
-        mutableUiState.update { it.copy(isStrobeOn = true, hasStrobeFailed = false) }
+        mutableUiState.update { it.copy(strobe = ToolState(isOn = true)) }
         strobeJob = viewModelScope.launch {
             runStrobe()
-            mutableUiState.update { it.copy(isStrobeOn = false, hasStrobeFailed = true) }
+            mutableUiState.update { it.copy(strobe = ToolState(hasFailed = true)) }
         }
     }
 
     private fun stopStrobe() {
         strobeJob?.cancel()
         strobeJob = null
-        mutableUiState.update { it.copy(isStrobeOn = false) }
+        mutableUiState.update { it.copy(strobe = it.strobe.copy(isOn = false)) }
+    }
+
+    private fun startWhistle() {
+        val isPlaying: Boolean = whistlePlayer.start()
+        mutableUiState.update { it.copy(whistle = ToolState(isOn = isPlaying, hasFailed = !isPlaying)) }
+    }
+
+    private fun stopWhistle() {
+        whistlePlayer.stop()
+        mutableUiState.update { it.copy(whistle = it.whistle.copy(isOn = false)) }
+    }
+
+    private fun stopAllTools() {
+        stopStrobe()
+        stopWhistle()
+    }
+
+    private fun trackToggled(tool: EmergencyToolValue, isEnabled: Boolean) {
+        analyticsTracker.track(AnalyticsEvent.EmergencyToolToggled(tool, isEnabled))
     }
 }

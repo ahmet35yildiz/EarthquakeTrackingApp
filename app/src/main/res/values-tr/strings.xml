@@ -356,6 +356,9 @@
     <string name="statistics_placeholder_message">Son 7 ve 30 günün deprem istatistikleri burada görünecek.</string>
 
     <string name="emergency_title">Acil durum araçları</string>
+    <string name="whistle_title">Düdük</string>
+    <string name="whistle_description">Yüksek ve tiz bir sinyal çalar: üç kısa düdük, ardından kısa bir ara; uluslararası yardım çağrısı. Telefon sessizdeyken de duyulur; çalışırken ekran açık kalır.</string>
+    <string name="whistle_failed">Düdük çalınamadı. Tekrar deneyin.</string>
     <string name="strobe_title">Çakar flaş</string>
     <string name="strobe_description">Kurtarma ekiplerinin sizi görebilmesi için telefonunuzun fenerini yakıp söndürür. Çalışırken ekran açık kalır.</string>
     <string name="strobe_unavailable">Bu cihazda fener yok.</string>

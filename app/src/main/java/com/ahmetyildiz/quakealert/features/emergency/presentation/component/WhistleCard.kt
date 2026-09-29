@@ -13,29 +13,24 @@ import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.emergency.presentation.viewmodel.ToolState
 
 @Composable
-fun StrobeLightCard(isAvailable: Boolean, state: ToolState, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+fun WhistleCard(state: ToolState, onToggle: () -> Unit, modifier: Modifier = Modifier) {
     EmergencyToolCard(
-        title = stringResource(R.string.strobe_title),
-        icon = painterResource(R.drawable.ic_emergency),
-        description = stringResource(if (isAvailable) R.string.strobe_description else R.string.strobe_unavailable),
-        failureMessage = stringResource(R.string.strobe_failed),
+        title = stringResource(R.string.whistle_title),
+        icon = painterResource(R.drawable.ic_notifications),
+        description = stringResource(R.string.whistle_description),
+        failureMessage = stringResource(R.string.whistle_failed),
         state = state,
-        onToggle = if (isAvailable) onToggle else null,
+        onToggle = onToggle,
         modifier = modifier,
     )
 }
 
 @PreviewLightDark
 @Composable
-private fun StrobeLightCardPreview() {
+private fun WhistleCardPreview() {
     QuakeAlertTheme {
         Surface {
-            StrobeLightCard(
-                isAvailable = true,
-                state = ToolState(isOn = true),
-                onToggle = {},
-                modifier = Modifier.padding(Spacing.large),
-            )
+            WhistleCard(state = ToolState(), onToggle = {}, modifier = Modifier.padding(Spacing.large))
         }
     }
 }

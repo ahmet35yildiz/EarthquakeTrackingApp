@@ -61,9 +61,9 @@ com.ahmetyildiz.quakealert/
 │   ├── settings/                    # Language, about, permission status, developer entry points
 │   │   └── presentation/viewmodel | screen | component   (+ SettingsConfig; no data/domain: reads core only)
 │   ├── eventlog/                    # Developer event log: data (AnalyticsEventDao) | domain (LoggedEvent, filter, share text) | presentation
-│   └── emergency/                   # Emergency tools tab (strobe light) + safety guide; core only
-│       ├── domain/                  # EmergencyConfig, TorchController (interface), usecase/RunStrobeUseCase
-│       ├── data/source/             # CameraTorchController (CameraManager.setTorchMode)
+│   └── emergency/                   # Emergency tools tab (whistle, strobe light) + safety guide; core only
+│       ├── domain/                  # EmergencyConfig, TorchController + WhistlePlayer (interfaces), model/WhistlePattern, usecase/RunStrobeUseCase
+│       ├── data/source/             # CameraTorchController (CameraManager.setTorchMode), AudioTrackWhistlePlayer + WhistleWaveform
 │       ├── presentation/viewmodel | screen | component
 │       └── di/
 ```
@@ -306,6 +306,16 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
   `EmergencyEntry` calls `onScreenStopped` from `LifecycleStartEffect` (skipped for configuration changes, the same
   pattern as the list), so switching tab, pushing the guide or leaving the app stops it; `KeepScreenOnEffect` sets
   `View.keepScreenOn` while it runs.
+
+### 4.5.2 Whistle (ADR-058)
+- `WhistleWaveform` builds one cycle of 16-bit mono PCM from `EmergencyConfig.WHISTLE_PATTERN` (pure Kotlin,
+  unit-tested): each blast is a sine with a 10 ms fade in / out, then silence for the gap or the final pause.
+- `AudioTrackWhistlePlayer` writes that cycle into a `MODE_STATIC` `AudioTrack` (usage `ALARM`) and loops it with
+  `setLoopPoints(…, -1)`, so the rhythm needs no timer. A static track reports `STATE_INITIALIZED` only after its data
+  is written, so readiness is checked after `write` (found on the emulator). Start raises `STREAM_ALARM` to its
+  maximum and remembers the old volume; stop releases the track and restores it.
+- `EmergencyViewModel` keeps one `ToolState` (on, failed) per tool; stop rules are shared with the strobe light and
+  `onCleared` stops both.
 
 ### 4.6 Notifications (ADR-030)
 - Channel `earthquake_alerts` ("Earthquake alerts", high importance) is registered in `QuakeAlertApplication.onCreate`

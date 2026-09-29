@@ -24,7 +24,7 @@ enum class DetailAction { MAP, USGS, SHARE }
 
 enum class SafetyGuideSectionValue { BEFORE, DURING, AFTER }
 
-enum class EmergencyToolValue { STROBE }
+enum class EmergencyToolValue { STROBE, WHISTLE }
 
 enum class SuppressionReason { PERMISSION_DENIED, ALERT_CHANNEL_BLOCKED }
 

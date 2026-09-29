@@ -101,6 +101,10 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
       `KEEP_SCREEN_ON`; tab switch / Home → torch off and "Start" again; rotation → keeps flashing; Stop → off,
       `emergency_tool_toggled` with `enabled` true and false. Emulators have an emulated torch (visible in the same
       dump); "no flashlight" is covered by `EmergencyScreenTest`.
+- [ ] Whistle on a physical device: Start → three blasts and a pause, repeating, audible with the phone in silent
+      mode; alarm volume at maximum while it plays (`adb shell cmd media_session volume --stream 4 --get`) and the
+      old volume back after Stop; tab switch / Home stop it, rotation does not; whistle and strobe together.
+      `AudioTrackWhistlePlayerTest` checks start / volume / stop with a real `AudioTrack` on the emulators.
 - [ ] Emergency → Safety guide: Before / During / After switch, back returns to the Emergency tab; rotation keeps the
       section; `safety_guide_viewed` once per shown section.
 - [ ] Detail: open in maps, I felt it (USGS form of the same event opens, `felt_reported` logged), open USGS, share; open from notification (cold start and warm start).

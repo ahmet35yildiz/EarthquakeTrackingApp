@@ -29,10 +29,12 @@ import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
 import com.ahmetyildiz.quakealert.features.emergency.presentation.component.KeepScreenOnEffect
 import com.ahmetyildiz.quakealert.features.emergency.presentation.component.StrobeLightCard
+import com.ahmetyildiz.quakealert.features.emergency.presentation.component.WhistleCard
 import com.ahmetyildiz.quakealert.features.emergency.presentation.viewmodel.EmergencyUiState
 import com.ahmetyildiz.quakealert.features.emergency.presentation.viewmodel.EmergencyViewModel
 
 data class EmergencyActions(
+    val onWhistleToggled: () -> Unit,
     val onStrobeToggled: () -> Unit,
     val onOpenSafetyGuide: () -> Unit,
 )
@@ -50,8 +52,9 @@ fun EmergencyEntry(
             viewModel.onScreenStopped(isConfigurationChange = activity?.isChangingConfigurations == true)
         }
     }
-    KeepScreenOnEffect(isEnabled = uiState.isStrobeOn)
+    KeepScreenOnEffect(isEnabled = uiState.isAnyToolOn)
     val actions = EmergencyActions(
+        onWhistleToggled = viewModel::onWhistleToggled,
         onStrobeToggled = viewModel::onStrobeToggled,
         onOpenSafetyGuide = onOpenSafetyGuide,
     )
@@ -72,10 +75,10 @@ fun EmergencyScreen(uiState: EmergencyUiState, actions: EmergencyActions, modifi
                 .padding(horizontal = Spacing.screenMargin, vertical = Spacing.small),
             verticalArrangement = Arrangement.spacedBy(Spacing.large),
         ) {
+            WhistleCard(state = uiState.whistle, onToggle = actions.onWhistleToggled)
             StrobeLightCard(
                 isAvailable = uiState.isStrobeAvailable,
-                isOn = uiState.isStrobeOn,
-                hasFailed = uiState.hasStrobeFailed,
+                state = uiState.strobe,
                 onToggle = actions.onStrobeToggled,
             )
             NavigationCard(
@@ -95,7 +98,7 @@ private fun EmergencyScreenPreview() {
         Surface {
             EmergencyScreen(
                 uiState = EmergencyUiState(isStrobeAvailable = true),
-                actions = EmergencyActions(onStrobeToggled = {}, onOpenSafetyGuide = {}),
+                actions = EmergencyActions(onWhistleToggled = {}, onStrobeToggled = {}, onOpenSafetyGuide = {}),
             )
         }
     }

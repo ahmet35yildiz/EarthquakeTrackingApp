@@ -33,7 +33,7 @@ publication delay + background check interval). The app says this explicitly in 
 7. Developer tools: "Simulate alert" and "Run check now" to demonstrate the notification flow on demand.
 8. Multilingual UI: English (default) + Turkish, in-app language switch.
 9. Light and dark theme, consistent custom Material 3 design.
-10. Emergency tab: strobe light, safety guide (before / during / after an earthquake); a whistle follows.
+10. Emergency tab: whistle, strobe light, safety guide (before / during / after an earthquake).
 11. Statistics tab (placeholder until the statistics screen is built).
 
 ### Out of scope (documented in README with reasons)
@@ -157,7 +157,11 @@ publication delay + background check interval). The app says this explicitly in 
 - Notification tap → app opens directly on the earthquake detail (back goes to the list).
 
 ### 4.8 Emergency tools (tab "Emergency")
-- A list of cards: Strobe light, Safety guide (→ pushed Safety guide screen). A whistle follows.
+- A list of cards: Whistle, Strobe light, Safety guide (→ pushed Safety guide screen).
+- Whistle: Start / Stop. A loud ~3 kHz tone in the international distress pattern (three 0.5 s blasts with 0.25 s
+  gaps, then a 1.5 s pause) on the alarm stream, so it sounds in silent mode (Do Not Disturb may still mute alarms).
+  While it plays the alarm volume is at maximum and the screen stays on; Stop restores the previous alarm volume.
+  Same stop rules as the strobe light; both tools can run together. A failure to play shows a message (ADR-058).
 - Strobe light: Start / Stop. While on, the phone's flashlight flashes twice a second (below the 3 flashes per second
   limit for photosensitivity) and the screen stays on. It stops when the user taps Stop, switches tab, opens the
   guide or leaves the app; rotation keeps it running. No flashlight → "This device has no flashlight." and no

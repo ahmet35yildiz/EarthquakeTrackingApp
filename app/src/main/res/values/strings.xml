@@ -370,6 +370,9 @@
     <string name="statistics_placeholder_message">Earthquake statistics for the last 7 and 30 days will appear here.</string>
 
     <string name="emergency_title">Emergency tools</string>
+    <string name="whistle_title">Whistle</string>
+    <string name="whistle_description">Plays a loud, high-pitched signal: three short blasts, then a pause, the international call for help. It sounds even in silent mode; the screen stays on while it runs.</string>
+    <string name="whistle_failed">The whistle could not be played. Try again.</string>
     <string name="strobe_title">Strobe light</string>
     <string name="strobe_description">Flashes your phone\'s flashlight so rescuers can see you. The screen stays on while it runs.</string>
     <string name="strobe_unavailable">This device has no flashlight.</string>
