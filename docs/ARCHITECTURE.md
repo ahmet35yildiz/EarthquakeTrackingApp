@@ -294,10 +294,13 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
 - Tabs pop up to `MainGraphRoute` with save/restore state; the tab navigation is shown only on the five tab
   destinations (`TopLevelDestination`): a bottom bar below 600 dp window width, a navigation rail from 600 dp
   (landscape phones, tablets), decided in `QuakeAlertApp` from `LocalWindowInfo.containerSize` (ADR-040). Tab labels
-  stay on one line. In the bottom bar all labels share one style from `rememberTabLabelStyle` (ADR-055): it measures
+  stay on one line. In the bottom bar all labels share one style from `core/ui/format/rememberFittingTextStyle` (ADR-055): it measures
   every label with a `TextMeasurer` against the item width (bar width minus Material's 8 dp item spacing, divided by
   the tab count) and steps the font size (and letter spacing with it) down from the theme size to the size that
   equals 100 % font scale. The rail's column scrolls when the tabs are taller than the window.
+- The same helper sizes the Safety guide tabs: every tab name has a line break in its string ("Depremden\nÖnce"),
+  each line is measured against the tab's text width (a third of the row minus Material's 16 dp padding on each
+  side), so all three names are two lines at one size and never break inside a word.
 - `EarthquakeDetailRoute` declares `navDeepLink` `quakealert://earthquake/{earthquakeId}?isFromNotification={bool}`
   (manifest: `VIEW` + scheme `quakealert`, `launchMode="singleTop"`). Cold start: the NavController handles the
   activity intent while setting the graph; any later intent (`onNewIntent`, also right after a restore from process

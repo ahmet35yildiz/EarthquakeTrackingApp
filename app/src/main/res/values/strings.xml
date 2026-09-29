@@ -405,9 +405,9 @@
     <string name="action_stop">Stop</string>
     <string name="safety_guide_title">Safety guide</string>
     <string name="safety_guide_card_description">What to do before, during and after an earthquake.</string>
-    <string name="safety_guide_section_before">Before an Earthquake</string>
-    <string name="safety_guide_section_during">During an Earthquake</string>
-    <string name="safety_guide_section_after">After an Earthquake</string>
+    <string name="safety_guide_section_before">Before\nEarthquake</string>
+    <string name="safety_guide_section_during">During\nEarthquake</string>
+    <string name="safety_guide_section_after">After\nEarthquake</string>
     <string name="safety_guide_source">General guidance based on AFAD and Ready.gov. Always follow the instructions of local authorities.</string>
     <string-array name="safety_guide_before_items">
         <item>Fix tall furniture, shelves and water heaters to the wall.</item>

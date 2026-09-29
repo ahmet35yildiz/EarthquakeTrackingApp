@@ -168,7 +168,8 @@ publication delay + background check interval). The app says this explicitly in 
   guide or leaves the app; rotation keeps it running. No flashlight → "This device has no flashlight." and no
   button. A flashlight that cannot be switched (e.g. the camera is in use) stops the strobe with a message.
   Start / Stop taps record `emergency_tool_toggled` (ADR-057).
-- Safety guide: tabs Before / During / After, each a numbered list of 5–7 short items (same count in every
+- Safety guide: tabs "Before / Earthquake", "During / Earthquake", "After / Earthquake" (TR "Depremden / Önce",
+  "Deprem / Anında", "Depremden / Sonra"), always on two lines at one shared size (ADR-055), each a numbered list of 5–7 short items (same count in every
   language), plus a source line (AFAD, Ready.gov; follow local authorities). Static, works offline. Opens on
   "Before"; the shown tab survives rotation. Each shown section records `safety_guide_viewed` (ADR-056).
 

@@ -391,9 +391,9 @@
     <string name="action_stop">Durdur</string>
     <string name="safety_guide_title">Güvenlik rehberi</string>
     <string name="safety_guide_card_description">Deprem öncesinde, sırasında ve sonrasında yapılması gerekenler.</string>
-    <string name="safety_guide_section_before">Depremden Önce</string>
-    <string name="safety_guide_section_during">Deprem Anında</string>
-    <string name="safety_guide_section_after">Depremden Sonra</string>
+    <string name="safety_guide_section_before">Depremden\nÖnce</string>
+    <string name="safety_guide_section_during">Deprem\nAnında</string>
+    <string name="safety_guide_section_after">Depremden\nSonra</string>
     <string name="safety_guide_source">AFAD ve Ready.gov önerilerine dayanan genel bilgilerdir. Her zaman yerel yetkililerin talimatlarına uyun.</string>
     <string-array name="safety_guide_before_items">
         <item>Dolap, kitaplık ve şofben gibi eşyaları duvara sabitleyin.</item>

@@ -760,7 +760,7 @@ Add a new record (next number) whenever a significant decision is made; never re
   label shrink on its own (`TextAutoSize`) gave five different sizes. In landscape at 2.0 the rail's last tab fell
   off the screen.
 - **Decision:** Order Earthquakes · Statistics · Alerts · Emergency · Settings (data first, then setup, help,
-  preferences). `rememberTabLabelStyle` gives all bottom bar labels one style: the theme's `labelMedium` when every
+  preferences). `rememberFittingTextStyle` gives all bottom bar labels one style: the theme's `labelMedium` when every
   label fits, otherwise the largest size (0.25 sp steps, letter spacing scaled with it) at which all labels fit,
   never below the size that equals 100 % font scale (`dp.toSp()`, which respects Android 14's non-linear font
   scaling). The rail keeps Material's own label sizing and its column scrolls when the tabs are taller than the
@@ -773,6 +773,10 @@ Add a new record (next number) whenever a significant decision is made; never re
   screen keeps the full scale. The bar's item spacing (8 dp) mirrors Material's internal constant; if Material
   changes it, the computed size may be slightly off (the ellipsis remains as a fallback). A new tab or a longer label
   needs no code change.
+- **Update (after 5.6):** the helper moved to `core/ui/format/rememberFittingTextStyle` and takes the lines that must
+  each fit on one line; it scales line height with the font size too. The Safety guide tabs use it with names that
+  always have two lines ("Depremden / Önce", "Before / Earthquake", line break in the string): at font scale 1.5 the
+  wrapped names had broken inside "Depremden".
 
 ## ADR-056 — Safety guide is static, localized content tracked per section
 - **Context:** People want to know what to do before, during and after an earthquake, including offline and in a

@@ -3,6 +3,7 @@ package com.ahmetyildiz.quakealert.navigation
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -14,6 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
+import com.ahmetyildiz.quakealert.core.ui.format.rememberFittingTextStyle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 
@@ -23,7 +25,12 @@ fun QuakeAlertBottomBar(
     onDestinationSelected: (TopLevelDestination) -> Unit,
 ) {
     BoxWithConstraints {
-        val labelStyle: TextStyle = rememberTabLabelStyle(labelWidth = itemWidth(maxWidth))
+        val labels: List<String> = TopLevelDestination.entries.map { stringResource(it.labelRes) }
+        val labelStyle: TextStyle = rememberFittingTextStyle(
+            lines = labels,
+            maxWidth = itemWidth(maxWidth),
+            style = MaterialTheme.typography.labelMedium,
+        )
         NavigationBar {
             TopLevelDestination.entries.forEach { destination ->
                 val isSelected: Boolean = currentDestination.isInHierarchyOf(destination)
