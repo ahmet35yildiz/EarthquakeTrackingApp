@@ -79,6 +79,7 @@ data class EarthquakeDetailActions(
     val onOpenInMaps: () -> Unit,
     val onViewOnUsgs: () -> Unit,
     val onShare: () -> Unit,
+    val onReportFelt: () -> Unit,
 )
 
 @Composable
@@ -98,11 +99,14 @@ fun EarthquakeDetailEntry(
     val scope = rememberCoroutineScope()
     val noAppMessage: String = stringResource(R.string.error_no_app_for_action)
     val intents: DetailIntents? = uiState.details?.let { rememberDetailIntents(it) }
-    val launch: (DetailAction, Intent?) -> Unit = { action, intent ->
-        viewModel.onActionClicked(action)
+    val open: (Intent?) -> Unit = { intent ->
         if (intent != null && !context.tryStartActivity(intent)) {
             scope.launch { snackbarHostState.showSnackbar(noAppMessage) }
         }
+    }
+    val launch: (DetailAction, Intent?) -> Unit = { action, intent ->
+        viewModel.onActionClicked(action)
+        open(intent)
     }
     val actions = EarthquakeDetailActions(
         onBack = onBack,
@@ -110,6 +114,10 @@ fun EarthquakeDetailEntry(
         onOpenInMaps = { launch(DetailAction.MAP, intents?.maps) },
         onViewOnUsgs = { launch(DetailAction.USGS, intents?.usgs) },
         onShare = { launch(DetailAction.SHARE, intents?.share) },
+        onReportFelt = {
+            viewModel.onFeltReported()
+            open(intents?.feltReport)
+        },
     )
     EarthquakeDetailScreen(
         uiState = uiState,
@@ -124,6 +132,7 @@ private data class DetailIntents(
     val maps: Intent,
     val usgs: Intent,
     val share: Intent,
+    val feltReport: Intent,
 )
 
 @Composable
@@ -137,6 +146,7 @@ private fun rememberDetailIntents(details: EarthquakeDetails): DetailIntents {
             maps = mapsIntent(earthquake.location, place),
             usgs = browserIntent(earthquake.detailUrl),
             share = shareIntent(shareText, chooserTitle),
+            feltReport = browserIntent(feltReportUrl(earthquake.detailUrl)),
         )
     }
 }
@@ -249,6 +259,9 @@ private fun DetailContent(
                 modifier = Modifier.padding(start = Spacing.small),
             )
         }
+        OutlinedButton(onClick = actions.onReportFelt, modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(R.string.action_report_felt))
+        }
         OutlinedButton(onClick = actions.onViewOnUsgs, modifier = Modifier.fillMaxWidth()) {
             Text(text = stringResource(R.string.action_view_on_usgs))
         }
@@ -272,7 +285,7 @@ private fun errorMessage(error: AppError?): String =
 
 private val PreviewNow: Instant = Instant.parse("2026-09-25T12:00:00Z")
 
-private val PreviewActions = EarthquakeDetailActions({}, {}, {}, {}, {})
+private val PreviewActions = EarthquakeDetailActions({}, {}, {}, {}, {}, {})
 
 @PreviewLightDark
 @Composable

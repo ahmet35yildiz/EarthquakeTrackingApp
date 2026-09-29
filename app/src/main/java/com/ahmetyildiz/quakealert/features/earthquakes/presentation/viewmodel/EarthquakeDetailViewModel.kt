@@ -8,6 +8,7 @@ import com.ahmetyildiz.quakealert.core.analytics.DetailAction
 import com.ahmetyildiz.quakealert.core.analytics.DetailSource
 import com.ahmetyildiz.quakealert.core.error.AppError
 import com.ahmetyildiz.quakealert.core.error.AppResult
+import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Earthquake
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeDetails
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.usecase.GetEarthquakeUseCase
 import dagger.assisted.Assisted
@@ -41,6 +42,12 @@ class EarthquakeDetailViewModel @AssistedInject constructor(
 
     fun onActionClicked(action: DetailAction) {
         analyticsTracker.track(AnalyticsEvent.DetailActionClicked(action))
+    }
+
+    fun onFeltReported() {
+        val earthquake: Earthquake = uiState.value.details?.earthquake ?: return
+        val event = AnalyticsEvent.FeltReported(eventId = earthquake.id, magnitude = earthquake.magnitude?.value)
+        analyticsTracker.track(event)
     }
 
     private fun load() {

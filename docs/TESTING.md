@@ -94,7 +94,7 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
 - [ ] Language: switch EN ↔ TR in-app; survives app restart; system settings language page shows the app (33+).
 - [ ] List: pull-to-refresh, filters, airplane mode → offline banner with cached data, dark mode, font scale 1.5×,
       rotation.
-- [ ] Detail: open in maps, open USGS, share; open from notification (cold start and warm start).
+- [ ] Detail: open in maps, I felt it (USGS form of the same event opens, `felt_reported` logged), open USGS, share; open from notification (cold start and warm start).
 - [ ] Detail from a notification link (`?isFromNotification=true`) for a cached event: online → no banner; airplane
   mode → the saved copy with the "may be out of date" banner and Retry.
 - [ ] Deep link: `adb shell am start -a android.intent.action.VIEW -d "quakealert://earthquake/<id>"` with the app

@@ -42,6 +42,7 @@ class EarthquakeDetailScreenTest {
         onOpenInMaps = { clickedActions += "maps" },
         onViewOnUsgs = { clickedActions += "usgs" },
         onShare = { clickedActions += "share" },
+        onReportFelt = { clickedActions += "felt" },
     )
     private val earthquake = Earthquake(
         id = "us1",
@@ -127,9 +128,10 @@ class EarthquakeDetailScreenTest {
         setContent(loaded(distance))
         composeRule.onNodeWithContentDescription(string(R.string.action_share)).performClick()
         composeRule.onNodeWithText(string(R.string.action_open_in_maps)).performScrollTo().performClick()
+        composeRule.onNodeWithText(string(R.string.action_report_felt)).performScrollTo().performClick()
         composeRule.onNodeWithText(string(R.string.action_view_on_usgs)).performScrollTo().performClick()
         composeRule.onNodeWithContentDescription(string(R.string.action_back)).performClick()
-        assertEquals(listOf("share", "maps", "usgs", "back"), clickedActions)
+        assertEquals(listOf("share", "maps", "felt", "usgs", "back"), clickedActions)
     }
 
     @Test

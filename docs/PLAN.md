@@ -577,6 +577,63 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   API 34 (EN + TR, deny, location off, rotation while locating; the API 34 AVD ignored `geo fix`, test providers
   used, see TESTING.md).
 
+- [x] **5.2 "I felt it" on the earthquake detail** (added on request). New action next to Open in maps / View on USGS
+  / Share. A tap records `felt_reported` (`event_id`, `magnitude`) and opens the USGS "Did You Feel It?" form for that
+  event (`https://earthquake.usgs.gov/earthquakes/eventpage/<id>/tellus`, built from one constant). No stored
+  "already reported" state; no browser → the existing error message. Shown for list and notification opens.
+  *Done when:* the event appears in the event log and the form opens for the right event; unit + Compose UI tests;
+  EN/TR; verified on API 31 and 34.
+  *Result:* outlined "I felt it" / "Hissettim" button between Open in maps and View on USGS; the ViewModel tracks
+  `felt_reported` (magnitude omitted when unknown), the entry composable opens `feltReportUrl(detailUrl)` = USGS event
+  page + `/tellus` through the shared missing-app snackbar path (ADR-054). SPEC, ANALYTICS (event + question),
+  ARCHITECTURE, TESTING and README updated. 505 unit (+6), 115/115 instrumented on API 31 and 34 (click test
+  extended), lint clean (only the existing dependency warnings); on API 34 (EN + TR label) and API 31: tap → Chrome
+  opens `…/eventpage/nc75444322/tellus` with the "Felt Report - Tell Us!" form of the same M4.7, `felt_reported
+  {event_id=nc75444322, magnitude=4.73}` logged.
+
+- [ ] **5.3 Two new tabs + safety guide** (added on request). Bottom bar and navigation rail get five destinations:
+  Earthquakes · Statistics · Alerts · Emergency · Settings; new drawables for both tab icons (approved 2026-09-29).
+  Statistics shows a placeholder until 5.6. New feature `features/emergency` (no dependency on other features); the
+  Emergency tab is a list of cards: whistle (5.5), strobe light (5.4), safety guide, emergency SMS (5.7, pending).
+  The guide card opens a guide screen with three tabs — Before / During / After — each with 5–7 short items in
+  `strings.xml` (EN + TR), works offline, with a source line (AFAD, Ready.gov). Event `safety_guide_viewed`
+  (`section`). The guide text is reviewed by the user before the task is done.
+  *Done when:* five tabs work in portrait and landscape, labels fit at the default font and stay on one line at 2.0,
+  tab back stacks behave as before, guide text approved; tests; verified on API 31 and 34.
+
+- [ ] **5.4 Strobe light** (added on request). `TorchController` interface in the emergency domain, implemented with
+  `CameraManager.setTorchMode` (no permission). On/off card on the Emergency tab; while on, the torch blinks at a fixed
+  rate from `EmergencyConfig` (at most ~2 flashes per second, for photosensitivity). No flash unit → the card says so.
+  While a tool is on the screen stays on; tools stop when the app goes to the background. Event
+  `emergency_tool_toggled` (`tool=strobe`, `enabled`).
+  *Done when:* blink logic unit-tested with a fake torch; verified on a physical device (emulators have no torch)
+  and the no-flash state on the emulator.
+
+- [ ] **5.5 Whistle** (added on request). Tone generated in code (`AudioTrack`, ~3 kHz, no audio file) on the alarm
+  stream, pattern "three short blasts + pause" (distress signal) in a loop; frequency, blast and pause lengths in
+  `EmergencyConfig`. On → alarm volume to maximum, off → previous volume restored. Same screen-on / background rules
+  as 5.4; whistle and strobe can run together. Event `emergency_tool_toggled` (`tool=whistle`, `enabled`).
+  *Done when:* pattern timing unit-tested with a fake player; audible on the emulator and the physical device,
+  silent mode checked, volume restored after turning it off.
+
+- [ ] **5.6 Statistics tab** (added on request). Part of the `earthquakes` feature (a view over earthquake data, no
+  new cross-feature dependency). Period chips: Last 7 days (existing cache, no extra request) / Last 30 days (USGS
+  request on demand, M2.5+, kept in memory, not written to the list cache). Region chips as on the list: Whole world /
+  My area. Cards: summary (count, largest — tap opens the detail, average magnitude); magnitude distribution
+  (horizontal bars with the existing severity classes and colours); daily count (column chart, 7 or 30 bars); top 5
+  regions (USGS region names with the existing localization). Pure `CalculateEarthquakeStatisticsUseCase`; charts
+  drawn with Compose `Canvas` (no chart library), each with a text description for screen readers. Loading / error /
+  offline states for the 30-day request. Event `statistics_viewed` (`period`, `region_filter`).
+  *Done when:* the statistics use case is fully unit-tested (classes, days, empty list, area); counts match the USGS
+  count API for sample queries; tests; verified on API 31 and 34 in EN/TR, dark mode and landscape.
+
+- [ ] **5.7 Emergency SMS — decision pending, re-evaluate with the user before starting** (added on request). Draft:
+  up to 3 contacts chosen with the system contact picker (no contacts permission), stored on the device; "Send
+  emergency SMS" opens the SMS app with the recipients and a prefilled text with a map link; the user presses send
+  (no `SEND_SMS`). Open questions: build it or not; location precision — approximate permission (~2 km, current) or
+  precise location requested only on first use; the multiple-recipient separator differs between SMS apps. Events
+  `emergency_contacts_changed`, `emergency_sms_opened` (no numbers, no coordinates).
+
 ---
 
 ## Open items (need the user's decision/approval)
@@ -587,6 +644,7 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | Update Android Studio to Quail 4 (2026.1.4)+ (required by AGP 9.4) | ✅ done 2026-09-25 |
 | App display name "QuakeAlert" | ✅ confirmed |
 | Keep `docs/PLAN.md` in the repo at delivery | decide in 4.4 |
+| 5.7 Emergency SMS: build or drop, location precision | pending, decide when 5.6 is done |
 
 ## Work log
 | Date | Time | Duration | Work |
@@ -636,3 +694,5 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-29 | 13:00–13:37 | ~37m | 3.11 Onboarding fits without scrolling (feature cards and hints removed, city search in a dialog, ADR-050); alert preview "N earthquakes in the last 3 days would have matched" with the alert rule on the cached list, live while dragging (ADR-051); 483 unit, 109/109 instrumented on API 31 and 34 |
 | 2026-09-29 | 14:10–14:20 | ~10m | 3.12 Preview removed from onboarding (Alerts tab only, ADR-051 updated); "saved" snackbar on the Alerts tab removed (ADR-029 updated); 482 unit, 109/109 instrumented on API 31 and 34 |
 | 2026-09-29 | 14:32–14:54 | ~22m | 3.13 Optional alert feedback on the notification detail (ADR-052); on-device alert metrics card in the event log: setup completion, opens, useful among answers, opt-out within 24 h (ADR-053); 499 unit, 115/115 instrumented on API 31 and 34 |
+| 2026-09-29 | 15:02–15:45 | ~43m | Planning of 5.2–5.7 (I felt it, two new tabs + safety guide, strobe light, whistle, statistics with 7/30 days, emergency SMS pending); location precision options checked |
+| 2026-09-29 | 15:45–15:58 | ~13m | 5.2 "I felt it" on the detail: `felt_reported` + USGS felt report form (ADR-054); 505 unit, 115/115 instrumented on API 31 and 34 |

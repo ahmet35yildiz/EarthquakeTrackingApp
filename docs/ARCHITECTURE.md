@@ -254,8 +254,9 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
   `AlertFeedbackViewModel` keeps "answered" in `SavedStateHandle` (survives rotation and process death) and tracks
   `alert_feedback_given` once.
 - States: `LOADING` | `LOADED` | `NOT_FOUND` (HTTP 404 or not an earthquake) | `ERROR` (retry).
-- Maps (`geo:` intent), USGS page (browser) and share (chooser) are launched by the entry composable; the ViewModel
-  only logs `detail_action_clicked`. A missing handler app shows a snackbar instead of crashing.
+- Maps (`geo:` intent), USGS page (browser), the USGS felt report form (browser, `feltReportUrl` = event page +
+  `/tellus`, ADR-054) and share (chooser) are launched by the entry composable; the ViewModel only logs
+  `detail_action_clicked` / `felt_reported`. A missing handler app shows a snackbar instead of crashing.
 - The bottom bar is shown only on top-level destinations; pushed screens (detail) use the full height.
 - The list's header (`EarthquakeListTopBar`) is a plain row with a 64 dp minimum height instead of a `TopAppBar`, so
   its two-line title block grows with the font scale instead of overflowing into the status bar (found in 3.5).

@@ -162,6 +162,7 @@
     <string name="action_share">Share</string>
     <string name="action_open_in_maps">Open in maps</string>
     <string name="action_view_on_usgs">View on USGS</string>
+    <string name="action_report_felt">I felt it</string>
     <string name="detail_within_alert_area">Within your %1$d km alert area</string>
     <string name="detail_outside_alert_area">Outside your %1$d km alert area</string>
     <string name="detail_facts_title">Details</string>

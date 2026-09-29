@@ -134,6 +134,14 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("action" to action.paramValue),
     )
 
+    data class FeltReported(val eventId: String, val magnitude: Double?) : AnalyticsEvent(
+        name = "felt_reported",
+        params = buildMap {
+            put("event_id", eventId)
+            magnitude?.let { put("magnitude", it.toString()) }
+        },
+    )
+
     data class AlertNotificationPosted(val eventId: String, val magnitude: Double, val batchSize: Int) : AnalyticsEvent(
         name = "alert_notification_posted",
         params = mapOf(

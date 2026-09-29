@@ -132,6 +132,16 @@ class AnalyticsEventTest {
                 "action" to "usgs",
             ),
             entry(
+                AnalyticsEvent.FeltReported(eventId = "us7000abcd", magnitude = 5.3),
+                "felt_reported",
+                "event_id" to "us7000abcd", "magnitude" to "5.3",
+            ),
+            entry(
+                AnalyticsEvent.FeltReported(eventId = "us7000abcd", magnitude = null),
+                "felt_reported",
+                "event_id" to "us7000abcd",
+            ),
+            entry(
                 AnalyticsEvent.AlertNotificationPosted(eventId = "us7000abcd", magnitude = 6.1, batchSize = 1),
                 "alert_notification_posted",
                 "event_id" to "us7000abcd", "magnitude" to "6.1", "batch_size" to "1",

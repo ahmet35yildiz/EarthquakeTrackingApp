@@ -741,3 +741,14 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** The same definitions can be moved to a backend later (the use case documents them in code). The
   numbers describe this device only and include simulated alerts, which keeps the view demonstrable.
 
+## ADR-054 — "I felt it" sends people to the USGS felt report form
+- **Context:** People who felt an earthquake want to say so, and USGS collects exactly this ("Did You Feel It?"); the
+  app itself has no backend to store reports.
+- **Decision:** The detail screen gets an "I felt it" button. A tap records `felt_reported` (`event_id`,
+  `magnitude`) and opens the event's USGS form in the browser: the event page URL that USGS returns plus `/tellus`
+  (`feltReportUrl`, the only place the path lives). Nothing is stored about whether the user already reported.
+- **Alternatives:** An in-app form (USGS has no public API for submitting reports); only a local "felt" mark (the
+  report would reach nobody); an "I'm safe" message (dropped by the product decision).
+- **Consequences:** The app knows the button was tapped, not whether the form was sent. The form is USGS's own
+  page and follows its languages. Simulated events have no USGS page, so nothing opens and the usual "no app"
+  message appears (developer tools only, same as "View on USGS"); the tap is still recorded.

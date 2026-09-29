@@ -21,7 +21,7 @@ yeni bir deprem olduğunda bildirim gönderen Android uygulaması. Veri kaynağ�
 - **Deprem listesi:** son 7 gün, M2.5+, tüm dünya. Bölge ve büyüklük filtreleri, sıralama (en yeni / en büyük /
   en yakın), çekerek yenileme; internet yokken son veri gösterilir.
 - **Deprem detayı:** büyüklük, yer, yerel saat + UTC, derinlik, koordinat, şehre uzaklık, inceleme durumu, tsunami
-  işareti. Haritada aç, USGS'te görüntüle, paylaş.
+  işareti. Haritada aç, "Hissettim" (USGS'in "Did You Feel It?" formu açılır), USGS'te görüntüle, paylaş.
 - **Alarm ayarları:** aç/kapa, eşik (M2.5–8.0, 0.5 adım, varsayılan M4.5), bölge: tüm dünya (uyarıyla birlikte) veya
   ülke → şehir arama → yarıçap (50–1000 km, varsayılan 250 km). Şehir, "Konumumu kullan" ile tek dokunuşla da
   seçilebilir (yalnızca yaklaşık konum izni). Her değişiklik anında kaydedilir.

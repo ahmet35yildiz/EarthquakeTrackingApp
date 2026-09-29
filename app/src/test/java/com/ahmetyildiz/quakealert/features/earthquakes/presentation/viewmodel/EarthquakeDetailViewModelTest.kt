@@ -96,6 +96,22 @@ class EarthquakeDetailViewModelTest {
         assertEquals(expected, analyticsTracker.events)
     }
 
+    @Test
+    fun `felt report is logged with the event id and magnitude`() {
+        val viewModel: EarthquakeDetailViewModel = createViewModel(id = "us1")
+        analyticsTracker.events.clear()
+        viewModel.onFeltReported()
+        assertEquals(listOf(AnalyticsEvent.FeltReported(eventId = "us1", magnitude = 5.3)), analyticsTracker.events)
+    }
+
+    @Test
+    fun `felt report before the earthquake is loaded logs nothing`() {
+        val viewModel: EarthquakeDetailViewModel = createViewModel(id = "unknown")
+        analyticsTracker.events.clear()
+        viewModel.onFeltReported()
+        assertEquals(emptyList<AnalyticsEvent>(), analyticsTracker.events)
+    }
+
     private fun createViewModel(id: String, source: DetailSource = DetailSource.LIST): EarthquakeDetailViewModel =
         EarthquakeDetailViewModel(
             earthquakeId = id,

@@ -92,7 +92,8 @@ publication delay + background check interval). The app says this explicitly in 
 ### 4.3 Earthquake detail
 - Magnitude + magnitude type, place, local time + UTC, relative time, depth, coordinates, distance to the user's city,
   review status (automatic/reviewed), tsunami flag, felt reports count (if any).
-- Actions: Open in maps (`geo:` intent), View on USGS (browser), Share (plain text summary).
+- Actions: Open in maps (`geo:` intent), I felt it (records `felt_reported`, opens the USGS "Did You Feel It?" form
+  for the event in the browser), View on USGS (browser), Share (plain text summary).
 - Loads from cache; if missing (e.g. opened from an old notification) fetches by `eventid`; 404 → not-found state.
 - Reached from the list or from a notification tap (deep link).
 - Opened from a notification: a small optional card "Was this alert useful? Yes / No" below the distance. Answering
