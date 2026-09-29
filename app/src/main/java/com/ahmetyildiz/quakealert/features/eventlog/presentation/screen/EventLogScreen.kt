@@ -47,6 +47,8 @@ import com.ahmetyildiz.quakealert.core.ui.component.EmptyState
 import com.ahmetyildiz.quakealert.core.ui.component.LoadingState
 import com.ahmetyildiz.quakealert.core.ui.component.ScreenTitle
 import com.ahmetyildiz.quakealert.core.ui.theme.Spacing
+import com.ahmetyildiz.quakealert.features.eventlog.domain.model.AlertMetrics
+import com.ahmetyildiz.quakealert.features.eventlog.presentation.component.AlertMetricsCard
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.component.EventLogItem
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.viewmodel.EventLogUiState
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.viewmodel.EventLogViewModel
@@ -211,6 +213,10 @@ private fun EventList(uiState: EventLogUiState) {
         ),
         verticalArrangement = Arrangement.spacedBy(Spacing.small),
     ) {
+        val metrics: AlertMetrics? = uiState.metrics
+        if (metrics != null && !uiState.isFiltered) {
+            item(key = METRICS_KEY) { AlertMetricsCard(metrics = metrics) }
+        }
         item(key = COUNT_KEY) {
             Text(
                 text = eventCountText(uiState),
@@ -250,4 +256,5 @@ private fun ClearEventLogDialog(eventCount: Int, onConfirm: () -> Unit, onDismis
     )
 }
 
+private const val METRICS_KEY: String = "metrics"
 private const val COUNT_KEY: String = "count"

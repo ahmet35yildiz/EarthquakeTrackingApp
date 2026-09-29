@@ -5,6 +5,8 @@ import com.ahmetyildiz.quakealert.core.database.AnalyticsEventEntity
 import com.ahmetyildiz.quakealert.core.database.FakeAnalyticsEventDao
 import com.ahmetyildiz.quakealert.core.testing.MainDispatcherExtension
 import com.ahmetyildiz.quakealert.features.eventlog.data.repository.EventLogRepositoryImpl
+import com.ahmetyildiz.quakealert.features.eventlog.domain.model.MetricRatio
+import com.ahmetyildiz.quakealert.features.eventlog.domain.usecase.CalculateAlertMetricsUseCase
 import com.ahmetyildiz.quakealert.features.eventlog.domain.usecase.ClearEventLogUseCase
 import com.ahmetyildiz.quakealert.features.eventlog.domain.usecase.ObserveEventLogUseCase
 import kotlinx.coroutines.launch
@@ -28,7 +30,12 @@ class EventLogViewModelTest {
     private val savedStateHandle = SavedStateHandle()
     private val viewModel: EventLogViewModel by lazy {
         val repository = EventLogRepositoryImpl(dao)
-        EventLogViewModel(savedStateHandle, ObserveEventLogUseCase(repository), ClearEventLogUseCase(repository))
+        EventLogViewModel(
+            savedStateHandle,
+            ObserveEventLogUseCase(repository),
+            ClearEventLogUseCase(repository),
+            CalculateAlertMetricsUseCase(),
+        )
     }
 
     @Test
@@ -50,6 +57,14 @@ class EventLogViewModelTest {
         assertEquals(listOf("alert_area_set", "alerts_toggled"), state.events.map { it.name })
         assertEquals(3, state.totalCount)
         assertTrue(state.isFiltered)
+    }
+
+    @Test
+    fun `metrics are calculated from every event, not only the filtered ones`() = runTest {
+        storeEvents("onboarding_started", "onboarding_completed", "app_opened")
+        collectState()
+        viewModel.onQueryChanged("app")
+        assertEquals(MetricRatio(count = 1, total = 1), viewModel.uiState.value.metrics?.setupCompletion)
     }
 
     @Test

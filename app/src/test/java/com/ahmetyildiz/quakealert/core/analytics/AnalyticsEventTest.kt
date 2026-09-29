@@ -152,6 +152,11 @@ class AnalyticsEventTest {
                 "event_id" to "us7000abcd", "delay_seconds" to "42",
             ),
             entry(
+                AnalyticsEvent.AlertFeedbackGiven(eventId = "us7000abcd", isUseful = false),
+                "alert_feedback_given",
+                "event_id" to "us7000abcd", "useful" to "false",
+            ),
+            entry(
                 AnalyticsEvent.BackgroundCheckCompleted(fetched = 12, matched = 2, notified = 1, durationMs = 850),
                 "background_check_completed",
                 "fetched" to "12", "matched" to "2", "notified" to "1", "duration_ms" to "850",

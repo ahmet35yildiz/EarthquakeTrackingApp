@@ -11,6 +11,7 @@ class EventCategoryTest {
         "alert_notification_posted, ALERT",
         "alert_notification_suppressed, ALERT",
         "alert_notification_opened, ALERT",
+        "alert_feedback_given, ALERT",
         "developer_simulated_alert, ALERT",
         "background_check_completed, BACKGROUND",
         "background_check_failed, BACKGROUND",

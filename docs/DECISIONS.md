@@ -711,3 +711,33 @@ Add a new record (next number) whenever a significant decision is made; never re
   is one constant; `AlertConfigTest` fails if it outgrows the cached period or the threshold range drops below the
   cached minimum magnitude. Events revised after the last refresh show their cached values (ADR-048).
 
+## ADR-052 — Optional "Was this alert useful?" on the detail opened from a notification
+- **Context:** The open rate says whether people look at alerts, not whether an alert was worth it. We want a
+  direct signal that costs the user nothing when they ignore it.
+- **Decision:** When the detail is opened from a notification, a small card below the distance asks "Was this alert
+  useful?" with Yes / No. An answer tracks `alert_feedback_given` (`event_id`, `useful`) once and turns the card into a
+  thank-you line; ignoring it records nothing. The card lives in the alerts feature (`AlertFeedbackCard`,
+  `AlertFeedbackViewModel`) and reaches the detail screen through a `feedback` slot filled by `navigation`, so the
+  earthquakes feature does not depend on alerts. "Answered" is kept in `SavedStateHandle`; a notification is
+  auto-cancelled on tap, so the same alert cannot be opened from a notification twice.
+- **Alternatives:** Yes / No actions on the notification itself (a broadcast receiver, answers without seeing the
+  event, a heavier notification); a dialog (interrupts the reason the user opened the alert); recording "dismissed"
+  (ignoring is not an answer and must not look like one).
+- **Consequences:** Only individual alerts can be rated (the summary opens the app). The answer lives in the
+  existing analytics table; no new storage, no schema change.
+
+## ADR-053 — Alert metrics are computed on the device from the event log
+- **Context:** The measurement plan (ANALYTICS.md) defines activation, open rate and a noise signal, but they were
+  only readable by scanning raw events. Feedback adds a fourth metric.
+- **Decision:** The Event log screen shows a small "Alert metrics on this device" card, computed by a pure
+  `CalculateAlertMetricsUseCase` from all recorded events: setup completion (completed / started onboardings), alert
+  opens (opened / posted), useful among answers (useful / answered, with answered / opened next to it; no answer is
+  never negative), and notifications followed within `AlertMetricsConfig.OPT_OUT_WINDOW` (24 h) by alerts turned off
+  or a higher threshold saved in settings (onboarding changes and lowered thresholds do not count), with both counts.
+  Existing events, the tracker, the table, filtering, sharing and clearing are unchanged; clearing the log resets the
+  metrics too.
+- **Alternatives:** Persisted counters (a second source of truth that drifts from the log); a separate metrics
+  screen (one more route for four numbers); only exporting the log (the numbers still have to be worked out by hand).
+- **Consequences:** The same definitions can be moved to a backend later (the use case documents them in code). The
+  numbers describe this device only and include simulated alerts, which keeps the view demonstrable.
+

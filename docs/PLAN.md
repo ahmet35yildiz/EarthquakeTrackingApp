@@ -531,6 +531,15 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   `AlertSettingsScreenTest`), lint clean; on API 34: no preview on step 2, a threshold change on the Alerts tab saves
   (summary M6.0+) without a message.
 
+- [x] **3.13 Alert feedback + on-device alert metrics** (added on request).
+  *Result:* a detail opened from a notification asks "Was this alert useful? Yes / No" (optional, once, kept across
+  rotation; slot filled by `navigation`), recorded as `alert_feedback_given` (ADR-052). The Event log gets an "Alert
+  metrics on this device" card computed from all recorded events: setup completion, alerts opened, useful among
+  answers (non-answers excluded), alerts off / threshold raised within 24 h after a notification (ADR-053); existing
+  events, table, filter, share and clear unchanged. 499 unit, 115/115 instrumented on API 31 and 34, lint clean; on
+  API 34: simulate → tap → Yes → thanks after rotation; list-opened detail without card; second alert unanswered →
+  useful 1/1, answered 1 of 2; threshold 4.5 → 6.0 → opt-out 1 / 2.
+
 ## Phase 4 — Documentation and delivery
 - [x] **4.1 README (Turkish) complete.** All sections filled, structured along the delivery requirements (how to run,
   key decisions, out of scope, time spent, next steps, AI usage: tools, delegated work, verification, link to the
@@ -626,3 +635,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-28 | 22:59–23:32 | ~33m | 3.10 Review fixes: blocked notification category suppressed and shown (ADR-047), onboarding area kept across process death (ADR-035 update), notification detail revalidated + cached copies refreshed (ADR-048), saved city clearable without geocoder (ADR-049); 466 unit, 96/96 instrumented on API 31 and 34 |
 | 2026-09-29 | 13:00–13:37 | ~37m | 3.11 Onboarding fits without scrolling (feature cards and hints removed, city search in a dialog, ADR-050); alert preview "N earthquakes in the last 3 days would have matched" with the alert rule on the cached list, live while dragging (ADR-051); 483 unit, 109/109 instrumented on API 31 and 34 |
 | 2026-09-29 | 14:10–14:20 | ~10m | 3.12 Preview removed from onboarding (Alerts tab only, ADR-051 updated); "saved" snackbar on the Alerts tab removed (ADR-029 updated); 482 unit, 109/109 instrumented on API 31 and 34 |
+| 2026-09-29 | 14:32–14:54 | ~22m | 3.13 Optional alert feedback on the notification detail (ADR-052); on-device alert metrics card in the event log: setup completion, opens, useful among answers, opt-out within 24 h (ADR-053); 499 unit, 115/115 instrumented on API 31 and 34 |

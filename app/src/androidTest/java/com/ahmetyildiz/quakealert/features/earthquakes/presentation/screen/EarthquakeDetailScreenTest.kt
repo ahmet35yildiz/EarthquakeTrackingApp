@@ -1,6 +1,7 @@
 package com.ahmetyildiz.quakealert.features.earthquakes.presentation.screen
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -19,13 +20,13 @@ import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.EarthquakeDe
 import com.ahmetyildiz.quakealert.features.earthquakes.domain.model.Magnitude
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.viewmodel.EarthquakeDetailContent
 import com.ahmetyildiz.quakealert.features.earthquakes.presentation.viewmodel.EarthquakeDetailUiState
+import java.text.NumberFormat
+import java.time.Duration
+import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.text.NumberFormat
-import java.time.Duration
-import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 class EarthquakeDetailScreenTest {
@@ -78,6 +79,16 @@ class EarthquakeDetailScreenTest {
     fun freshDetailsShowNoSavedCopyNotice() {
         setContent(loaded(distance))
         composeRule.onNodeWithText(string(R.string.detail_saved_copy_message)).assertDoesNotExist()
+    }
+
+    @Test
+    fun feedbackSlotIsShownWithLoadedDetails() {
+        composeRule.setContent {
+            QuakeAlertTheme {
+                EarthquakeDetailScreen(uiState = loaded(distance), actions = actions, now = now) { Text(text = "Feedback") }
+            }
+        }
+        composeRule.onNodeWithText("Feedback").assertIsDisplayed()
     }
 
     @Test

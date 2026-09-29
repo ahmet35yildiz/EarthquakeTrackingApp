@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetyildiz.quakealert.features.eventlog.domain.model.EventLogText
 import com.ahmetyildiz.quakealert.features.eventlog.domain.model.LoggedEvent
 import com.ahmetyildiz.quakealert.features.eventlog.domain.model.filterByName
+import com.ahmetyildiz.quakealert.features.eventlog.domain.usecase.CalculateAlertMetricsUseCase
 import com.ahmetyildiz.quakealert.features.eventlog.domain.usecase.ClearEventLogUseCase
 import com.ahmetyildiz.quakealert.features.eventlog.domain.usecase.ObserveEventLogUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ class EventLogViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     observeEventLog: ObserveEventLogUseCase,
     private val clearEventLog: ClearEventLogUseCase,
+    private val calculateAlertMetrics: CalculateAlertMetricsUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<EventLogUiState> = combine(
@@ -46,6 +48,7 @@ class EventLogViewModel @Inject constructor(
             query = query,
             events = events.filterByName(query),
             totalCount = events.size,
+            metrics = calculateAlertMetrics(events),
         )
 
     private companion object {

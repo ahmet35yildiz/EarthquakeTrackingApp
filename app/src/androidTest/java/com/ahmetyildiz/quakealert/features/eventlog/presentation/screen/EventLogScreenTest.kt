@@ -11,13 +11,16 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ahmetyildiz.quakealert.R
 import com.ahmetyildiz.quakealert.core.ui.theme.QuakeAlertTheme
+import com.ahmetyildiz.quakealert.features.eventlog.domain.AlertMetricsConfig
+import com.ahmetyildiz.quakealert.features.eventlog.domain.model.AlertMetrics
 import com.ahmetyildiz.quakealert.features.eventlog.domain.model.LoggedEvent
+import com.ahmetyildiz.quakealert.features.eventlog.domain.model.MetricRatio
 import com.ahmetyildiz.quakealert.features.eventlog.presentation.viewmodel.EventLogUiState
+import java.time.Instant
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 class EventLogScreenTest {
@@ -28,6 +31,16 @@ class EventLogScreenTest {
     private val events: List<LoggedEvent> = listOf(
         LoggedEvent(2, "language_changed", mapOf("from" to "system", "to" to "tr"), Instant.parse("2026-09-26T18:12:01Z")),
         LoggedEvent(1, "app_opened", mapOf("source" to "launcher"), Instant.parse("2026-09-26T18:00:00Z")),
+    )
+    private val metrics = AlertMetrics(
+        setupCompletion = MetricRatio(count = 1, total = 1),
+        notificationOpens = MetricRatio(count = 4, total = 5),
+        answeredOpens = MetricRatio(count = 3, total = 4),
+        usefulAnswers = MetricRatio(count = 2, total = 3),
+        notificationsFollowedByOptOut = MetricRatio(count = 1, total = 5),
+        alertsTurnedOffAfterNotification = 1,
+        thresholdsRaisedAfterNotification = 0,
+        optOutWindow = AlertMetricsConfig.OPT_OUT_WINDOW,
     )
     private val queries: MutableList<String> = mutableListOf()
     private var shareCount: Int = 0
@@ -45,6 +58,31 @@ class EventLogScreenTest {
         composeRule.onNodeWithText("language_changed").assertIsDisplayed()
         composeRule.onNodeWithText("to=tr").assertIsDisplayed()
         composeRule.onNodeWithText(quantityString(R.plurals.event_log_count, 2, 2)).assertIsDisplayed()
+    }
+
+    @Test
+    fun metricsAreShownAboveTheEventsWithCountsAndPercentages() {
+        setContent(EventLogUiState(isLoading = false, events = events, totalCount = 2, metrics = metrics))
+        composeRule.onNodeWithText(string(R.string.metrics_title)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.metrics_ratio, 2, 3, 67)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.metrics_useful_answers_detail, 3, 4)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.metrics_opt_out_detail, 1, 0)).assertIsDisplayed()
+    }
+
+    @Test
+    fun metricsWithoutDataShowNoPercentage() {
+        val empty = metrics.copy(usefulAnswers = MetricRatio(count = 0, total = 0))
+        setContent(EventLogUiState(isLoading = false, events = events, totalCount = 2, metrics = empty))
+        composeRule.onNodeWithText(string(R.string.metrics_ratio_without_percent, 0, 0)).assertIsDisplayed()
+    }
+
+    @Test
+    fun metricsAreHiddenWhileFiltering() {
+        setContent(
+            EventLogUiState(isLoading = false, query = "app", events = events.drop(1), totalCount = 2, metrics = metrics),
+            query = "app",
+        )
+        composeRule.onNodeWithText(string(R.string.metrics_title)).assertDoesNotExist()
     }
 
     @Test

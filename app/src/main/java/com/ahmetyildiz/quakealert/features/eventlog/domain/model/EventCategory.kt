@@ -7,7 +7,7 @@ enum class EventCategory {
     USAGE;
 
     companion object {
-        private val ALERT_PREFIXES: List<String> = listOf("alert_notification_", "developer_simulated_alert")
+        private val ALERT_PREFIXES: List<String> = listOf("alert_notification_", "alert_feedback_", "developer_simulated_alert")
         private val BACKGROUND_PREFIXES: List<String> =
             listOf("background_check_", "earthquake_list_refreshed", "developer_check_triggered")
         private val SETTINGS_PREFIXES: List<String> = listOf(

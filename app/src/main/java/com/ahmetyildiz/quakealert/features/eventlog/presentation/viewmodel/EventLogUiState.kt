@@ -1,5 +1,6 @@
 package com.ahmetyildiz.quakealert.features.eventlog.presentation.viewmodel
 
+import com.ahmetyildiz.quakealert.features.eventlog.domain.model.AlertMetrics
 import com.ahmetyildiz.quakealert.features.eventlog.domain.model.LoggedEvent
 
 data class EventLogUiState(
@@ -7,6 +8,7 @@ data class EventLogUiState(
     val query: String = "",
     val events: List<LoggedEvent> = emptyList(),
     val totalCount: Int = 0,
+    val metrics: AlertMetrics? = null,
 ) {
     val isFiltered: Boolean
         get() = query.isNotBlank()

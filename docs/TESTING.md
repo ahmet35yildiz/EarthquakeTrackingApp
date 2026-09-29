@@ -12,6 +12,7 @@
 | Notification access | app off → `permission_denied`, app on + alert channel off → `alert_channel_blocked`; both suppressed, not remembered, delivered once allowed again; ViewModels expose the channel state |
 | Repository | refresh replaces cache; failure keeps cache and returns error; `eventid` 404 → NotFound; fetches replace cached copies but never add events |
 | Detail lookup | list: cache first; notification: USGS first, revised version wins, network error → cached copy flagged, 404 → cached copy unflagged |
+| Feedback + metrics | feedback recorded once with the event id, kept across a restored screen; metrics built from real `AnalyticsEvent` objects: setup, opens, useful among answers only (non-answers excluded), opt-out within the window (end included, before / after / onboarding / lowered / turned on excluded), percent rounding and empty totals; metrics use all events while filtering |
 | Alert preview | threshold boundary, radius, period start included, unknown magnitude, simulated events skipped, monotonic in threshold/radius; the shared rule equals delivery for eligible events; ViewModel: hidden / missing → load / load fails / stale → shown + refreshed / recount on change; config coverage of the preview period and threshold range |
 | Onboarding restore | page, threshold and city + radius survive a new ViewModel on the same `SavedStateHandle`; notifications page without a restorable area → setup page |
 | City search | country-code filtering, de-duplication, error mapping (with a fake geocoder) |
@@ -40,6 +41,9 @@ Fakes are preferred over mocks for repositories and the clock (`FakeClock`), so 
   skipped before settings are saved, a new matching earthquake is notified once across two runs, an earthquake
   older than the baseline is not, network error → retry, unreadable response → failure, analytics recorded.
 - Room DAOs and the WorkManager scheduler against the real libraries.
+- Before `connectedDebugAndroidTest` on an emulator where the debug app finished onboarding by hand, run
+  `adb shell pm clear com.ahmetyildiz.quakealert`: a periodic check that fires during the run starts WorkManager's job
+  service in the test process, where `HiltTestApplication` has no WorkManager, and the run stops.
 
 ## 2. Emulator matrix (manual + instrumented)
 
@@ -67,6 +71,9 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
   a second repeat is `already_notified`.
 - [ ] Onboarding at font scale 1.0 on API 31 and 34, EN and TR: no step scrolls (also whole world vs. a city with a
   long region name). "Near a city" opens the "Choose a city" dialog; picking a result closes it.
+- [ ] Simulate → tap the notification → "Was this alert useful?" on the detail; Yes → thank-you, kept after
+  rotation, `alert_feedback_given` in the log. Opened from the list → no card. Open a second alert without answering
+  → Event log metrics: useful rate unchanged, "1 of 2 opened alerts answered". Raise the threshold → opt-out 1.
 - [ ] Alerts tab: changing the threshold, area or radius shows no "saved" message; the summary card updates.
 - [ ] Preview (Alerts tab only, not in onboarding): whole world M4.5+ equals `https://earthquake.usgs.gov/fdsnws/event/1/count?starttime=<now-3d>&minmagnitude=4.5`;
   a city + radius equals the same query with `latitude`, `longitude`, `maxradiuskm`; the number changes while the

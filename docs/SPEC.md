@@ -95,6 +95,9 @@ publication delay + background check interval). The app says this explicitly in 
 - Actions: Open in maps (`geo:` intent), View on USGS (browser), Share (plain text summary).
 - Loads from cache; if missing (e.g. opened from an old notification) fetches by `eventid`; 404 → not-found state.
 - Reached from the list or from a notification tap (deep link).
+- Opened from a notification: a small optional card "Was this alert useful? Yes / No" below the distance. Answering
+  records `alert_feedback_given` and shows a thank-you line; ignoring it records nothing. Not shown when opened from
+  the list; the summary notification opens the app, so it has no card.
 
 ### 4.4 Alert settings (tab "Alerts")
 - Alerts on/off switch (on: schedules periodic work; off: cancels it).
@@ -135,6 +138,10 @@ publication delay + background check interval). The app says this explicitly in 
 ### 4.6 Event log (developer)
 - Chronological list of recorded analytics events (name, params, timestamp), filter by name, clear, share as text.
   Each event is coloured by category (alert, background, settings, usage).
+- On top (hidden while filtering): "Alert metrics on this device", computed from all recorded events: setup
+  completed (completed / started onboardings), alerts opened (opened / posted), useful among answers (useful /
+  answered, plus how many opened alerts were answered; no answer never counts as "not useful"), and alerts turned off
+  or threshold raised in settings within 24 h after a notification (notifications followed / posted, with both counts).
 
 ### 4.7 Navigation
 - Bottom bar with 3 tabs: Earthquakes, Alerts, Settings (a navigation rail on wide windows: landscape, tablets). Detail, Developer tools and Event log are pushed on top

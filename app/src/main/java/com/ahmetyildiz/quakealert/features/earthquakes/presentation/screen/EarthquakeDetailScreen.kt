@@ -87,6 +87,7 @@ fun EarthquakeDetailEntry(
     source: DetailSource,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    feedback: @Composable () -> Unit = {},
     viewModel: EarthquakeDetailViewModel = hiltViewModel<EarthquakeDetailViewModel, EarthquakeDetailViewModel.Factory>(
         creationCallback = { factory -> factory.create(earthquakeId, source) },
     ),
@@ -115,6 +116,7 @@ fun EarthquakeDetailEntry(
         actions = actions,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
+        feedback = feedback,
     )
 }
 
@@ -163,6 +165,7 @@ fun EarthquakeDetailScreen(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     now: Instant = rememberCurrentTime(),
+    feedback: @Composable () -> Unit = {},
 ) {
     Scaffold(
         modifier = modifier,
@@ -207,7 +210,7 @@ fun EarthquakeDetailScreen(
                 modifier = contentModifier,
             )
             EarthquakeDetailContent.LOADED -> uiState.details?.let {
-                DetailContent(details = it, actions = actions, now = now, modifier = contentModifier)
+                DetailContent(details = it, actions = actions, now = now, feedback = feedback, modifier = contentModifier)
             }
         }
     }
@@ -218,6 +221,7 @@ private fun DetailContent(
     details: EarthquakeDetails,
     actions: EarthquakeDetailActions,
     now: Instant,
+    feedback: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -232,6 +236,7 @@ private fun DetailContent(
         }
         DetailHeaderCard(earthquake = details.earthquake, now = now)
         details.distanceFromCity?.let { DistanceCard(distance = it) }
+        feedback()
         DetailFactsCard(earthquake = details.earthquake)
         Button(onClick = actions.onOpenInMaps, modifier = Modifier.fillMaxWidth()) {
             Icon(

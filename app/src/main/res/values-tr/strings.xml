@@ -231,6 +231,10 @@
     <string name="action_change">Değiştir</string>
     <string name="action_cancel">Vazgeç</string>
     <string name="action_close">Kapat</string>
+    <string name="action_yes">Evet</string>
+    <string name="action_no">Hayır</string>
+    <string name="alert_feedback_question">Bu alarm faydalı mıydı?</string>
+    <string name="alert_feedback_thanks">Yanıtın için teşekkürler. Alarmları iyileştirmemize yardımcı oluyor.</string>
 
     <string name="alerts_switch_title">Deprem alarmları</string>
     <string name="alerts_summary_world">Dünyanın her yerindeki M%1$s+ depremler için bildirim alırsın.</string>
@@ -311,6 +315,15 @@
     <string name="settings_about_version">Sürüm %1$s (%2$d)</string>
     <string name="settings_developer_tools_description">Alarm simüle et, hemen kontrol çalıştır ve olay kaydını gör.</string>
     <string name="developer_alert_testing_title">Alarm testi</string>
+    <string name="metrics_title">Bu cihazdaki alarm ölçümleri</string>
+    <string name="metrics_setup_completed">Kurulumu tamamlama</string>
+    <string name="metrics_alerts_opened">Açılan alarmlar</string>
+    <string name="metrics_useful_answers">Faydalı bulunan, yanıtlar içinde</string>
+    <string name="metrics_useful_answers_detail">Açılan %2$d alarmın %1$d tanesi yanıtlandı. Yanıt verilmemesi \"faydalı değil\" sayılmaz.</string>
+    <string name="metrics_opt_out">%1$d saat içinde alarm kapatma veya eşik yükseltme</string>
+    <string name="metrics_opt_out_detail">Alarm kapatma: %1$d · Eşik yükseltme: %2$d</string>
+    <string name="metrics_ratio">%1$d / %2$d · %%%3$d</string>
+    <string name="metrics_ratio_without_percent">%1$d / %2$d</string>
     <string name="event_log_title">Olay kaydı</string>
     <string name="event_log_description">Kaydedilen analitik olaylar. Filtrele, paylaş ya da temizle.</string>
     <string name="event_log_filter_label">Olay adına göre filtrele</string>

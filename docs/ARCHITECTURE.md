@@ -150,6 +150,12 @@ WorkManager (periodic 15 min, NetworkType.CONNECTED)
   `SavedStateHandle` (`filterByName`: trimmed, case-insensitive "contains"); the text field keeps its own saveable
   text so typing never waits for the flow. Share = the visible events as text (`EventLogText`: one line per event,
   ISO-8601 local time with offset, name, `key=value` params) through the system share sheet; Clear asks first.
+- Alert metrics (ADR-053): `CalculateAlertMetricsUseCase` is a pure function over all `LoggedEvent`s (not the
+  filtered ones) and returns `AlertMetrics` (`MetricRatio` count / total, percent only when total > 0). Event names
+  and params it reads are listed once in `MeasuredEvents`; its tests build the log from real `AnalyticsEvent`
+  objects, so a renamed event or param breaks them. The 24 h window is `AlertMetricsConfig.OPT_OUT_WINDOW`.
+  `AlertMetricsCard` is the first list item while no filter is set. Nothing is stored besides the existing
+  `analytics_events` rows.
 
 ### 4.3 City search (Geocoder wrapper)
 ```
@@ -243,6 +249,10 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
   `DistanceFromCity` with `isWithinAlertArea` from `AlertArea.contains`, the same rule as alerts, +
   `isSavedCopyAfterFailedRefresh`). From the list: cache first, then USGS. From a notification: USGS first; on a
   network / server error the cached copy is shown under a "may be out of date" banner with Retry (ADR-048).
+- Feedback (ADR-052): the detail screen has a `feedback` slot; `navigation` fills it with the alerts feature's
+  `AlertFeedbackEntry(eventId)` only for `isFromNotification`, so `earthquakes` does not depend on `alerts`.
+  `AlertFeedbackViewModel` keeps "answered" in `SavedStateHandle` (survives rotation and process death) and tracks
+  `alert_feedback_given` once.
 - States: `LOADING` | `LOADED` | `NOT_FOUND` (HTTP 404 or not an earthquake) | `ERROR` (retry).
 - Maps (`geo:` intent), USGS page (browser) and share (chooser) are launched by the entry composable; the ViewModel
   only logs `detail_action_clicked`. A missing handler app shows a snackbar instead of crashing.

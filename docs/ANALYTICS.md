@@ -12,7 +12,8 @@ in later as another `AnalyticsTracker` implementation.
 | Can we actually reach them? | **Notification opt-in rate** = granted / requested | notification_permission_result |
 | Do users personalise alerts? | % with an area set; threshold distribution; located vs. searched areas | onboarding_completed, alert_*, current_location_used, city_search_performed |
 | Are alerts valuable? (**north star**) | **Alert open rate** = `alert_notification_opened` / `alert_notification_posted`; median time to open | alert_notification_* |
-| Are alerts too noisy? | Threshold raised or alerts disabled within 24 h after a notification | alert_threshold_changed, alerts_toggled |
+| Are alerts relevant to the people who answer? | **Useful rate among answers** = useful / answered `alert_feedback_given`; answer rate = answered / opened. Not answering is never counted as "not useful" | alert_feedback_given, alert_notification_opened |
+| Are alerts too noisy? | Share of notifications followed within 24 h by alerts turned off or the threshold raised (settings only) | alert_notification_posted, alert_threshold_changed, alerts_toggled |
 | Is the list useful on its own? | Detail views per list view; share/map actions; which sort orders people use | earthquake_list_viewed, earthquake_detail_viewed, detail_action_clicked, list_sort_changed |
 | Is the pipeline reliable? | Background check success rate; refresh failure rate | background_check_*, earthquake_list_refreshed |
 
@@ -44,12 +45,17 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `alert_notification_posted` | `event_id` (`summary` for the summary), `magnitude` (largest for the summary), `batch_size` | Once per notification handed to Android while app notifications and the "Earthquake alerts" category were on (up to 3 individual ones, or 1 summary). Handed over, not seen: Do Not Disturb or a dismissed notification are invisible to the app; `alert_notification_opened` is the only "seen" signal |
 | `alert_notification_suppressed` | `reason` = permission_denied (app notifications off) \| alert_channel_blocked (app allowed, "Earthquake alerts" category off) | Match found but cannot notify; the match is not remembered and is retried by the next check |
 | `alert_notification_opened` | `event_id` (`summary` for the summary), `delay_seconds` | Notification tapped (cold or warm start) |
+| `alert_feedback_given` | `event_id`, `useful` = true \| false | "Was this alert useful?" answered on a detail opened from a notification; once per opened alert, nothing when ignored |
 | `background_check_completed` | `fetched`, `matched`, `notified`, `duration_ms` | Worker success |
 | `background_check_failed` | `reason` = network \| server \| parsing \| unknown | Worker failure/retry |
 | `language_changed` | `from`, `to` = language tag \| system | Language picked |
 | `theme_changed` | `from`, `to` = system \| light \| dark | Theme picked |
 | `developer_simulated_alert` | `outcome` = posted \| already_notified \| not_matched \| notifications_off \| alerts_off \| nothing_to_repeat, `scheduled` | Simulated alert delivered or rejected (debug; immediately or when the scheduled one runs) |
 | `developer_check_triggered` | – | Run check now (debug) |
+
+The Event log screen (debug builds) shows these on the device as "Alert metrics on this device": setup completion,
+alert open rate, useful rate among answers and the 24 h opt-out share (ADR-053). Simulated alerts from the developer
+tools count like real ones there, so the view can be demonstrated; a remote pipeline would filter `simulated-` ids.
 
 ## 3. Implementation notes
 - Event names and params are defined once in `core/analytics/AnalyticsEvent.kt` (sealed class) — no free-form

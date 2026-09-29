@@ -153,6 +153,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("event_id" to eventId, "delay_seconds" to delaySeconds.toString()),
     )
 
+    data class AlertFeedbackGiven(val eventId: String, val isUseful: Boolean) : AnalyticsEvent(
+        name = "alert_feedback_given",
+        params = mapOf("event_id" to eventId, "useful" to isUseful.toString()),
+    )
+
     data class BackgroundCheckCompleted(
         val fetched: Int,
         val matched: Int,
