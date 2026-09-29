@@ -33,7 +33,7 @@ publication delay + background check interval). The app says this explicitly in 
 7. Developer tools: "Simulate alert" and "Run check now" to demonstrate the notification flow on demand.
 8. Multilingual UI: English (default) + Turkish, in-app language switch.
 9. Light and dark theme, consistent custom Material 3 design.
-10. Emergency tab: safety guide (before / during / after an earthquake); whistle and strobe light follow.
+10. Emergency tab: strobe light, safety guide (before / during / after an earthquake); a whistle follows.
 11. Statistics tab (placeholder until the statistics screen is built).
 
 ### Out of scope (documented in README with reasons)
@@ -157,7 +157,12 @@ publication delay + background check interval). The app says this explicitly in 
 - Notification tap → app opens directly on the earthquake detail (back goes to the list).
 
 ### 4.8 Emergency tools (tab "Emergency")
-- A list of cards. Now: "Safety guide" → pushed Safety guide screen. A whistle and a strobe light follow.
+- A list of cards: Strobe light, Safety guide (→ pushed Safety guide screen). A whistle follows.
+- Strobe light: Start / Stop. While on, the phone's flashlight flashes twice a second (below the 3 flashes per second
+  limit for photosensitivity) and the screen stays on. It stops when the user taps Stop, switches tab, opens the
+  guide or leaves the app; rotation keeps it running. No flashlight → "This device has no flashlight." and no
+  button. A flashlight that cannot be switched (e.g. the camera is in use) stops the strobe with a message.
+  Start / Stop taps record `emergency_tool_toggled` (ADR-057).
 - Safety guide: tabs Before / During / After, each a numbered list of 5–7 short items (same count in every
   language), plus a source line (AFAD, Ready.gov; follow local authorities). Static, works offline. Opens on
   "Before"; the shown tab survives rotation. Each shown section records `safety_guide_viewed` (ADR-056).

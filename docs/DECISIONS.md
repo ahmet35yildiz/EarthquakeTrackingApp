@@ -788,3 +788,18 @@ Add a new record (next number) whenever a significant decision is made; never re
 - **Consequences:** Adding a language means translating three arrays with the same item count. Content changes are
   resource edits, no code change. Country-specific numbers (e.g. emergency phone numbers) are deliberately left out
   because the app is global.
+
+## ADR-057 — Strobe light: camera torch, twice a second, only while the Emergency screen is visible
+- **Context:** Someone trapped or in the dark needs to be seen. The phone's flashlight is the brightest light it has.
+- **Decision:** `CameraManager.setTorchMode` on the first camera with a flash unit (no permission, no camera
+  preview). `RunStrobeUseCase` flashes 250 ms on / 250 ms off (`EmergencyConfig`), i.e. 2 flashes per second, under
+  the 3 per second limit used for photosensitive seizures. It runs while the Emergency screen is visible: Stop, a tab
+  switch, the guide or leaving the app stop it and turn the torch off; rotation does not (configuration changes are
+  skipped). The screen stays on while it runs. A torch that cannot be switched ends the strobe with a message. Only
+  the user's Start / Stop taps record `emergency_tool_toggled` (`tool`, `enabled`).
+- **Alternatives:** A foreground service to keep flashing with the screen off (a persistent notification and a new
+  service type, rejected earlier for the same reasons); the screen as a light (much weaker, drains the battery
+  faster); an SOS pattern (harder to notice than a steady rhythm, can be added through `EmergencyConfig`).
+- **Consequences:** The strobe stops if the user locks the phone or goes elsewhere, which also prevents a forgotten
+  torch from draining the battery. Real flashing can only be verified on a device; emulators expose an emulated torch
+  (visible in `adb shell dumpsys media.camera`), and the "no flashlight" state is covered by a UI test.

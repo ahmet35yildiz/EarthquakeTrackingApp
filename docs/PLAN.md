@@ -614,13 +614,23 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
   API 34: EN/TR at font scale 1.0, 1.3, 2.0 (all labels complete, one size), landscape 1.0 / 2.0, guide tabs and back;
   on API 31: tabs, placeholder, guide. Guide text approved by the user as written (2026-09-29).
 
-- [ ] **5.4 Strobe light** (added on request). `TorchController` interface in the emergency domain, implemented with
+- [x] **5.4 Strobe light** (added on request). `TorchController` interface in the emergency domain, implemented with
   `CameraManager.setTorchMode` (no permission). On/off card on the Emergency tab; while on, the torch blinks at a fixed
   rate from `EmergencyConfig` (at most ~2 flashes per second, for photosensitivity). No flash unit → the card says so.
   While a tool is on the screen stays on; tools stop when the app goes to the background. Event
   `emergency_tool_toggled` (`tool=strobe`, `enabled`).
   *Done when:* blink logic unit-tested with a fake torch; verified on a physical device (emulators have no torch)
   and the no-flash state on the emulator.
+  *Result:* `TorchController` + `CameraTorchController` (first camera with a flash unit, `setTorchMode`, no
+  permission), `RunStrobeUseCase` (250 ms on / 250 ms off from `EmergencyConfig`, torch off in `finally`, ends when a
+  switch fails), `EmergencyViewModel` + `EmergencyEntry` (stops on Stop, tab switch, guide, Home; keeps running on
+  rotation; `KeepScreenOnEffect`), Strobe light card with a shared `ToolToggleButton`, no-flashlight and failure
+  texts (EN/TR), `emergency_tool_toggled` for Start / Stop taps (ADR-057). SPEC, ARCHITECTURE, ANALYTICS, TESTING,
+  README updated. 520 unit (+10), 126/126 instrumented on API 31 and 34 (+4 `EmergencyScreenTest`), lint clean (only
+  the existing dependency warnings). On a Samsung Galaxy S20 FE (API 31): the camera service logged 4 torch switches
+  per second, `KEEP_SCREEN_ON` set while running and cleared after; tab switch and Home turned the torch off, rotation
+  kept it flashing, Stop turned it off; events `enabled=true` / `enabled=false`. The emulators expose an emulated
+  torch (switches visible in `dumpsys media.camera`), so the "no flashlight" state is covered by the UI test instead.
 
 - [ ] **5.5 Whistle** (added on request). Tone generated in code (`AudioTrack`, ~3 kHz, no audio file) on the alarm
   stream, pattern "three short blasts + pause" (distress signal) in a loop; frequency, blast and pause lengths in
@@ -710,3 +720,4 @@ Decisions: `docs/DECISIONS.md`. Tests: `docs/TESTING.md`. Events: `docs/ANALYTIC
 | 2026-09-29 | 15:02–15:45 | ~43m | Planning of 5.2–5.7 (I felt it, two new tabs + safety guide, strobe light, whistle, statistics with 7/30 days, emergency SMS pending); location precision options checked |
 | 2026-09-29 | 15:45–15:58 | ~13m | 5.2 "I felt it" on the detail: `felt_reported` + USGS felt report form (ADR-054); 505 unit, 115/115 instrumented on API 31 and 34 |
 | 2026-09-29 | 16:01–16:39 | ~38m | 5.3 Statistics + Emergency tabs, safety guide (EN/TR, `safety_guide_viewed`, ADR-056); shared tab label size + scrolling rail after the 2.0 font-scale check (ADR-055); 510 unit, 122/122 instrumented on API 31 and 34; guide text approved |
+| 2026-09-29 | 16:50–17:10 | ~20m | 5.4 Strobe light: camera torch 2 flashes/s, stops when the Emergency screen is left, keeps the screen on (ADR-057); 520 unit, 126/126 instrumented on API 31 and 34; verified on a Galaxy S20 FE |

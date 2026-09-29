@@ -96,6 +96,11 @@ Last full run: 2026-09-27 on `Pixel_6` (API 31) and `Pixel_7_API_34` — every i
       rotation.
 - [ ] Five tabs (Earthquakes, Statistics, Alerts, Emergency, Settings) in EN and TR at font scale 1.0, 1.3 and 2.0:
       labels complete and the same size; landscape: rail centred at 1.0, scrolls to Settings at 2.0.
+- [ ] Strobe light on a physical device: Start → the flashlight flashes twice a second
+      (`adb shell dumpsys media.camera | grep quakealert` shows ~4 switches per second) and the window has
+      `KEEP_SCREEN_ON`; tab switch / Home → torch off and "Start" again; rotation → keeps flashing; Stop → off,
+      `emergency_tool_toggled` with `enabled` true and false. Emulators have an emulated torch (visible in the same
+      dump); "no flashlight" is covered by `EmergencyScreenTest`.
 - [ ] Emergency → Safety guide: Before / During / After switch, back returns to the Emergency tab; rotation keeps the
       section; `safety_guide_viewed` once per shown section.
 - [ ] Detail: open in maps, I felt it (USGS form of the same event opens, `felt_reported` logged), open USGS, share; open from notification (cold start and warm start).

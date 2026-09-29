@@ -134,6 +134,11 @@ sealed class AnalyticsEvent(val name: String, val params: Map<String, String> = 
         params = mapOf("action" to action.paramValue),
     )
 
+    data class EmergencyToolToggled(val tool: EmergencyToolValue, val isEnabled: Boolean) : AnalyticsEvent(
+        name = "emergency_tool_toggled",
+        params = mapOf("tool" to tool.paramValue, "enabled" to isEnabled.toString()),
+    )
+
     data class FeltReported(val eventId: String, val magnitude: Double?) : AnalyticsEvent(
         name = "felt_reported",
         params = buildMap {

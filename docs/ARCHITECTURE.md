@@ -61,7 +61,11 @@ com.ahmetyildiz.quakealert/
 │   ├── settings/                    # Language, about, permission status, developer entry points
 │   │   └── presentation/viewmodel | screen | component   (+ SettingsConfig; no data/domain: reads core only)
 │   ├── eventlog/                    # Developer event log: data (AnalyticsEventDao) | domain (LoggedEvent, filter, share text) | presentation
-│   └── emergency/                   # Emergency tools tab + safety guide (presentation only so far; core only)
+│   └── emergency/                   # Emergency tools tab (strobe light) + safety guide; core only
+│       ├── domain/                  # EmergencyConfig, TorchController (interface), usecase/RunStrobeUseCase
+│       ├── data/source/             # CameraTorchController (CameraManager.setTorchMode)
+│       ├── presentation/viewmodel | screen | component
+│       └── di/
 ```
 
 ### Cross-feature rules
@@ -292,6 +296,16 @@ CurrentLocationSection ─▶ AreaSelectorEntry (permission launcher) ─▶ Cit
   page). The setup page reuses `MagnitudeThresholdSelector` + `AreaSelectorEntry`; the notifications
   page requests `POST_NOTIFICATIONS` through `rememberLauncherForActivityResult` on API 33+. Finish →
   `CompleteOnboardingUseCase` (save settings + baseline, completion flag, schedule) → `navigateToMainGraph()`.
+
+### 4.5.1 Strobe light (ADR-057)
+- `CameraTorchController` finds the first camera with `FLASH_INFO_AVAILABLE` and switches it with
+  `CameraManager.setTorchMode` (no permission); a `CameraAccessException` returns `false`.
+- `RunStrobeUseCase` loops on → `STROBE_FLASH_DURATION` → off → `STROBE_PAUSE_DURATION` (`EmergencyConfig`) until
+  it is cancelled or a switch fails, and turns the torch off in `finally`.
+- `EmergencyViewModel` runs it in `viewModelScope` and marks a failure when the loop ends by itself.
+  `EmergencyEntry` calls `onScreenStopped` from `LifecycleStartEffect` (skipped for configuration changes, the same
+  pattern as the list), so switching tab, pushing the guide or leaving the app stops it; `KeepScreenOnEffect` sets
+  `View.keepScreenOn` while it runs.
 
 ### 4.6 Notifications (ADR-030)
 - Channel `earthquake_alerts` ("Earthquake alerts", high importance) is registered in `QuakeAlertApplication.onCreate`

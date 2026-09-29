@@ -356,6 +356,12 @@
     <string name="statistics_placeholder_message">Son 7 ve 30 günün deprem istatistikleri burada görünecek.</string>
 
     <string name="emergency_title">Acil durum araçları</string>
+    <string name="strobe_title">Çakar flaş</string>
+    <string name="strobe_description">Kurtarma ekiplerinin sizi görebilmesi için telefonunuzun fenerini yakıp söndürür. Çalışırken ekran açık kalır.</string>
+    <string name="strobe_unavailable">Bu cihazda fener yok.</string>
+    <string name="strobe_failed">Fener açılamadı. Kamerayı başka bir uygulama kullanıyor olabilir.</string>
+    <string name="action_start">Başlat</string>
+    <string name="action_stop">Durdur</string>
     <string name="safety_guide_title">Güvenlik rehberi</string>
     <string name="safety_guide_card_description">Deprem öncesinde, sırasında ve sonrasında yapılması gerekenler.</string>
     <string name="safety_guide_section_before">Depremden Önce</string>

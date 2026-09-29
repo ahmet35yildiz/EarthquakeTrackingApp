@@ -137,6 +137,11 @@ class AnalyticsEventTest {
                 "section" to "during",
             ),
             entry(
+                AnalyticsEvent.EmergencyToolToggled(EmergencyToolValue.STROBE, isEnabled = true),
+                "emergency_tool_toggled",
+                "tool" to "strobe", "enabled" to "true",
+            ),
+            entry(
                 AnalyticsEvent.FeltReported(eventId = "us7000abcd", magnitude = 5.3),
                 "felt_reported",
                 "event_id" to "us7000abcd", "magnitude" to "5.3",

@@ -370,6 +370,12 @@
     <string name="statistics_placeholder_message">Earthquake statistics for the last 7 and 30 days will appear here.</string>
 
     <string name="emergency_title">Emergency tools</string>
+    <string name="strobe_title">Strobe light</string>
+    <string name="strobe_description">Flashes your phone\'s flashlight so rescuers can see you. The screen stays on while it runs.</string>
+    <string name="strobe_unavailable">This device has no flashlight.</string>
+    <string name="strobe_failed">The flashlight could not be turned on. Another app may be using the camera.</string>
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
     <string name="safety_guide_title">Safety guide</string>
     <string name="safety_guide_card_description">What to do before, during and after an earthquake.</string>
     <string name="safety_guide_section_before">Before an Earthquake</string>

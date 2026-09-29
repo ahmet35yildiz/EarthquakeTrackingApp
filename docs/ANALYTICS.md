@@ -17,6 +17,7 @@ in later as another `AnalyticsTracker` implementation.
 | Is the list useful on its own? | Detail views per list view; share/map actions; which sort orders people use | earthquake_list_viewed, earthquake_detail_viewed, detail_action_clicked, list_sort_changed |
 | Do people who feel an earthquake report it? | Felt reports per detail view, by magnitude | felt_reported, earthquake_detail_viewed |
 | Do people prepare with the safety guide? | Guide opens per active user; share of opens that reach "during" / "after" | safety_guide_viewed |
+| Are the emergency tools used? | Starts per tool; share of starts stopped by the user | emergency_tool_toggled |
 | Is the pipeline reliable? | Background check success rate; refresh failure rate | background_check_*, earthquake_list_refreshed |
 
 ## 2. Event dictionary
@@ -44,6 +45,7 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `list_sort_changed` | `sort` = newest_first \| largest_first \| nearest_first | Sort order picked |
 | `earthquake_detail_viewed` | `source` = list \| notification (an external `quakealert://` link counts as list; the app only publishes it in notifications), `magnitude` (omitted when unknown) | Detail loaded; once per opened detail (not for not-found / error, not again after rotation) |
 | `detail_action_clicked` | `action` = map \| usgs \| share | Detail action |
+| `emergency_tool_toggled` | `tool` = strobe, `enabled` = true \| false | Start / Stop tapped on an emergency tool (automatic stops are not recorded) |
 | `safety_guide_viewed` | `section` = before \| during \| after | Safety guide opened (its first section) and each tab switch; not again after rotation |
 | `felt_reported` | `event_id`, `magnitude` (omitted when unknown) | "I felt it" tapped on the detail (before the USGS form opens; whether the form was sent is not visible to the app) |
 | `alert_notification_posted` | `event_id` (`summary` for the summary), `magnitude` (largest for the summary), `batch_size` | Once per notification handed to Android while app notifications and the "Earthquake alerts" category were on (up to 3 individual ones, or 1 summary). Handed over, not seen: Do Not Disturb or a dismissed notification are invisible to the app; `alert_notification_opened` is the only "seen" signal |
