@@ -1,8 +1,8 @@
 # QuakeAlert — Measurement Plan and Event Dictionary
 
 Events are recorded locally (Room `analytics_events` + Logcat tag `Analytics`) through the `AnalyticsTracker`
-interface and can be inspected in Settings → Developer tools → Event log (debug builds). A remote backend (e.g. Firebase) can be plugged
-in later as another `AnalyticsTracker` implementation.
+interface and can be inspected in Settings → Developer tools → Event log (debug builds). A remote backend (e.g. Firebase) can be
+plugged in later as another `AnalyticsTracker` implementation.
 
 ## 1. What "the product works" means
 
@@ -23,7 +23,7 @@ in later as another `AnalyticsTracker` implementation.
 
 ## 2. Event dictionary
 
-Parameter values are strings. No personal data: never log coordinates or city names.
+33 events. Parameter values are strings. No personal data: never log coordinates or city names.
 
 | Event | Params | When |
 |---|---|---|
@@ -31,10 +31,10 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `onboarding_started` | – | First onboarding screen shown |
 | `onboarding_step_viewed` | `step` = welcome \| alert_setup \| notifications | Each step shown |
 | `onboarding_completed` | `threshold`, `has_area`, `radius_km`, `notifications_granted` | Finish tapped |
-| `notification_permission_requested` | `context` = onboarding | Before system dialog (Alerts and Settings open the system notification page instead of the dialog, ADR-038) |
+| `notification_permission_requested` | `context` = onboarding | Before system dialog (Alerts and Settings open the system notification page instead of the dialog) |
 | `notification_permission_result` | `granted` | Dialog result |
 | `alerts_toggled` | `enabled` | Alerts switch changed |
-| `alert_threshold_changed` | `from`, `to`, `context` | Threshold saved |
+| `alert_threshold_changed` | `from`, `to`, `context` = onboarding \| settings | Threshold saved |
 | `alert_area_set` | `country_code`, `radius_km`, `context` | City + radius saved |
 | `alert_area_cleared` | `context` | Switched to whole world |
 | `city_search_performed` | `country_code`, `result_count` | Search completed |
@@ -62,16 +62,5 @@ Parameter values are strings. No personal data: never log coordinates or city na
 | `developer_check_triggered` | – | Run check now (debug) |
 
 The Event log screen (debug builds) shows these on the device as "Alert metrics on this device": setup completion,
-alert open rate, useful rate among answers and the 24 h opt-out share (ADR-053). Simulated alerts from the developer
+alert open rate, useful rate among answers and the 24 h opt-out share. Simulated alerts from the developer
 tools count like real ones there, so the view can be demonstrated; a remote pipeline would filter `simulated-` ids.
-
-## 3. Implementation notes
-- Event names and params are defined once in `core/analytics/AnalyticsEvent.kt` (sealed class) — no free-form
-  strings at call sites. Enum-like values are enums in `AnalyticsParameters.kt`, logged as the constant name in
-  lower case. Numbers are logged with `toString()` (e.g. `4.5`, `250`); booleans as `true` / `false`.
-- Tracking calls happen in ViewModels / use cases / worker, never inside composables' recomposition paths
-  (use `LaunchedEffect` keyed on the screen for "viewed" events).
-- `LocalAnalyticsTracker` writes on an IO dispatcher and never throws to callers.
-- The alert preview (ADR-051) logs no event of its own; the cache load it may start is not an
-  `earthquake_list_refreshed` (that event stays a list metric). Whether the preview changes choices can be read from
-  `alert_threshold_changed` / `alert_area_set` in onboarding vs. before it existed.
